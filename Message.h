@@ -2,6 +2,7 @@
 #define MESSAGE_H
 
 #include <boost/cstdint.hpp>
+#include <boost/utility.hpp>
 #include <amqp.h>
 #include <amqp_framing.h>
 #include <string>
@@ -9,7 +10,7 @@
 
 namespace AmqpClient {
 
-class Message
+class Message : boost::noncopyable
 {
 public:
 

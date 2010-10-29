@@ -4,12 +4,13 @@
 #include "Message.h"
 
 #include <boost/cstdint.hpp>
+#include <boost/utility.hpp>
 #include <amqp.h>
 #include <string>
 
 namespace AmqpClient {
 
-class Channel
+class Channel : boost::noncopyable
 {
 public:
     Channel(amqp_connection_state_t connection, amqp_channel_t channel_num);

@@ -26,6 +26,14 @@ SET(SAC_LIB_SRCS
     Message.h
     Message.cpp
 
+    Util.h
+    Util.cpp
+
+    AmqpResponseLibraryException.h
+    AmqpResponseLibraryException.cpp
+
+    AmqpResponseServerException.h
+    AmqpResponseServerException.cpp
 	)
 
 
