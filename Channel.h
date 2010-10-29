@@ -5,6 +5,8 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <amqp.h>
 #include <string>
 
@@ -13,6 +15,11 @@ namespace AmqpClient {
 class Channel : boost::noncopyable
 {
 public:
+    typedef boost::shared_ptr<Channel> Ptr;
+
+    static Ptr New(amqp_connection_state_t connection, amqp_channel_t channel)
+        { return boost::make_shared<Channel>(connection, channel); }
+
     Channel(amqp_connection_state_t connection, amqp_channel_t channel_num);
     virtual ~Channel();
 

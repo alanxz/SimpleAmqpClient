@@ -7,6 +7,7 @@
 #include <amqp.h>
 #include <boost/utility.hpp>
 #include <string>
+#include <vector>
 
 #define BROKER_HOST "141.214.124.76"
 #define BROKER_PORT 5672
@@ -28,11 +29,12 @@ public:
 
     amqp_connection_state_t GetConnectionObject() const { return m_connection; }
 
-    Channel CreateChannel();
+    Channel::Ptr CreateChannel();
 
 protected:
     amqp_connection_state_t m_connection;
     amqp_channel_t m_nextChannel;
+    std::vector<Channel::Ptr> m_channels;
 };
 
 } // namespace AmqpClient

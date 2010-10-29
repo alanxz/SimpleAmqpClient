@@ -4,10 +4,11 @@
 #include "AmqpResponseServerException.h"
 
 #include <stdexcept>
+#include <sstream>
 
 namespace AmqpClient {
 
-void Util::CheckRpcReply(amqp_rpc_reply_t& reply, const std::string& context = "")
+void Util::CheckRpcReply(amqp_rpc_reply_t reply, const std::string& context)
 {
     switch (reply.reply_type)
     {
@@ -31,9 +32,21 @@ void Util::CheckRpcReply(amqp_rpc_reply_t& reply, const std::string& context = "
     }
 }
 
-void Util::CheckLastRpcReply(amqp_connection_state_t connection, const std::string& context = "")
+void Util::CheckLastRpcReply(amqp_connection_state_t connection, const std::string& context)
 {
     CheckRpcReply(amqp_get_rpc_reply(connection));
 }
 
+void Util::CheckForError(int ret, const std::string& context)
+{
+    if (ret < 0)
+    {
+        char* errstr = amqp_error_string(-ret);
+        std::ostringstream oss;
+        oss << context << ": " << errstr;
+        free(errstr);
+        throw std::runtime_error(oss.str.c_str());
+    }
+
+}
 } // namespace AmqpClient
