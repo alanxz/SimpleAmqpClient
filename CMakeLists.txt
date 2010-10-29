@@ -17,6 +17,12 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}
 					${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(SAC_LIB_SRCS
+    Connection.h
+    Connection.cpp
+
+    Channel.h
+    Channel.cpp
+
 
 	)
 
