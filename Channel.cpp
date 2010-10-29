@@ -49,6 +49,16 @@ void Channel::DeclareQueue(const std::string& queue_name,
                        m_empty_table);
 }
 
+void Channel::DeleteQueue(const std::string& queue_name,
+                          bool if_unused,
+                          bool if_empty)
+{
+    amqp_queue_delete(m_connection, m_channel,
+                      amqp_cstring_bytes(queue_name),
+                      if_unused,
+                      if_empty);
+}
+
 void Channel::BindQueue(const std::string& queue_name,
                         const std::string& exchange_name,
                         const std::string& routing_key)
@@ -58,6 +68,31 @@ void Channel::BindQueue(const std::string& queue_name,
                     amqp_cstring_bytes(exchange_name.c_str()),
                     amqp_cstring_bytes(routing_key.c_str()),
                     m_empty_table);
+}
+
+void Channel::UnbindQueue(const std::string& queue_name,
+                          const std::string& exchange_name,
+                          const std::string& binding_key = "")
+{
+    amqp_queue_unbind(m_connection, m_channel,
+                      amqp_cstring_bytes(queue_name.c_str()),
+                      amqp_cstring_bytes(exchange_name.c_str()),
+                      amqp_cstring_bytes(binding_key.c_str()));
+}
+
+void Channel::BasicPublish(const std::string& exchange_name,
+                           const std::string& routing_key,
+                           const Message& message,
+                           bool mandatory,
+                           bool immediate)
+{
+    amqp_basic_publish(m_connection, m_channel,
+                       amqp_cstring_bytes(exchange_name.c_str()),
+                       amqp_cstring_bytes(routing_key.c_str()),
+                       mandatory,
+                       immediate,
+                       message.getAmqpProperties(),
+                       message.getAmqpBody());
 }
 
 } // namespace AmqpClient

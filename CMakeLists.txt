@@ -23,6 +23,8 @@ SET(SAC_LIB_SRCS
     Channel.h
     Channel.cpp
 
+    Message.h
+    Message.cpp
 
 	)
 
