@@ -109,11 +109,11 @@ void Channel::BasicPublish(const std::string& exchange_name,
 	Util::CheckLastRpcReply(m_connection, "Publishing to queue");
 }
 
-std::string Channel::BasicConsume(const std::string& queue,
-								  const std::string& consumer_tag,
-								  bool no_local,
-								  bool no_ack,
-								  bool exclusive)
+void Channel::BasicConsume(const std::string& queue,
+						   const std::string& consumer_tag,
+						   bool no_local,
+						   bool no_ack,
+						   bool exclusive)
 {
 	amqp_basic_consume(m_connection, m_channel,
 			amqp_cstring_bytes(queue.c_str()),
@@ -136,6 +136,48 @@ void Channel::BasicCancel(const std::string& consumer_tag)
 	Util::CheckRpcReply(amqp_simple_rpc(m_connection, m_channel,
 				AMQP_BASIC_CANCEL_METHOD,
 				replies, &req), "Basic Cancel");
+}
+
+
+Message Channel::BasicConsumeMessage()
+{
+	while (true)
+	{
+		amqp_frame_t frame;
+		amqp_maybe_release_buffers(m_connection);
+		
+		Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: method frame");
+
+		if (frame.frame_type != AMQP_FRAME_METHOD || frame.payload.method.id != AMQP_BASIC_DELIVER_METHOD)
+			continue;
+
+		amqp_basic_deliver_t* deliver_method = reinterpret_cast<amqp_basic_deliver_t*>(frame.payload.method.decoded);
+
+		// Wait for frame #2, the header frame which contains body size
+		Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: header frame");
+
+		if (frame.frame_type != AMQP_FRAME_HEADER)
+			throw std::runtime_error("Channel::BasicConsumeMessage: receieved unexpected frame type (was expected AMQP_FRAME_HEADER)");
+
+		amqp_basic_properties_t* properties = reinterpret_cast<amqp_basic_properties_t*>(frame.payload.properties.decoded);
+
+		size_t body_size = frame.payload.properties.body_size;
+		size_t received_size = 0;
+		amqp_bytes_t body = amqp_bytes_malloc(body_size);
+
+		// frame #3 and up:
+		while (received_size < body_size)
+		{
+			Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: body frame");
+
+			if (frame.frame_type != AMQP_FRAME_BODY)
+				throw std::runtime_error("Channel::BasicConsumeMessge: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
+
+			memcpy(body.bytes + received_size, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
+			received_size += frame.payload.body_fragment.len;
+		}
+		return Message(properties, body);
+	}
 }
 
 } // namespace AmqpClient

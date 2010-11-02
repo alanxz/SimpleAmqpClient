@@ -3,6 +3,8 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #include <amqp.h>
 #include <amqp_framing.h>
 #include <string>
@@ -13,13 +15,21 @@ namespace AmqpClient {
 class Message : boost::noncopyable
 {
 public:
+	typedef boost::shared_ptr<Message> ptr_t;
+	friend ptr_t boost::make_shared<Message>();
+	friend ptr_t boost::make_shared<Message>(amqp_bytes_t, amqp_basic_properties_t*);
 
     enum delivery_mode_t {
         dm_nonpersistent = 1,
         dm_persistent = 2
     };
 
+	static ptr_t Create() { return boost::make_shared<Message>(); }
+	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties) { return boost::make_shared<Message>(body, properties); }
+private:
     Message();
+	Message(amqp_bytes_t body, amqp_basic_properties_t* properties);
+public:
     virtual ~Message();
 
     const amqp_basic_properties_t* getAmqpProperties() const { return &m_properties; }

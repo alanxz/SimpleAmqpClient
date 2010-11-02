@@ -56,9 +56,16 @@ public:
                       bool mandatory = false,
                       bool immediate = false);
 
-	void BasicConsume();
+	void BasicConsume(const std::string& queue,
+					  const std::string& consumer_tag,
+					  bool no_local = true,
+					  bool no_ack = true,
+					  bool exclusive = true);
 
-	void BasicCancel();
+	void BasicCancel(const std::string& consumer_tag);
+
+	Message BasicConsumeMessage();
+
 protected:
     amqp_connection_state_t m_connection;
     amqp_channel_t m_channel;
