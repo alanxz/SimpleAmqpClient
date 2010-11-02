@@ -13,7 +13,7 @@ class AmqpResponseLibraryException : public std::exception
 public:
     AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
     AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw();
-    AmqpResponseLibraryException& operator=(const AmqpResponseLibaryException& e) throw();
+    AmqpResponseLibraryException& operator=(const AmqpResponseLibraryException& e) throw();
 
     virtual ~AmqpResponseLibraryException() throw();
 

@@ -21,7 +21,7 @@ void Util::CheckRpcReply(amqp_rpc_reply_t reply, const std::string& context)
             break;
 
         case AMQP_RESPONSE_LIBRARY_EXCEPTION:
-            throw AmqpResponseLibraryException(reply.library_error, context);
+            throw AmqpResponseLibraryException(reply, context);
             break;
 
         case AMQP_RESPONSE_SERVER_EXCEPTION:
@@ -45,7 +45,7 @@ void Util::CheckForError(int ret, const std::string& context)
         std::ostringstream oss;
         oss << context << ": " << errstr;
         free(errstr);
-        throw std::runtime_error(oss.str.c_str());
+        throw std::runtime_error(oss.str().c_str());
     }
 
 }

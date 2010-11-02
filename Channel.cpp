@@ -1,5 +1,7 @@
 #include "Channel.h"
 
+#include "Util.h"
+
 #include <amqp_framing.h>
 
 namespace AmqpClient {
@@ -31,6 +33,7 @@ void Channel::DeclareExchange(const std::string& exchange_name,
                           durable,
                           auto_delete,
                           m_empty_table);
+	Util::CheckLastRpcReply(m_connection, "Declaring exchange");
 }
 
 
@@ -47,6 +50,8 @@ void Channel::DeclareQueue(const std::string& queue_name,
                        exclusive,
                        auto_delete,
                        m_empty_table);
+
+	Util::CheckLastRpcReply(m_connection, "Declaring queue");
 }
 
 void Channel::DeleteQueue(const std::string& queue_name,
@@ -57,6 +62,8 @@ void Channel::DeleteQueue(const std::string& queue_name,
                       amqp_cstring_bytes(queue_name.c_str()),
                       if_unused,
                       if_empty);
+
+	Util::CheckLastRpcReply(m_connection, "Deleting Queue");
 }
 
 void Channel::BindQueue(const std::string& queue_name,
@@ -68,6 +75,8 @@ void Channel::BindQueue(const std::string& queue_name,
                     amqp_cstring_bytes(exchange_name.c_str()),
                     amqp_cstring_bytes(routing_key.c_str()),
                     m_empty_table);
+
+	Util::CheckLastRpcReply(m_connection, "Binding queue");
 }
 
 void Channel::UnbindQueue(const std::string& queue_name,
@@ -79,6 +88,8 @@ void Channel::UnbindQueue(const std::string& queue_name,
                       amqp_cstring_bytes(exchange_name.c_str()),
                       amqp_cstring_bytes(binding_key.c_str()),
                       m_empty_table);
+
+	Util::CheckLastRpcReply(m_connection, "Unbinding queue");
 }
 
 void Channel::BasicPublish(const std::string& exchange_name,
@@ -94,6 +105,37 @@ void Channel::BasicPublish(const std::string& exchange_name,
                        immediate,
                        message.getAmqpProperties(),
                        message.getAmqpBody());
+
+	Util::CheckLastRpcReply(m_connection, "Publishing to queue");
+}
+
+std::string Channel::BasicConsume(const std::string& queue,
+								  const std::string& consumer_tag,
+								  bool no_local,
+								  bool no_ack,
+								  bool exclusive)
+{
+	amqp_basic_consume(m_connection, m_channel,
+			amqp_cstring_bytes(queue.c_str()),
+			amqp_cstring_bytes(consumer_tag.c_str()),
+			no_local,
+			no_ack,
+			exclusive
+			m_empty_table);
+
+	Util::CheckLastRpcReply(m_connection, "Basic Consume");
+}
+
+void Channel::BasicCancel(const std::string& consumer_tag)
+{
+	amqp_method_number_t replies[2] = { AMQP_BASIC_CANCEL_OK_METHOD, 0 }
+	amqp_basic_cancel_t req;
+	req.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
+	req.nowait = 0;
+
+	Util::CheckRpcReply(amqp_simple_rpc(m_connection, m_channel,
+				AMQP_BASIC_CANCEL_METHOD,
+				replies, &req), "Basic Cancel");
 }
 
 } // namespace AmqpClient

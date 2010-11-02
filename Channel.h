@@ -55,6 +55,10 @@ public:
                       const Message& message,
                       bool mandatory = false,
                       bool immediate = false);
+
+	void BasicConsume();
+
+	void BasicCancel();
 protected:
     amqp_connection_state_t m_connection;
     amqp_channel_t m_channel;
