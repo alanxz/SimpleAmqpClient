@@ -1,5 +1,7 @@
 #include "Message.h"
 
+#include <cstring>
+
 namespace AmqpClient {
 
 Message::Message()
