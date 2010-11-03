@@ -6,12 +6,26 @@ namespace AmqpClient {
 
 Message::Message()
 {
-    init_amqp_pool(&m_pool, 4096);
+}
+
+Message::Message(amqp_bytes_t body, amqp_basic_properties_t* properties) :
+	m_body(body), m_properties(*properties)
+{
 }
 
 Message::~Message()
 {
-    empty_amqp_pool(&m_pool);
+	amqp_bytes_free(m_body);
+	if (ContentTypeIsSet()) amqp_bytes_free(m_properties.content_type);
+	if (ContentEncodingIsSet()) amqp_bytes_free(m_properties.content_encoding);
+	if (CorrelationIdIsSet()) amqp_bytes_free(m_properties.correlation_id);
+	if (ReplyToIsSet()) amqp_bytes_free(m_properties.reply_to);
+	if (ExpirationIsSet()) amqp_bytes_free(m_properties.expiration);
+	if (MessageIdIsSet()) amqp_bytes_free(m_properties.message_id);
+	if (TypeIsSet()) amqp_bytes_free(m_properties.type);
+	if (UserIdIsSet()) amqp_bytes_free(m_properties.user_id);
+	if (AppIdIsSet()) amqp_bytes_free(m_properties.app_id);
+	if (ClusterIdIsSet()) amqp_bytes_free(m_properties.cluster_id);
 }
 
 std::string Message::Body() const
@@ -23,8 +37,7 @@ std::string Message::Body() const
 }
 void Message::Body(const std::string& body)
 {
-    amqp_pool_alloc_bytes(&m_pool, body.length(), &m_body);
-    memcpy(m_body.bytes, body.c_str(), m_body.len);
+	m_body = amqp_bytes_malloc_dup(amqp_cstring_bytes(body.c_str()));
 }
 
 std::string Message::ContentType() const
@@ -37,8 +50,8 @@ std::string Message::ContentType() const
 
 void Message::ContentType(const std::string& content_type)
 {
-    amqp_pool_alloc_bytes(&m_pool, content_type.length(), &m_properties.content_type);
-    memcpy(m_properties.content_type.bytes, content_type.c_str(), m_properties.content_type.len);
+	if (ContentTypeIsSet()) amqp_bytes_free(m_properties.content_type);
+	m_properties.content_type = amqp_bytes_malloc_dup(amqp_cstring_bytes(content_type.c_str()));
     m_properties._flags |= AMQP_BASIC_CONTENT_TYPE_FLAG;
 }
 
@@ -53,8 +66,8 @@ std::string Message::ContentEncoding() const
 
 void Message::ContentEncoding(const std::string& content_encoding)
 {
-    amqp_pool_alloc_bytes(&m_pool, content_encoding.length(), &m_properties.content_encoding);
-    memcpy(m_properties.content_encoding.bytes, content_encoding.c_str(), m_properties.content_encoding.len);
+	if (ContentEncodingIsSet()) amqp_bytes_free(m_properties.content_encoding);
+	m_properties.content_encoding = amqp_bytes_malloc_dup(amqp_cstring_bytes(content_encoding.c_str()));
     m_properties._flags |= AMQP_BASIC_CONTENT_ENCODING_FLAG;
 }
 
@@ -93,8 +106,8 @@ std::string Message::CorrelationId() const
 }
 void Message::CorrelationId(const std::string& correlation_id)
 {
-    amqp_pool_alloc_bytes(&m_pool, correlation_id.length(), &m_properties.correlation_id);
-    memcpy(m_properties.correlation_id.bytes, correlation_id.c_str(), m_properties.correlation_id.len);
+	if (CorrelationIdIsSet()) amqp_bytes_free(m_properties.correlation_id);
+	m_properties.correlation_id = amqp_bytes_malloc_dup(amqp_cstring_bytes(correlation_id.c_str()));
     m_properties._flags |= AMQP_BASIC_CORRELATION_ID_FLAG;
 }
 
@@ -107,8 +120,8 @@ std::string Message::ReplyTo() const
 }
 void Message::ReplyTo(const std::string& reply_to)
 {
-    amqp_pool_alloc_bytes(&m_pool, reply_to.length(), &m_properties.reply_to);
-    memcpy(m_properties.reply_to.bytes, reply_to.c_str(), m_properties.reply_to.len);
+	if (ReplyToIsSet()) amqp_bytes_free(m_properties.reply_to);
+	m_properties.reply_to = amqp_bytes_malloc_dup(amqp_cstring_bytes(reply_to.c_str()));
     m_properties._flags |= AMQP_BASIC_REPLY_TO_FLAG;
 }
 
@@ -121,8 +134,8 @@ std::string Message::Expiration() const
 }
 void Message::Expiration(const std::string& expiration)
 {
-    amqp_pool_alloc_bytes(&m_pool, expiration.length(), &m_properties.expiration);
-    memcpy(m_properties.expiration.bytes, expiration.c_str(), m_properties.expiration.len);
+	if (ExpirationIsSet()) amqp_bytes_free(m_properties.expiration);
+	m_properties.expiration = amqp_bytes_malloc_dup(amqp_cstring_bytes(expiration.c_str()));
     m_properties._flags |= AMQP_BASIC_EXPIRATION_FLAG;
 }
 
@@ -135,8 +148,8 @@ std::string Message::MessageId() const
 }
 void Message::MessageId(const std::string& message_id)
 {
-    amqp_pool_alloc_bytes(&m_pool, message_id.length(), &m_properties.message_id);
-    memcpy(m_properties.message_id.bytes, message_id.c_str(), m_properties.message_id.len);
+	if (MessageIdIsSet()) amqp_bytes_free(m_properties.message_id);
+	m_properties.message_id = amqp_bytes_malloc_dup(amqp_cstring_bytes(message_id.c_str()));
     m_properties._flags |= AMQP_BASIC_MESSAGE_ID_FLAG;
 }
 
@@ -162,8 +175,8 @@ std::string Message::Type() const
 }
 void Message::Type(const std::string& type)
 {
-    amqp_pool_alloc_bytes(&m_pool, type.length(), &m_properties.type);
-    memcpy(m_properties.type.bytes, type.c_str(), m_properties.type.len);
+	if (TypeIsSet()) amqp_bytes_free(m_properties.type);
+	m_properties.type = amqp_bytes_malloc_dup(amqp_cstring_bytes(type.c_str()));
     m_properties._flags |= AMQP_BASIC_TYPE_FLAG;
 }
 
@@ -176,8 +189,8 @@ std::string Message::UserId() const
 }
 void Message::UserId(const std::string& user_id)
 {
-    amqp_pool_alloc_bytes(&m_pool, user_id.length(), &m_properties.user_id);
-    memcpy(m_properties.user_id.bytes, user_id.c_str(), m_properties.user_id.len);
+	if (UserIdIsSet()) amqp_bytes_free(m_properties.user_id);
+	m_properties.user_id = amqp_bytes_malloc_dup(amqp_cstring_bytes(user_id.c_str()));
     m_properties._flags |= AMQP_BASIC_USER_ID_FLAG;
 }
 
@@ -190,8 +203,8 @@ std::string Message::AppId() const
 }
 void Message::AppId(const std::string& app_id)
 {
-    amqp_pool_alloc_bytes(&m_pool, app_id.length(), &m_properties.app_id);
-    memcpy(m_properties.app_id.bytes, app_id.c_str(), m_properties.app_id.len);
+	if (AppIdIsSet()) amqp_bytes_free(m_properties.app_id);
+	m_properties.app_id = amqp_bytes_malloc_dup(amqp_cstring_bytes(app_id.c_str()));
     m_properties._flags |= AMQP_BASIC_APP_ID_FLAG;
 }
 
@@ -204,8 +217,8 @@ std::string Message::ClusterId() const
 }
 void Message::ClusterId(const std::string& cluster_id)
 {
-    amqp_pool_alloc_bytes(&m_pool, cluster_id.length(), &m_properties.cluster_id);
-    memcpy(m_properties.cluster_id.bytes, cluster_id.c_str(), m_properties.cluster_id.len);
+	if (AppIdIsSet()) amqp_bytes_free(m_properties.cluster_id);
+	m_properties.cluster_id = amqp_bytes_malloc_dup(amqp_cstring_bytes(cluster_id.c_str()));
     m_properties._flags |= AMQP_BASIC_CLUSTER_ID_FLAG;
 }
 

@@ -4,19 +4,25 @@
 #include <amqp_framing.h>
 namespace AmqpClient {
 
-Connection::Connection() :
+Connection::Connection(const std::string& host,
+			   int port,
+			   const std::string& username,
+			   const std::string& password,
+			   const std::string& vhost,
+			   int channel_max,
+			   int frame_max) :
     m_nextChannel(0)
 {
     m_connection = amqp_new_connection();
 
-    int sock = amqp_open_socket(BROKER_HOST, BROKER_PORT);
+    int sock = amqp_open_socket(host.c_str(), port);
     Util::CheckForError(sock, "Connection::Connection amqp_open_socket");
 
     amqp_set_sockfd(m_connection, sock);
 
-    Util::CheckRpcReply(amqp_login(m_connection, BROKER_VHOST, BROKER_CHANNEL_MAX,
-                                   BROKER_FRAME_MAX, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                                   BROKER_USERNAME, BROKER_PASSWORD), std::string("Amqp Login"));
+    Util::CheckRpcReply(amqp_login(m_connection, vhost.c_str(), channel_max,
+                                   frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
+                                   username.c_str(), password.c_str()), std::string("Amqp Login"));
 }
 
 Connection::~Connection()
@@ -25,10 +31,10 @@ Connection::~Connection()
     amqp_destroy_connection(m_connection);
 }
 
-Channel::Ptr Connection::CreateChannel()
+Channel::ptr_t Connection::CreateChannel()
 {
     m_nextChannel++;
-    m_channels.push_back(Channel::New(m_connection, m_nextChannel));
+    m_channels.push_back(Channel::Create(m_connection, m_nextChannel));
     return m_channels.back();
 }
 

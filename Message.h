@@ -16,19 +16,22 @@ class Message : boost::noncopyable
 {
 public:
 	typedef boost::shared_ptr<Message> ptr_t;
-	friend ptr_t boost::make_shared<Message>();
-	friend ptr_t boost::make_shared<Message>(amqp_bytes_t, amqp_basic_properties_t*);
 
     enum delivery_mode_t {
         dm_nonpersistent = 1,
         dm_persistent = 2
     };
 
+	friend ptr_t boost::make_shared<Message>();
+	friend ptr_t boost::make_shared<Message>( amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2 );
+
 	static ptr_t Create() { return boost::make_shared<Message>(); }
 	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties) { return boost::make_shared<Message>(body, properties); }
+
 private:
     Message();
 	Message(amqp_bytes_t body, amqp_basic_properties_t* properties);
+
 public:
     virtual ~Message();
 
@@ -106,7 +109,6 @@ public:
 
 
 protected:
-    amqp_pool_t m_pool;
     amqp_basic_properties_t m_properties;
     amqp_bytes_t m_body;
 

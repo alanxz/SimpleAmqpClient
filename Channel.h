@@ -15,12 +15,18 @@ namespace AmqpClient {
 class Channel : boost::noncopyable
 {
 public:
-    typedef boost::shared_ptr<Channel> Ptr;
+    typedef boost::shared_ptr<Channel> ptr_t;
 
-    static Ptr New(amqp_connection_state_t connection, amqp_channel_t channel)
-        { return boost::make_shared<Channel>(connection, channel); }
+	friend ptr_t boost::make_shared<Channel>(amqp_connection_state_t const & a1, amqp_channel_t const & a2 );
 
-    Channel(amqp_connection_state_t connection, amqp_channel_t channel_num);
+	static ptr_t Create(amqp_connection_state_t connection, amqp_channel_t channel)
+		{ return boost::make_shared<Channel>(connection, channel); }
+
+
+private:
+    explicit Channel(amqp_connection_state_t connection, amqp_channel_t channel_num);
+
+public:
     virtual ~Channel();
 
     void DeclareExchange(const std::string& exchange_name,
@@ -64,7 +70,7 @@ public:
 
 	void BasicCancel(const std::string& consumer_tag);
 
-	Message BasicConsumeMessage();
+	Message::ptr_t BasicConsumeMessage();
 
 protected:
     amqp_connection_state_t m_connection;

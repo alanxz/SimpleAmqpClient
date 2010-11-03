@@ -4,6 +4,9 @@
 
 #include <amqp_framing.h>
 
+#include <stdexcept>
+#include <cstring>
+
 namespace AmqpClient {
 
 Channel::Channel(amqp_connection_state_t connection, amqp_channel_t channel_num) :
@@ -120,15 +123,14 @@ void Channel::BasicConsume(const std::string& queue,
 			amqp_cstring_bytes(consumer_tag.c_str()),
 			no_local,
 			no_ack,
-			exclusive
-			m_empty_table);
+			exclusive);
 
 	Util::CheckLastRpcReply(m_connection, "Basic Consume");
 }
 
 void Channel::BasicCancel(const std::string& consumer_tag)
 {
-	amqp_method_number_t replies[2] = { AMQP_BASIC_CANCEL_OK_METHOD, 0 }
+	amqp_method_number_t replies[2] = { AMQP_BASIC_CANCEL_OK_METHOD, 0 };
 	amqp_basic_cancel_t req;
 	req.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
 	req.nowait = 0;
@@ -139,7 +141,7 @@ void Channel::BasicCancel(const std::string& consumer_tag)
 }
 
 
-Message Channel::BasicConsumeMessage()
+Message::ptr_t Channel::BasicConsumeMessage()
 {
 	while (true)
 	{
@@ -173,10 +175,11 @@ Message Channel::BasicConsumeMessage()
 			if (frame.frame_type != AMQP_FRAME_BODY)
 				throw std::runtime_error("Channel::BasicConsumeMessge: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
 
-			memcpy(body.bytes + received_size, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
+			void* body_ptr = reinterpret_cast<char*>(body.bytes) + received_size;
+			memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
 			received_size += frame.payload.body_fragment.len;
 		}
-		return Message(properties, body);
+		return Message::Create(body, properties);
 	}
 }
 
