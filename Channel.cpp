@@ -95,6 +95,13 @@ void Channel::UnbindQueue(const std::string& queue_name,
 	Util::CheckLastRpcReply(m_connection, "Unbinding queue");
 }
 
+void Channel::BasicAck(uint64_t delivery_tag)
+{
+	Util::CheckForError(amqp_basic_ack(m_connection, m_channel,
+			delivery_tag,
+			false), "Ack");
+
+}
 void Channel::BasicPublish(const std::string& exchange_name,
                            const std::string& routing_key,
                            const Message::ptr_t message,
