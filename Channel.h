@@ -12,6 +12,7 @@
 
 namespace AmqpClient {
 
+class Connection;
 class Channel : boost::noncopyable
 {
 public:
@@ -58,7 +59,7 @@ public:
 
     void BasicPublish(const std::string& exchange_name,
                       const std::string& routing_key,
-                      const Message& message,
+                      const Message::ptr_t message,
                       bool mandatory = false,
                       bool immediate = false);
 

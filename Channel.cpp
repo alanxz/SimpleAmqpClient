@@ -20,7 +20,7 @@ Channel::Channel(amqp_connection_state_t connection, amqp_channel_t channel_num)
 
 Channel::~Channel()
 {
-    amqp_channel_close(m_connection, m_channel, AMQP_REPLY_SUCCESS);
+    //amqp_channel_close(m_connection, m_channel, AMQP_REPLY_SUCCESS);
 }
 
 void Channel::DeclareExchange(const std::string& exchange_name,
@@ -97,7 +97,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
 
 void Channel::BasicPublish(const std::string& exchange_name,
                            const std::string& routing_key,
-                           const Message& message,
+                           const Message::ptr_t message,
                            bool mandatory,
                            bool immediate)
 {
@@ -106,8 +106,8 @@ void Channel::BasicPublish(const std::string& exchange_name,
                        amqp_cstring_bytes(routing_key.c_str()),
                        mandatory,
                        immediate,
-                       message.getAmqpProperties(),
-                       message.getAmqpBody());
+                       message->getAmqpProperties(),
+                       message->getAmqpBody());
 
 	Util::CheckLastRpcReply(m_connection, "Publishing to queue");
 }

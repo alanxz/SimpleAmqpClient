@@ -39,6 +39,7 @@ SET(SAC_LIB_SRCS
 	)
 
 
+
 ADD_LIBRARY(simple-amqp-client-static STATIC ${SAC_LIB_SRCS})
 ADD_LIBRARY(simple-amqp-client-shared SHARED ${SAC_LIB_SRCS})
 
@@ -47,3 +48,6 @@ SET_TARGET_PROPERTIES(simple-amqp-client-shared PROPERTIES OUTPUT_NAME SimpleAmq
 
 TARGET_LINK_LIBRARIES(simple-amqp-client-shared ${Rabbitmqc_LIBRARY})
 
+ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
+
+TARGET_LINK_LIBRARIES(simple_connect simple-amqp-client-shared)

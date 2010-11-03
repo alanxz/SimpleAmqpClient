@@ -44,8 +44,6 @@ private:
 public:
     virtual ~Connection();
 
-    amqp_connection_state_t GetConnectionObject() const { return m_connection; }
-
     Channel::ptr_t CreateChannel();
 
 protected:
