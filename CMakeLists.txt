@@ -51,3 +51,8 @@ TARGET_LINK_LIBRARIES(simple-amqp-client-shared ${Rabbitmqc_LIBRARY})
 ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
 
 TARGET_LINK_LIBRARIES(simple_connect simple-amqp-client-shared)
+
+# Documentation generation
+SET(DOXYFILE_LATEX "NO")
+SET(PROJECT_VERSION "1.0.0")
+INCLUDE(UseDoxygen)
