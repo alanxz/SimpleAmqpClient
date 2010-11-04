@@ -36,6 +36,12 @@ SET(SAC_LIB_SRCS
 
     AmqpResponseServerException.h
     AmqpResponseServerException.cpp
+
+	SimpleRpcClient.h
+	SimpleRpcClient.cpp
+
+	SimpleRpcServer.h
+	SimpleRpcServer.cpp
 	)
 
 
