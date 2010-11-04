@@ -3,13 +3,12 @@
 
 namespace AmqpClient {
 
-SimpleRpcClient::SimpleRpcClient(Channel::ptr_t channel, const std::string&
-		rpc_name) :
-	m_channel(channel)
-{
+SimpleRpcClient::SimpleRpcClient(Channel::ptr_t channel, const std::string& rpc_name) :
+	m_channel(channel), m_outgoing_tag(rpc_name),
 	// Declare the reply queue, by passing an empty string, the broker will
 	// give us a name
-	m_incoming_tag = m_channel->DeclareQueue("");
+	m_incoming_tag(m_channel->DeclareQueue(""))
+{
 	m_channel->BindQueue(m_incoming_tag, "amq.direct", m_incoming_tag);
 	m_channel->BasicConsume(m_incoming_tag, m_incoming_tag);
 }
