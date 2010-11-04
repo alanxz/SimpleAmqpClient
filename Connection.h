@@ -52,6 +52,14 @@
 
 namespace AmqpClient {
 
+/**
+  * Connection to an AMQP Broker
+  * The connection object represents a connection to an AMQP broker,
+  * it holds, currently it connects to the broker on construction throwing
+  * an exception if it fails. The only other operation is to create a channel
+  * on which most operations can be performed.
+  * Connection will disconnect when its destructed.
+  */
 class Connection : boost::noncopyable
 {
 public:
@@ -60,6 +68,19 @@ public:
 			std::string const & a3, std::string const & a4,
 			std::string const & a5, int const & a6, int const & a7);
 
+	/**
+	  * Creates a new connection object
+	  * Creates a new connection to an AMQP broker using the supplied parameters
+	  * @param host The hostname or IP address of the AMQP broker
+	  * @param port The port to connect to the AMQP broker on
+	  * @param username The username used to authenticate with the AMQP broker
+	  * @param password The password corresponding to the username used to authenticate with the AMQP broker
+	  * @param vhost The virtual host on the AMQP we should connect to
+	  * @param channel_max Request that the server limit the number of channels for 
+	  * this connection to the specified parameter, a value of zero will use the broker-supplied value
+	  * @param frame_max Request that the server limit the maximum size of any frame to this value
+	  * @return a new Connection object pointer
+	  */
 	static ptr_t Create(const std::string& host = "127.0.0.1",
 						int port = 5672,
 						const std::string& username = "guest",
@@ -79,8 +100,16 @@ private:
 			   int channel_max,
 			   int frame_max);
 public:
+	/**
+	  * Destructor
+	  * Connection automatically disconnects on destruction
+	  */
     virtual ~Connection();
 
+	/**
+	  * Creates a new channel object
+	  * Creates a new channel object pointer
+	  */
     Channel::ptr_t CreateChannel();
 
 protected:
