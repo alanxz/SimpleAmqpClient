@@ -95,6 +95,11 @@ void Channel::UnbindQueue(const std::string& queue_name,
 	Util::CheckLastRpcReply(m_connection, "Unbinding queue");
 }
 
+void Channel::BasicAck(const Message::ptr_t message)
+{
+	BasicAck(message->DeliveryTag());
+}
+
 void Channel::BasicAck(uint64_t delivery_tag)
 {
 	Util::CheckForError(amqp_basic_ack(m_connection, m_channel,
@@ -186,7 +191,7 @@ Message::ptr_t Channel::BasicConsumeMessage()
 			memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
 			received_size += frame.payload.body_fragment.len;
 		}
-		return Message::Create(body, properties);
+		return Message::Create(body, properties, deliver_method->delivery_tag);
 	}
 }
 

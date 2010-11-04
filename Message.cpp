@@ -4,12 +4,16 @@
 
 namespace AmqpClient {
 
-Message::Message()
+Message::Message() :
+	m_delivery_tag(0)
 {
+	m_body.bytes = NULL;
+	m_body.len = 0;
+	m_properties._flags = 0;
 }
 
-Message::Message(amqp_bytes_t body, amqp_basic_properties_t* properties) :
-	m_body(body), m_properties(*properties)
+Message::Message(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag) :
+	m_body(body), m_properties(*properties), m_delivery_tag(delivery_tag)
 {
 }
 

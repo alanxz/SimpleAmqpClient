@@ -57,6 +57,8 @@ public:
     void PurgeQueue(const std::string& queue_name,
                     bool no_wait = false);
 
+	void BasicAck(const Message::ptr_t message);
+
 	void BasicAck(uint64_t delivery_tag);
 
     void BasicPublish(const std::string& exchange_name,

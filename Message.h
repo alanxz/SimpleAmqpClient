@@ -23,14 +23,15 @@ public:
     };
 
 	friend ptr_t boost::make_shared<Message>();
-	friend ptr_t boost::make_shared<Message>( amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2 );
+	friend ptr_t boost::make_shared<Message>(amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2, uint64_t const& a3 );
 
 	static ptr_t Create() { return boost::make_shared<Message>(); }
-	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties) { return boost::make_shared<Message>(body, properties); }
+	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag = 0) 
+		{ return boost::make_shared<Message>(body, properties, delivery_tag); }
 
 private:
     Message();
-	Message(amqp_bytes_t body, amqp_basic_properties_t* properties);
+	Message(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag);
 
 public:
     virtual ~Message();
@@ -40,6 +41,9 @@ public:
 
     std::string Body() const;
     void Body(const std::string& body);
+
+	uint64_t DeliveryTag() const { return m_delivery_tag; }
+	void DeliveryTag(uint64_t delivery_tag) { m_delivery_tag = delivery_tag; }
 
     std::string ContentType() const;
     void ContentType(const std::string& content_type);
@@ -111,6 +115,7 @@ public:
 protected:
     amqp_basic_properties_t m_properties;
     amqp_bytes_t m_body;
+	uint64_t m_delivery_tag;
 
 };
 
