@@ -2,11 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(SimpleAmqpClient)
 
-#SET(Boost_USE_STATIC_LIBS ON)
-#SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_DEBUG TRUE)
 SET(Boost_DETAILED_FAILURE_MSG TRUE)
-SET(BOOST_ROOT /devel/aega/local)
 SET(Boost_ADDITIONAL_VERSIONS "1.44.0")
 
 FIND_PACKAGE(Boost 1.44.0)
@@ -25,8 +22,8 @@ SET(SAC_LIB_SRCS
     Channel.h
     Channel.cpp
 
-    Message.h
-    Message.cpp
+    BasicMessage.h
+    BasicMessage.cpp
 
     Util.h
     Util.cpp

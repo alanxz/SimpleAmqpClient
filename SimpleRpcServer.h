@@ -39,7 +39,7 @@
  */
 
 #include "Channel.h"
-#include "Message.h"
+#include "BasicMessage.h"
 
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -69,12 +69,12 @@ public:
 
 	std::string GetRpcName() const { return m_incoming_tag; }
 
-	Message::ptr_t GetNextIncomingMessage();
+	BasicMessage::ptr_t GetNextIncomingMessage();
 
-	void RespondToMessage(Message::ptr_t request, 
-						  Message::ptr_t response);
+	void RespondToMessage(BasicMessage::ptr_t request, 
+						  BasicMessage::ptr_t response);
 
-	void RespondToMessage(Message::ptr_t request,
+	void RespondToMessage(BasicMessage::ptr_t request,
 						  const std::string response);
 
 private:

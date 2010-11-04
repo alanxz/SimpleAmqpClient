@@ -54,12 +54,12 @@ SimpleRpcServer::~SimpleRpcServer()
 {
 }
 
-Message::ptr_t SimpleRpcServer::GetNextIncomingMessage()
+BasicMessage::ptr_t SimpleRpcServer::GetNextIncomingMessage()
 {
 	return m_channel->BasicConsumeMessage();
 }
 
-void SimpleRpcServer::RespondToMessage(Message::ptr_t request, Message::ptr_t response)
+void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, BasicMessage::ptr_t response)
 {
 	if (request->CorrelationIdIsSet() && !response->CorrelationIdIsSet())
 	{
@@ -69,9 +69,9 @@ void SimpleRpcServer::RespondToMessage(Message::ptr_t request, Message::ptr_t re
 	m_channel->BasicPublish("amq.direct", request->ReplyTo(), response);
 }
 
-void SimpleRpcServer::RespondToMessage(Message::ptr_t request, const std::string response)
+void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, const std::string response)
 {
-	Message::ptr_t response_message = Message::Create();
+	BasicMessage::ptr_t response_message = BasicMessage::Create();
 	response_message->Body(response);
 
 	RespondToMessage(request, response_message);

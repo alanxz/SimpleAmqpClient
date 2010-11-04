@@ -38,7 +38,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Message.h"
+#include "BasicMessage.h"
 
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
@@ -94,13 +94,13 @@ public:
     void PurgeQueue(const std::string& queue_name,
                     bool no_wait = false);
 
-	void BasicAck(const Message::ptr_t message);
+	void BasicAck(const BasicMessage::ptr_t message);
 
 	void BasicAck(uint64_t delivery_tag);
 
     void BasicPublish(const std::string& exchange_name,
                       const std::string& routing_key,
-                      const Message::ptr_t message,
+                      const BasicMessage::ptr_t message,
                       bool mandatory = false,
                       bool immediate = false);
 
@@ -112,7 +112,7 @@ public:
 
 	void BasicCancel(const std::string& consumer_tag);
 
-	Message::ptr_t BasicConsumeMessage();
+	BasicMessage::ptr_t BasicConsumeMessage();
 
 protected:
     amqp_connection_state_t m_connection;

@@ -138,7 +138,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
 	Util::CheckLastRpcReply(m_connection, "Unbinding queue");
 }
 
-void Channel::BasicAck(const Message::ptr_t message)
+void Channel::BasicAck(const BasicMessage::ptr_t message)
 {
 	BasicAck(message->DeliveryTag());
 }
@@ -152,7 +152,7 @@ void Channel::BasicAck(uint64_t delivery_tag)
 }
 void Channel::BasicPublish(const std::string& exchange_name,
                            const std::string& routing_key,
-                           const Message::ptr_t message,
+                           const BasicMessage::ptr_t message,
                            bool mandatory,
                            bool immediate)
 {
@@ -196,7 +196,7 @@ void Channel::BasicCancel(const std::string& consumer_tag)
 }
 
 
-Message::ptr_t Channel::BasicConsumeMessage()
+BasicMessage::ptr_t Channel::BasicConsumeMessage()
 {
 	while (true)
 	{
@@ -234,7 +234,7 @@ Message::ptr_t Channel::BasicConsumeMessage()
 			memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
 			received_size += frame.payload.body_fragment.len;
 		}
-		return Message::Create(body, properties, deliver_method->delivery_tag);
+		return BasicMessage::Create(body, properties, deliver_method->delivery_tag);
 	}
 }
 

@@ -49,29 +49,29 @@
 
 namespace AmqpClient {
 
-class Message : boost::noncopyable
+class BasicMessage : boost::noncopyable
 {
 public:
-	typedef boost::shared_ptr<Message> ptr_t;
+	typedef boost::shared_ptr<BasicMessage> ptr_t;
 
     enum delivery_mode_t {
         dm_nonpersistent = 1,
         dm_persistent = 2
     };
 
-	friend ptr_t boost::make_shared<Message>();
-	friend ptr_t boost::make_shared<Message>(amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2, uint64_t const& a3 );
+	friend ptr_t boost::make_shared<BasicMessage>();
+	friend ptr_t boost::make_shared<BasicMessage>(amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2, uint64_t const& a3 );
 
-	static ptr_t Create() { return boost::make_shared<Message>(); }
+	static ptr_t Create() { return boost::make_shared<BasicMessage>(); }
 	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag = 0) 
-		{ return boost::make_shared<Message>(body, properties, delivery_tag); }
+		{ return boost::make_shared<BasicMessage>(body, properties, delivery_tag); }
 
 private:
-    Message();
-	Message(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag);
+    BasicMessage();
+	BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag);
 
 public:
-    virtual ~Message();
+    virtual ~BasicMessage();
 
     const amqp_basic_properties_t* getAmqpProperties() const { return &m_properties; }
     amqp_bytes_t getAmqpBody() const { return m_body; }

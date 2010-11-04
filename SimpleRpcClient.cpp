@@ -37,7 +37,7 @@
  */
 
 #include "SimpleRpcClient.h"
-#include "Message.h"
+#include "BasicMessage.h"
 
 namespace AmqpClient {
 
@@ -57,7 +57,7 @@ SimpleRpcClient::~SimpleRpcClient()
 
 std::string SimpleRpcClient::Call(const std::string& message)
 {
-	Message::ptr_t outgoing_msg;
+	BasicMessage::ptr_t outgoing_msg;
 	outgoing_msg->Body(message);
 	outgoing_msg->ReplyTo(m_incoming_tag);
 
@@ -65,7 +65,7 @@ std::string SimpleRpcClient::Call(const std::string& message)
 
 	m_channel->BasicConsume(m_incoming_tag, m_incoming_tag);
 
-	Message::ptr_t incoming_msg = m_channel->BasicConsumeMessage();
+	BasicMessage::ptr_t incoming_msg = m_channel->BasicConsumeMessage();
 	return incoming_msg->Body();
 }
 

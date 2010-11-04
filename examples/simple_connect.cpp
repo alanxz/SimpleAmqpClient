@@ -38,6 +38,7 @@
 
 #include "Connection.h"
 #include "Channel.h"
+#include "BasicMessage.h"
 
 #include <iostream>
 
@@ -50,7 +51,7 @@ int main()
 	channel->DeclareQueue("alanqueue");
 	channel->BindQueue("alanqueue", "amq.direct", "alankey");
 
-	Message::ptr_t msg_in = Message::Create();
+	BasicMessage::ptr_t msg_in = BasicMessage::Create();
 
 	msg_in->Body("This is a small message.");
 
@@ -58,7 +59,7 @@ int main()
 
 	channel->BasicConsume("alanqueue", "consumertag");
 
-	Message::ptr_t msg_out = channel->BasicConsumeMessage();
+	BasicMessage::ptr_t msg_out = channel->BasicConsumeMessage();
 
 	std::cout << "Message text: " << msg_out->Body() << std::endl;
 
