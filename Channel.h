@@ -36,11 +36,11 @@ public:
                          bool durable = false,
                          bool auto_delete = true);
 
-    void DeclareQueue(const std::string& queue_name,
-                      bool passive = false,
-                      bool durable = false,
-                      bool exclusive = true,
-                      bool auto_delete = true);
+	std::string DeclareQueue(const std::string& queue_name,
+              		         bool passive = false,
+							 bool durable = false,
+							 bool exclusive = true,
+							 bool auto_delete = true);
 
     void DeleteQueue(const std::string& queue_name,
                      bool if_unused = false,

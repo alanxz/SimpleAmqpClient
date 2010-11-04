@@ -40,21 +40,26 @@ void Channel::DeclareExchange(const std::string& exchange_name,
 }
 
 
-void Channel::DeclareQueue(const std::string& queue_name,
-                           bool passive,
-                           bool durable,
-                           bool exclusive,
-                           bool auto_delete)
+std::string Channel::DeclareQueue(const std::string& queue_name,
+          		                  bool passive,
+								  bool durable,
+								  bool exclusive,
+								  bool auto_delete)
 {
-    amqp_queue_declare(m_connection, m_channel,
-                       amqp_cstring_bytes(queue_name.c_str()),
-                       passive,
-                       durable,
-                       exclusive,
-                       auto_delete,
-                       m_empty_table);
+
+    amqp_queue_declare_ok_t* queue_declare = 
+			amqp_queue_declare(m_connection, m_channel,
+								amqp_cstring_bytes(queue_name.c_str()),
+								passive,
+								durable,
+								exclusive,
+								auto_delete,
+								m_empty_table);
 
 	Util::CheckLastRpcReply(m_connection, "Declaring queue");
+
+	return std::string((char*)queue_declare->queue.bytes,
+			queue_declare->queue.len);
 }
 
 void Channel::DeleteQueue(const std::string& queue_name,
