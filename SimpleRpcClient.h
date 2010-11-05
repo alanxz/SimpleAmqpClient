@@ -52,7 +52,7 @@ class SimpleRpcClient : boost::noncopyable
 {
 public:
 	typedef boost::shared_ptr<SimpleRpcClient> ptr_t;
-	friend ptr_t boost::make_shared<SimpleRpcClient>(Channel::ptr_t const & a1, std::string const & a2);
+	friend ptr_t boost::make_shared<SimpleRpcClient>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
 
 	static ptr_t Create(Channel::ptr_t channel, const std::string& rpc_name) 
 	{ return boost::make_shared<SimpleRpcClient>(channel, rpc_name); }
