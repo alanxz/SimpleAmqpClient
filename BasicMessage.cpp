@@ -53,6 +53,16 @@ BasicMessage::BasicMessage() :
 BasicMessage::BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag) :
 	m_body(body), m_properties(*properties), m_delivery_tag(delivery_tag)
 {
+	if (ContentTypeIsSet()) m_properties.content_type = amqp_bytes_malloc_dup(m_properties.content_type);
+	if (ContentEncodingIsSet()) m_properties.content_encoding = amqp_bytes_malloc_dup(m_properties.content_encoding);
+	if (CorrelationIdIsSet()) m_properties.correlation_id = amqp_bytes_malloc_dup(m_properties.correlation_id);
+	if (ReplyToIsSet()) m_properties.reply_to = amqp_bytes_malloc_dup(m_properties.reply_to);
+	if (ExpirationIsSet()) m_properties.expiration = amqp_bytes_malloc_dup(m_properties.expiration);
+	if (MessageIdIsSet()) m_properties.message_id = amqp_bytes_malloc_dup(m_properties.message_id);
+	if (TypeIsSet()) m_properties.type = amqp_bytes_malloc_dup(m_properties.type);
+	if (UserIdIsSet()) m_properties.user_id = amqp_bytes_malloc_dup(m_properties.user_id);
+	if (AppIdIsSet()) m_properties.app_id = amqp_bytes_malloc_dup(m_properties.app_id);
+	if (ClusterIdIsSet()) m_properties.cluster_id = amqp_bytes_malloc_dup(m_properties.cluster_id);
 }
 
 BasicMessage::~BasicMessage()
