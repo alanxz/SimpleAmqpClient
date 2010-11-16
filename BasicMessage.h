@@ -144,7 +144,7 @@ public:
 	/**
 	  * Unsets the content type property if it is set
 	  */
-    void ContentTypeClear() { m_properties._flags &= ~AMQP_BASIC_CONTENT_TYPE_FLAG; }
+    void ContentTypeClear();
 
 	/**
 	  * Gets the content encoding property
@@ -161,7 +161,7 @@ public:
 	/**
 	  * Unsets the content encoding property if it is set
 	  */
-    void ContentEncodingClear() { m_properties._flags &= ~AMQP_BASIC_CONTENT_ENCODING_FLAG; }
+    void ContentEncodingClear();
 
 	/**
 	  * Gets the delivery mode property
@@ -212,7 +212,7 @@ public:
 	/**
 	  * Unsets the correlation id property
 	  */
-    void CorrelationIdClear() { m_properties._flags &= ~AMQP_BASIC_CORRELATION_ID_FLAG; }
+    void CorrelationIdClear();
 
 	/**
 	  * Gets the reply to property
@@ -229,7 +229,7 @@ public:
 	/**
 	  * Unsets the reply to property
 	  */
-    void ReplyToClear() { m_properties._flags &= ~AMQP_BASIC_REPLY_TO_FLAG; }
+    void ReplyToClear();
 
 	/**
 	  * Gets the expiration property
@@ -246,7 +246,7 @@ public:
 	/**
 	  * Unsets the expiration property
 	  */
-    void ExpirationClear() { m_properties._flags &= ~AMQP_BASIC_EXPIRATION_FLAG; }
+    void ExpirationClear();
 
 	/**
 	  * Gets the message id property
@@ -263,7 +263,7 @@ public:
 	/**
 	  * Unsets the message id property
 	  */
-    void MessageIdClear() { m_properties._flags &= ~AMQP_BASIC_MESSAGE_ID_FLAG; }
+    void MessageIdClear();
 
 	/**
 	  * Gets the timestamp property 
@@ -280,7 +280,7 @@ public:
 	/**
 	  * Unsets the timestamp property
 	  */
-    void TimestampClear() { m_properties._flags &= ~AMQP_BASIC_TIMESTAMP_FLAG; }
+    void TimestampClear();
 
 	/**
 	  * Gets the type property
@@ -297,7 +297,7 @@ public:
 	/**
 	  * Unsets the type property
 	  */
-    void TypeClear() { m_properties._flags &= ~AMQP_BASIC_TYPE_FLAG; }
+    void TypeClear();
 
 	/**
 	  * Gets the user id property
@@ -314,7 +314,7 @@ public:
 	/**
 	  * Unsets the user id property
 	  */
-    void UserIdClear() { m_properties._flags &= ~AMQP_BASIC_USER_ID_FLAG; }
+    void UserIdClear();
 
 	/**
 	  * Gets the app id property
@@ -331,7 +331,7 @@ public:
 	/**
 	  * Unsets the app id property
 	  */
-    void AppIdClear() { m_properties._flags &= ~AMQP_BASIC_APP_ID_FLAG; }
+    void AppIdClear();
 
 	/**
 	  * Gets the cluster id property
@@ -348,7 +348,7 @@ public:
 	/**
 	  * Unsets the cluster id property
 	  */
-    void ClusterIdClear() { m_properties._flags &= ~AMQP_BASIC_CLUSTER_ID_FLAG; }
+    void ClusterIdClear();
 
 
 
