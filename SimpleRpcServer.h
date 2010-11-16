@@ -56,10 +56,8 @@ public:
 
 	friend ptr_t boost::make_shared<SimpleRpcServer>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
 
-	static ptr_t Create(Channel::ptr_t channel, const std::string& rpc_name) 
+	static ptr_t Create(Channel::ptr_t channel, const std::string& rpc_name = "") 
 		{ return boost::make_shared<SimpleRpcServer>(channel, rpc_name); }
-
-	static std::string CreateUniqueRpcName(const std::string prefix = "");
 
 private:
 	explicit SimpleRpcServer(Channel::ptr_t channel, const std::string& rpc_name);
