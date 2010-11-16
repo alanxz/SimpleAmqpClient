@@ -61,6 +61,12 @@ public:
 
 	friend ptr_t boost::make_shared<Channel>(amqp_connection_state_t const & a1, amqp_channel_t const & a2 );
 
+	/**
+	  * Creates a new Channel object
+	  *
+	  * This method should not be called directly, instead the CreateChannel()
+	  * method on the Connection object should be to create a new channel
+	  */
 	static ptr_t Create(amqp_connection_state_t connection, amqp_channel_t channel)
 		{ return boost::make_shared<Channel>(connection, channel); }
 
