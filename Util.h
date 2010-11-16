@@ -47,8 +47,29 @@ namespace AmqpClient {
 class Util
 {
 public:
+	/**
+	  * Checks the result of a librabbitmq-c call that returns a amqp_rpc_reply_t
+	  *
+	  * Checks the result of a librabbitmq-c call that returns an
+	  * amqp_rpc_reply_t struct and throws an exception if it fails.
+	  */
     static void CheckRpcReply(amqp_rpc_reply_t reply, const std::string& context = "");
+	
+	/**
+	  * Checks the result of a librabbitmq-c that doesn't return a amqp_rpc_reply_t
+	  *
+	  * Checks the result of a librabbitmq-c call that doesn't return an
+	  * amqp_rpc_reply_t struct, but the result is stored as a part of the
+	  * amqp_connection_state_t, and is checked with amqp_check_last_rpc()
+	  * Throws an exception if an error condition is detected
+	  */
 	static void CheckLastRpcReply(amqp_connection_state_t connection, const std::string& context);
+	/**
+	  * Checks the result of a librabbitmq-c call that returns an int
+	  *
+	  * Checks the result of a librabbitmq-c call that returns an int, 
+	  * throws an exception if an error condition is detected.
+	  */
     static void CheckForError(int ret, const std::string& context = "");
 private:
     Util();
