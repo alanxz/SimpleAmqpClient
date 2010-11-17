@@ -39,6 +39,9 @@ SET(SAC_LIB_SRCS
 
 	SimpleRpcServer.h
 	SimpleRpcServer.cpp
+
+	SimplePublisher.h
+	SimplePublisher.cpp
 	)
 
 
