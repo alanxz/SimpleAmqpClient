@@ -57,16 +57,21 @@ SimpleRpcClient::~SimpleRpcClient()
 
 std::string SimpleRpcClient::Call(const std::string& message)
 {
-	BasicMessage::ptr_t outgoing_msg;
+	BasicMessage::ptr_t outgoing_msg = BasicMessage::Create();
 	outgoing_msg->Body(message);
-	outgoing_msg->ReplyTo(m_incoming_tag);
 
-	m_channel->BasicPublish("amq.direct", m_outgoing_tag, outgoing_msg);
+	BasicMessage::ptr_t reply = Call(outgoing_msg);
+	return reply->Body();
+}
 
-	m_channel->BasicConsume(m_incoming_tag, m_incoming_tag);
+BasicMessage::ptr_t SimpleRpcClient::Call(BasicMessage::ptr_t message)
+{
+	message->ReplyTo(m_incoming_tag);
+	m_channel->BasicPublish("amq.direct", m_outgoing_tag, message);
 
 	BasicMessage::ptr_t incoming_msg = m_channel->BasicConsumeMessage();
-	return incoming_msg->Body();
+
+	return incoming_msg;
 }
 
 } // namespace AmqpClient

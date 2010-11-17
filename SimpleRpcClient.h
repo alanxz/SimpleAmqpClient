@@ -39,6 +39,7 @@
  */
 
 #include "Channel.h"
+#include "BasicMessage.h"
 
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -64,6 +65,7 @@ public:
 	virtual ~SimpleRpcClient();
 
 	std::string Call(const std::string& message);
+	BasicMessage::ptr_t Call(BasicMessage::ptr_t message);
 
 
 private:
