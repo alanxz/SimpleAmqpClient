@@ -47,6 +47,9 @@
 #include <amqp.h>
 #include <string>
 
+#define BROKER_HEARTBEAT 0
+#define DEFAULT_CHANNEL 1
+
 namespace AmqpClient {
 
 class Connection;
@@ -57,23 +60,42 @@ class Connection;
 class Channel : boost::noncopyable
 {
 public:
-    typedef boost::shared_ptr<Channel> ptr_t;
-
-	friend ptr_t boost::make_shared<Channel>(amqp_connection_state_t const & a1, amqp_channel_t const & a2 );
+	typedef boost::shared_ptr<Channel> ptr_t;
+	friend ptr_t boost::make_shared<Channel>(std::string const & a1, int const & a2,
+			std::string const & a3, std::string const & a4,
+			std::string const & a5, int const & a6);
 
 	/**
-	  * Creates a new Channel object
-	  *
-	  * This method should not be called directly, instead the CreateChannel()
-	  * method on the Connection object should be to create a new channel
+	  * Creates a new channel object
+	  * Creates a new connection to an AMQP broker using the supplied parameters and opens
+	  * a single channel for use
+	  * @param host The hostname or IP address of the AMQP broker
+	  * @param port The port to connect to the AMQP broker on
+	  * @param username The username used to authenticate with the AMQP broker
+	  * @param password The password corresponding to the username used to authenticate with the AMQP broker
+	  * @param vhost The virtual host on the AMQP we should connect to
+	  * @param channel_max Request that the server limit the number of channels for
+	  * this connection to the specified parameter, a value of zero will use the broker-supplied value
+	  * @param frame_max Request that the server limit the maximum size of any frame to this value
+	  * @return a new Channel object pointer
 	  */
-	static ptr_t Create(amqp_connection_state_t connection, amqp_channel_t channel)
-		{ return boost::make_shared<Channel>(connection, channel); }
-
+	static ptr_t Create(const std::string& host = "127.0.0.1",
+						int port = 5672,
+						const std::string& username = "guest",
+						const std::string& password = "guest",
+						const std::string& vhost = "/",
+						int frame_max = 131072)
+	{
+		return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
+	}
 
 private:
-    explicit Channel(amqp_connection_state_t connection, amqp_channel_t channel_num);
-
+	explicit Channel(const std::string& host,
+			   int port,
+			   const std::string& username,
+			   const std::string& password,
+			   const std::string& vhost,
+			   int frame_max);
 public:
     virtual ~Channel();
 
@@ -236,7 +258,8 @@ public:
 protected:
     amqp_connection_state_t m_connection;
     amqp_channel_t m_channel;
-    amqp_table_t m_empty_table;
+
+    static const amqp_table_t EMPTY_TABLE;
 
 };
 
