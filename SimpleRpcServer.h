@@ -77,7 +77,7 @@ public:
 
 private:
 	Channel::ptr_t m_channel;
-	const std::string& m_incoming_tag;
+	const std::string m_incoming_tag;
 
 
 
