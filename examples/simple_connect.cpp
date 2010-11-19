@@ -36,17 +36,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Connection.h"
 #include "Channel.h"
 #include "BasicMessage.h"
 
 #include <iostream>
+#include <stdlib.h>
 
 using namespace AmqpClient;
 int main()
 {
-	Connection::ptr_t conn = Connection::Create("141.214.124.76", 5672);
-	Channel::ptr_t channel = conn->CreateChannel();
+    char* szBroker = getenv("AMQP_BROKER");
+    Channel::ptr_t channel;
+    if (szBroker != NULL)
+        channel = Channel::Create(szBroker);
+    else
+        channel = Channel::Create();
 
 	channel->DeclareQueue("alanqueue");
 	channel->BindQueue("alanqueue", "amq.direct", "alankey");

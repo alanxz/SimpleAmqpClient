@@ -47,18 +47,36 @@
 
 namespace AmqpClient {
 
-Channel::Channel(amqp_connection_state_t connection, amqp_channel_t channel_num) :
-    m_connection(connection), m_channel(channel_num)
+const amqp_table_t Channel::EMPTY_TABLE = { 0, NULL };
+
+Channel::Channel(const std::string& host,
+                 int port,
+                 const std::string& username,
+                 const std::string& password,
+                 const std::string& vhost,
+                 int frame_max) :
+    m_channel(DEFAULT_CHANNEL)
 {
-    m_empty_table.num_entries = 0;
-    m_empty_table.entries = NULL;
+    m_connection = amqp_new_connection();
+
+    int sock = amqp_open_socket(host.c_str(), port);
+    Util::CheckForError(sock, "Channel::Channel amqp_open_socket");
+
+    amqp_set_sockfd(m_connection, sock);
+
+    Util::CheckRpcReply(amqp_login(m_connection, vhost.c_str(), 2,
+                                   frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
+                                   username.c_str(), password.c_str()), "Amqp Login");
 
     amqp_channel_open(m_connection, m_channel);
+    Util::CheckLastRpcReply(m_connection, "Channel::Channel creating default channel");
 }
 
 Channel::~Channel()
 {
-    //amqp_channel_close(m_connection, m_channel, AMQP_REPLY_SUCCESS);
+    amqp_channel_close(m_connection, m_channel, AMQP_REPLY_SUCCESS);
+    amqp_connection_close(m_connection, AMQP_REPLY_SUCCESS);
+    amqp_destroy_connection(m_connection);
 }
 
 void Channel::DeclareExchange(const std::string& exchange_name,
@@ -73,7 +91,7 @@ void Channel::DeclareExchange(const std::string& exchange_name,
                           passive,
                           durable,
                           auto_delete,
-                          m_empty_table);
+                          EMPTY_TABLE);
 	Util::CheckLastRpcReply(m_connection, "Declaring exchange");
 }
 
@@ -92,7 +110,7 @@ std::string Channel::DeclareQueue(const std::string& queue_name,
 								durable,
 								exclusive,
 								auto_delete,
-								m_empty_table);
+								EMPTY_TABLE);
 
 	Util::CheckLastRpcReply(m_connection, "Declaring queue");
 
@@ -120,7 +138,7 @@ void Channel::BindQueue(const std::string& queue_name,
                     amqp_cstring_bytes(queue_name.c_str()),
                     amqp_cstring_bytes(exchange_name.c_str()),
                     amqp_cstring_bytes(routing_key.c_str()),
-                    m_empty_table);
+                    EMPTY_TABLE);
 
 	Util::CheckLastRpcReply(m_connection, "Binding queue");
 }
@@ -133,7 +151,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
                       amqp_cstring_bytes(queue_name.c_str()),
                       amqp_cstring_bytes(exchange_name.c_str()),
                       amqp_cstring_bytes(binding_key.c_str()),
-                      m_empty_table);
+                      EMPTY_TABLE);
 
 	Util::CheckLastRpcReply(m_connection, "Unbinding queue");
 }
