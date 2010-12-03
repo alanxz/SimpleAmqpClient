@@ -58,7 +58,8 @@ SimplePublisher::SimplePublisher(Channel::ptr_t channel, const std::string& publ
 		m_publisherExchange += boost::lexical_cast<std::string>(guid);
 	}
 
-	m_channel->DeclareExchange(m_publisherExchange, "fanout");
+
+	m_channel->DeclareExchange(m_publisherExchange, "fanout", false, false, false);
 }
 
 SimplePublisher::~SimplePublisher()
