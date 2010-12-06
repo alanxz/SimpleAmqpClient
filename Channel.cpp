@@ -95,6 +95,20 @@ void Channel::DeclareExchange(const std::string& exchange_name,
 	Util::CheckLastRpcReply(m_connection, "Declaring exchange");
 }
 
+void Channel::DeleteExchange(const std::string& exchange_name,
+                             bool if_unused,
+                             bool nowait)
+{
+	amqp_method_number_t replies[2] = { AMQP_EXCHANGE_DELETE_OK_METHOD, 0 };
+	amqp_exchange_delete_t req;
+	req.exchange = amqp_cstring_bytes(exchange_name.c_str());
+	req.if_unused = if_unused;
+	req.nowait = nowait;
+
+	Util::CheckRpcReply(amqp_simple_rpc(m_connection, m_channel,
+				AMQP_EXCHANGE_DELETE_METHOD,
+				replies, &req), "Delete Exchange");
+}
 
 std::string Channel::DeclareQueue(const std::string& queue_name,
           		                  bool passive,
