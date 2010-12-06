@@ -120,6 +120,16 @@ public:
                          bool durable = false,
                          bool auto_delete = true);
 
+    /**
+      * Deletes an exachange on the AMQP broker
+      * @param exchange_name the name of the exchange to be deleteed
+      * @param if_unused if true only delete the exchange if it has no queues bound to it
+      * @param nowait if true do not wait for the exchange to become unused before deleting it
+      */
+    void DeleteExchange(const std::string& exchange_name,
+                        bool if_unused = false,
+                        bool nowait = true);
+
 	/**
 	  * Declares a queue
 	  * Creates a queue on the AMQP broker if it does not already exist
