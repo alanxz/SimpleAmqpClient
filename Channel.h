@@ -65,6 +65,10 @@ public:
 			std::string const & a3, std::string const & a4,
 			std::string const & a5, int const & a6);
 
+	static const std::string EXCHANGE_TYPE_DIRECT;
+	static const std::string EXCHANGE_TYPE_FANOUT;
+	static const std::string EXCHANGE_TYPE_TOPIC;
+
 	/**
 	  * Creates a new channel object
 	  * Creates a new connection to an AMQP broker using the supplied parameters and opens

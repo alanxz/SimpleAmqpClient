@@ -60,12 +60,22 @@ public:
     };
 
 	friend ptr_t boost::make_shared<BasicMessage>();
+	friend ptr_t boost::make_shared<BasicMessage>(std::string const & a1);
 	friend ptr_t boost::make_shared<BasicMessage>(amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2, uint64_t const& a3 );
 
 	/**
 	  * Create a new empty BasicMessage object
 	  */
 	static ptr_t Create() { return boost::make_shared<BasicMessage>(); }
+
+	/**
+	  * Create a new BasicMessage object
+	  * Creates a new BasicMessage object with a given body
+	  * @param body the message body.
+	  * @returns a new BasicMessage object
+	  */
+	static ptr_t Create(const std::string& body) { return boost::make_shared<BasicMessage>(body); }
+
 	/**
 	  * Create a new BasicMessage object
 	  * Creates a new BasicMessage object with a given body, properties and
@@ -83,6 +93,7 @@ public:
 
 private:
     BasicMessage();
+	BasicMessage(const std::string& body);
 	BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag);
 
 public:

@@ -2,8 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(SimpleAmqpClient)
 
-SET(Boost_DEBUG TRUE)
-SET(Boost_DETAILED_FAILURE_MSG TRUE)
+#SET(Boost_DEBUG TRUE)
+#SET(Boost_DETAILED_FAILURE_MSG TRUE)
 SET(Boost_ADDITIONAL_VERSIONS "1.44.0")
 
 FIND_PACKAGE(Boost 1.44.0 REQUIRED)
@@ -42,6 +42,12 @@ SET(SAC_LIB_SRCS
 
 	SimpleSubscriber.h
 	SimpleSubscriber.cpp
+
+	SimpleTwoWayChannel.h
+	SimpleTwoWayChannel.cpp
+
+	UmroBrokerConfiguration.h
+	UmroBrokerConfiguration.cpp
 	)
 
 
