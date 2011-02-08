@@ -48,6 +48,9 @@
 namespace AmqpClient {
 
 const amqp_table_t Channel::EMPTY_TABLE = { 0, NULL };
+const std::string Channel::EXCHANGE_TYPE_DIRECT("amq.direct");
+const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
+const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
 Channel::Channel(const std::string& host,
                  int port,

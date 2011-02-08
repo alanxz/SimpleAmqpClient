@@ -50,6 +50,13 @@ BasicMessage::BasicMessage() :
 	m_properties._flags = 0;
 }
 
+BasicMessage::BasicMessage(const std::string& body) :
+	m_delivery_tag(0)
+{
+	Body(body);
+	m_properties._flags = 0;
+}
+
 BasicMessage::BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag) :
 	m_body(body), m_properties(*properties), m_delivery_tag(delivery_tag)
 {
