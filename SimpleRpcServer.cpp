@@ -59,6 +59,11 @@ BasicMessage::ptr_t SimpleRpcServer::GetNextIncomingMessage()
 	return m_channel->BasicConsumeMessage();
 }
 
+bool SimpleRpcServer::GetNextIncomingMessage(BasicMessage::ptr_t& message, int timeout)
+{
+	return m_channel->BasicConsumeMessage(message, timeout);
+}
+
 void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, BasicMessage::ptr_t response)
 {
 	if (request->CorrelationIdIsSet() && !response->CorrelationIdIsSet())

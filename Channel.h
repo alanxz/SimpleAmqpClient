@@ -269,6 +269,16 @@ public:
 	  */
 	BasicMessage::ptr_t BasicConsumeMessage();
 
+	/**
+	  * Consumes a single message with a timeout
+	  * Waits for a single Basic message to be Delivered or the timeout to expire.
+	  * This function only works after BasicConsume as been successfully called.
+	  * @param message the message object to save it to. Is ok to be an empty pointer
+	  * @param timeout the timeout for the first part of the message to be delivered in ms
+	  * @returns true if a message was delivered before the timeout, false otherwise
+	  */
+	bool BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout);
+
 protected:
     amqp_connection_state_t m_connection;
     amqp_channel_t m_channel;

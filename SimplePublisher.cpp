@@ -64,7 +64,7 @@ SimplePublisher::SimplePublisher(Channel::ptr_t channel, const std::string& publ
 
 SimplePublisher::~SimplePublisher()
 {
-	m_channel->DeleteExchange(m_publisherExchange);
+	m_channel->DeleteExchange(m_publisherExchange, false, false);
 }
 
 void SimplePublisher::Publish(const std::string& message)
