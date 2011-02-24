@@ -1,6 +1,3 @@
-#ifndef SIMPLERPCSERVER_H
-#define SIMPLERPCSERVER_H
-
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
@@ -40,51 +37,73 @@
 
 #include "Channel.h"
 #include "BasicMessage.h"
+#include "SimpleRpcServer.h"
 
-#include <boost/utility.hpp>
+#include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <string>
+#include <boost/thread/thread.hpp>
+#include <boost/utility.hpp>
 
-namespace AmqpClient {
+#include <iostream>
+#include <stdlib.h>
 
+using namespace AmqpClient;
 
-class SimpleRpcServer : boost::noncopyable
+class thread_body : boost::noncopyable
 {
-public:
-	typedef boost::shared_ptr<SimpleRpcServer> ptr_t;
-
-	friend ptr_t boost::make_shared<SimpleRpcServer>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
-
-	static ptr_t Create(Channel::ptr_t channel, const std::string& rpc_name = "") 
-		{ return boost::make_shared<SimpleRpcServer>(channel, rpc_name); }
-
-private:
-	explicit SimpleRpcServer(Channel::ptr_t channel, const std::string& rpc_name);
-
-public:
-	virtual ~SimpleRpcServer();
-
-	std::string GetRpcName() const { return m_incoming_tag; }
-
-	BasicMessage::ptr_t GetNextIncomingMessage();
-
-	bool GetNextIncomingMessage(BasicMessage::ptr_t& message, int timeout);
-
-	void RespondToMessage(BasicMessage::ptr_t request, 
-						  BasicMessage::ptr_t response);
-
-	void RespondToMessage(BasicMessage::ptr_t request,
-						  const std::string response);
-
-private:
-	Channel::ptr_t m_channel;
-	const std::string m_incoming_tag;
+	public:
+		thread_body()
+		{
+			char* szBroker = getenv("AMQP_BROKER");
+			Channel::ptr_t channel;
+			if (szBroker != NULL)
+				channel = Channel::Create(szBroker);
+			else
+				channel = Channel::Create();
 
 
+			server = SimpleRpcServer::Create(channel);
 
+			m_thread =
+				boost::make_shared<boost::thread>(boost::bind(&thread_body::run,
+							this));
+		}
+
+		virtual ~thread_body()
+		{
+			std::cout << "Is joinable " << m_thread->joinable() << "inter reqd: " << m_thread->interruption_requested() << std::endl;
+			m_thread->interrupt();
+			std::cout << "Is joinable " << m_thread->joinable() << "inter reqd: " << m_thread->interruption_requested() << std::endl;
+			m_thread->join();
+		}
+
+		void run()
+		{
+			while (!boost::this_thread::interruption_requested())
+			{
+				std::cout << "Waiting for message... " << std::flush;
+				BasicMessage::ptr_t message;
+				if (server->GetNextIncomingMessage(message, 1))
+				{
+					std::cout << "message received.\n";
+				}
+				else
+				{
+					std::cout << "message not received.\n";
+				}
+			}
+		}
+
+		SimpleRpcServer::ptr_t server;
+		boost::shared_ptr<boost::thread> m_thread;
 
 };
+int main()
+{
+	boost::shared_ptr<thread_body> body = boost::make_shared<thread_body>();
 
+	boost::this_thread::sleep(boost::posix_time::seconds(3));
+
+	return 0;
 }
-#endif // SIMPLERPCSERVER_H

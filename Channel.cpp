@@ -43,7 +43,14 @@
 #include <amqp_framing.h>
 
 #include <stdexcept>
-#include <cstring>
+
+
+// This will get us the posix version of strerror_r() on linux
+#define _XOPEN_SOURCE 600
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <errno.h>
 
 namespace AmqpClient {
 
@@ -233,12 +240,60 @@ void Channel::BasicCancel(const std::string& consumer_tag)
 
 BasicMessage::ptr_t Channel::BasicConsumeMessage()
 {
+	BasicMessage::ptr_t returnval;
+	BasicConsumeMessage(returnval, 0);
+	return returnval;
+}
+
+bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
+{
+
+	int socketno = amqp_get_sockfd(m_connection);
+
+	struct timeval tv_timeout;
+	memset(&tv_timeout, 0, sizeof(tv_timeout));
+	tv_timeout.tv_sec = timeout;
+
+	struct timeval tv_zero;
+	memset(&tv_zero, 0, sizeof(tv_zero));
+	tv_zero.tv_sec = 0;
+
 	while (true)
 	{
 		amqp_frame_t frame;
 		amqp_maybe_release_buffers(m_connection);
 		
-		Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: method frame");
+		// Possibly set a timeout on receiving
+		// We only do this on the first frame otherwise we'd confuse
+		// This function if it immediately turns around and gets called again
+		if (timeout > 0)
+		{
+			if (setsockopt(socketno, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_timeout, sizeof(tv_timeout)))
+			{
+				const int BUFFER_LENGTH = 256;
+				char error_string_buffer[BUFFER_LENGTH] = {0};
+				strerror_r(errno, error_string_buffer, BUFFER_LENGTH);
+
+				std::string error_string = "Setting socket timeout failed (setsockopt) ";
+				error_string += error_string_buffer;
+				
+				throw std::runtime_error(error_string.c_str());
+			}
+		}
+
+		int ret = amqp_simple_wait_frame(m_connection, &frame);
+		// Save errno as it might be overwritten by setsockopt
+		int errno_save = errno;
+
+		setsockopt(socketno, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_zero, sizeof(tv_zero));
+
+		if (ret != 0 && (errno_save == EAGAIN || errno_save == EWOULDBLOCK))
+		{
+			return false;
+		}
+
+		Util::CheckForError(ret, "Consume Message: method frame");
+
 
 		if (frame.frame_type != AMQP_FRAME_METHOD || frame.payload.method.id != AMQP_BASIC_DELIVER_METHOD)
 			continue;
@@ -269,7 +324,9 @@ BasicMessage::ptr_t Channel::BasicConsumeMessage()
 			memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
 			received_size += frame.payload.body_fragment.len;
 		}
-		return BasicMessage::Create(body, properties, deliver_method->delivery_tag);
+
+		message = BasicMessage::Create(body, properties, deliver_method->delivery_tag);
+		return true;
 	}
 }
 
