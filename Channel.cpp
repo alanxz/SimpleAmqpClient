@@ -287,9 +287,17 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 
 		setsockopt(socketno, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_zero, sizeof(tv_zero));
 
-		if (ret != 0 && (errno_save == EAGAIN || errno_save == EWOULDBLOCK))
+		if (ret != 0)
 		{
-			return false;
+			// Interrupted system call, just loop around and try it again
+			if (errno_save == EINTR)
+			{
+				continue;
+			}
+			else if (errno_save == EAGAIN || errno_save == EWOULDBLOCK)
+			{
+				return false;
+			}
 		}
 
 		Util::CheckForError(ret, "Consume Message: method frame");
