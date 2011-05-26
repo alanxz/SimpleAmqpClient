@@ -39,6 +39,7 @@
 #include "Channel.h"
 
 #include "Util.h"
+#include "config.h"
 
 #include <amqp_framing.h>
 
@@ -49,8 +50,10 @@
 #define _XOPEN_SOURCE 600
 #include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <errno.h>
+
+#include <time.h>
+#include <WinSock2.h>
 
 namespace AmqpClient {
 
@@ -100,7 +103,6 @@ void Channel::DeclareExchange(const std::string& exchange_name,
                           amqp_cstring_bytes(exchange_type.c_str()),
                           passive,
                           durable,
-                          auto_delete,
                           EMPTY_TABLE);
 	Util::CheckLastRpcReply(m_connection, "Declaring exchange");
 }
@@ -220,7 +222,8 @@ void Channel::BasicConsume(const std::string& queue,
 			amqp_cstring_bytes(consumer_tag.c_str()),
 			no_local,
 			no_ack,
-			exclusive);
+			exclusive,
+      EMPTY_TABLE);
 
 	Util::CheckLastRpcReply(m_connection, "Basic Consume");
 }
@@ -270,12 +273,21 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 		{
 			if (setsockopt(socketno, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_timeout, sizeof(tv_timeout)))
 			{
+
+				std::string error_string("Setting socket timeout failed (setsockopt) ");
+#ifdef HAVE_STRERROR_S
+        const int BUFFER_LENGTH = 256;
+        char error_string_buffer[BUFFER_LENGTH] = {0};
+        strerror_s(error_string_buffer, errno);
+        error_string += error_string_buffer;
+#elif HAVE_STRERROR_R
 				const int BUFFER_LENGTH = 256;
 				char error_string_buffer[BUFFER_LENGTH] = {0};
 				strerror_r(errno, error_string_buffer, BUFFER_LENGTH);
-
-				std::string error_string = "Setting socket timeout failed (setsockopt) ";
-				error_string += error_string_buffer;
+        error_string += error_string_buffer;
+#else
+        error_string += strerror(errno);
+#endif
 				
 				throw std::runtime_error(error_string.c_str());
 			}

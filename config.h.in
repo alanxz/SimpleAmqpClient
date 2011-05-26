@@ -1,0 +1,10 @@
+#ifndef SIMPLEAMQPCLIENT_CONFIG_H_
+#define SIMPLEAMQPCLIENT_CONFIG_H_
+
+// strerror_s on win32
+#cmakedefine HAVE_STRERROR_S
+
+// strerror_r on linux
+#cmakedefine HAVE_STRERROR_R
+
+#endif // SIMPLEAMQPCLIENT_CONFIG_H_
