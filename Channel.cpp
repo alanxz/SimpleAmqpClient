@@ -52,8 +52,15 @@
 #include <sys/types.h>
 #include <errno.h>
 
+#ifdef HAVS_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
+
+#ifdef HAVE_WINSOCK2_H
+# include <WinSock2.h>
+#endif
+
 #include <time.h>
-#include <WinSock2.h>
 
 namespace AmqpClient {
 
