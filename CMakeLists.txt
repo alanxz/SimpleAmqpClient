@@ -4,18 +4,36 @@ PROJECT(SimpleAmqpClient)
 
 #SET(Boost_DEBUG TRUE)
 #SET(Boost_DETAILED_FAILURE_MSG TRUE)
-SET(Boost_ADDITIONAL_VERSIONS "1.44.0")
+SET(Boost_ADDITIONAL_VERSIONS "1.44.0" "1.46.1")
 
-FIND_PACKAGE(Boost 1.44.0 COMPONENTS thread REQUIRED)
+FIND_PACKAGE(Boost 1.44.0 REQUIRED)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 FIND_PACKAGE(Rabbitmqc REQUIRED)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}
 					${Rabbitmqc_INCLUDE_DIRS}
-					${CMAKE_CURRENT_SOURCE_DIR})
+					${CMAKE_CURRENT_SOURCE_DIR}
+					${CMAKE_CURRENT_BINARY_DIR})
+
+ADD_DEFINITIONS(-DBUILDING_SIMPLEAMQPCLIENT)
+
+# We need winsock32 if we're compiling on windows
+IF (WIN32)
+	SET(SOCKET_LIBRARY ws2_32)
+ENDIF()
+
+INCLUDE (CheckIncludeFiles)
+INCLUDE (CheckFunctionExists)
+
+CHECK_FUNCTION_EXISTS(strerror_s HAVE_STRERROR_S)
+CHECK_FUNCTION_EXISTS(strerror_r HAVE_STRERROR_R)
+
+CONFIGURE_FILE(config.h.in config.h)
 
 SET(SAC_LIB_SRCS
+	SimpleAmqpClient.h
+
     Channel.h
     Channel.cpp
 
@@ -58,7 +76,7 @@ ADD_LIBRARY(simple-amqp-client-shared SHARED ${SAC_LIB_SRCS})
 SET_TARGET_PROPERTIES(simple-amqp-client-static PROPERTIES OUTPUT_NAME SimpleAmqpClient)
 SET_TARGET_PROPERTIES(simple-amqp-client-shared PROPERTIES OUTPUT_NAME SimpleAmqpClient)
 
-TARGET_LINK_LIBRARIES(simple-amqp-client-shared ${Rabbitmqc_LIBRARY} ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(simple-amqp-client-shared ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
 
 ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
 
