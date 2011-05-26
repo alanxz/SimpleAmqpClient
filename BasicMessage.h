@@ -48,6 +48,11 @@
 #include <amqp_framing.h>
 #include <string>
 
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4275 )
+#endif 
+
 namespace AmqpClient {
 
 class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable
@@ -152,7 +157,7 @@ public:
 	/**
 	  * Determines whether the content type property is set
 	  */
-    bool ContentTypeIsSet() const { return m_properties._flags & AMQP_BASIC_CONTENT_TYPE_FLAG; }
+    bool ContentTypeIsSet() const { return AMQP_BASIC_CONTENT_TYPE_FLAG == (m_properties._flags & AMQP_BASIC_CONTENT_TYPE_FLAG); }
 	/**
 	  * Unsets the content type property if it is set
 	  */
@@ -169,7 +174,7 @@ public:
 	/**
 	  * Determines whether the content encoding property is set
 	  */
-    bool ContentEncodingIsSet() const { return m_properties._flags & AMQP_BASIC_CONTENT_ENCODING_FLAG; }
+    bool ContentEncodingIsSet() const { return AMQP_BASIC_CONTENT_ENCODING_FLAG == (m_properties._flags & AMQP_BASIC_CONTENT_ENCODING_FLAG); }
 	/**
 	  * Unsets the content encoding property if it is set
 	  */
@@ -186,7 +191,7 @@ public:
 	/**
 	  * Determines whether the delivery mode property is set
 	  */
-    bool DeliveryModeIsSet() const { return m_properties._flags & AMQP_BASIC_DELIVERY_MODE_FLAG; }
+    bool DeliveryModeIsSet() const { return AMQP_BASIC_DELIVERY_MODE_FLAG == (m_properties._flags & AMQP_BASIC_DELIVERY_MODE_FLAG); }
 	/**
 	  * Unsets the delivery mode property if it is set
 	  */
@@ -203,7 +208,7 @@ public:
 	/**
 	  * Determines whether the priority property is set
 	  */
-    bool PriorityIsSet() const { return m_properties._flags & AMQP_BASIC_PRIORITY_FLAG; }
+    bool PriorityIsSet() const { return AMQP_BASIC_PRIORITY_FLAG == (m_properties._flags & AMQP_BASIC_PRIORITY_FLAG); }
 	/**
 	  * Unsets the priority property if it is set
 	  */
@@ -220,7 +225,7 @@ public:
 	/**
 	  * Determines whether the correlation id property is set
 	  */
-    bool CorrelationIdIsSet() const { return m_properties._flags & AMQP_BASIC_CORRELATION_ID_FLAG; }
+    bool CorrelationIdIsSet() const { return AMQP_BASIC_CORRELATION_ID_FLAG == (m_properties._flags & AMQP_BASIC_CORRELATION_ID_FLAG); }
 	/**
 	  * Unsets the correlation id property
 	  */
@@ -237,7 +242,7 @@ public:
 	/**
 	  * Determines whether the reply to property is set
 	  */
-    bool ReplyToIsSet() const { return m_properties._flags & AMQP_BASIC_REPLY_TO_FLAG; }
+    bool ReplyToIsSet() const { return AMQP_BASIC_REPLY_TO_FLAG == (m_properties._flags & AMQP_BASIC_REPLY_TO_FLAG); }
 	/**
 	  * Unsets the reply to property
 	  */
@@ -254,7 +259,7 @@ public:
 	/**
 	  * Determines whether the expiration property is set
 	  */
-    bool ExpirationIsSet() const { return m_properties._flags & AMQP_BASIC_EXPIRATION_FLAG; }
+    bool ExpirationIsSet() const { return AMQP_BASIC_EXPIRATION_FLAG == (m_properties._flags & AMQP_BASIC_EXPIRATION_FLAG); }
 	/**
 	  * Unsets the expiration property
 	  */
@@ -271,7 +276,7 @@ public:
 	/**
 	  * Determines if the message id property is set
 	  */
-    bool MessageIdIsSet() const { return m_properties._flags & AMQP_BASIC_MESSAGE_ID_FLAG; }
+    bool MessageIdIsSet() const { return AMQP_BASIC_MESSAGE_ID_FLAG == (m_properties._flags & AMQP_BASIC_MESSAGE_ID_FLAG); }
 	/**
 	  * Unsets the message id property
 	  */
@@ -288,7 +293,7 @@ public:
 	/**
 	  * Determines whether the timestamp property is set
 	  */
-    bool TimestampIsSet() const { return m_properties._flags & AMQP_BASIC_TIMESTAMP_FLAG; }
+    bool TimestampIsSet() const { return AMQP_BASIC_TIMESTAMP_FLAG == (m_properties._flags & AMQP_BASIC_TIMESTAMP_FLAG); }
 	/**
 	  * Unsets the timestamp property
 	  */
@@ -305,7 +310,7 @@ public:
 	/**
 	  * Determines whether the type property is set
 	  */
-    bool TypeIsSet() const { return m_properties._flags & AMQP_BASIC_TYPE_FLAG; }
+    bool TypeIsSet() const { return AMQP_BASIC_TYPE_FLAG == (m_properties._flags & AMQP_BASIC_TYPE_FLAG); }
 	/**
 	  * Unsets the type property
 	  */
@@ -322,7 +327,7 @@ public:
 	/**
 	  * Determines whether the user id property is set
 	  */
-    bool UserIdIsSet() const { return m_properties._flags & AMQP_BASIC_USER_ID_FLAG; }
+    bool UserIdIsSet() const { return AMQP_BASIC_USER_ID_FLAG == (m_properties._flags & AMQP_BASIC_USER_ID_FLAG); }
 	/**
 	  * Unsets the user id property
 	  */
@@ -339,7 +344,7 @@ public:
 	/**
 	  * Determines whether the app id property is set
 	  */
-    bool AppIdIsSet() const { return m_properties._flags & AMQP_BASIC_APP_ID_FLAG; }
+    bool AppIdIsSet() const { return AMQP_BASIC_APP_ID_FLAG == (m_properties._flags & AMQP_BASIC_APP_ID_FLAG); }
 	/**
 	  * Unsets the app id property
 	  */
@@ -356,7 +361,7 @@ public:
 	/**
 	  * Determines if the cluster id property is set
 	  */
-    bool ClusterIdIsSet() const { return m_properties._flags & AMQP_BASIC_CLUSTER_ID_FLAG; }
+    bool ClusterIdIsSet() const { return AMQP_BASIC_CLUSTER_ID_FLAG == (m_properties._flags & AMQP_BASIC_CLUSTER_ID_FLAG); }
 	/**
 	  * Unsets the cluster id property
 	  */
@@ -372,5 +377,9 @@ protected:
 };
 
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
 
 #endif // MESSAGE_H
