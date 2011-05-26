@@ -49,7 +49,7 @@
 namespace AmqpClient {
 
 
-class SimpleTwoWayChannel : boost::noncopyable
+class SIMPLEAMQPCLIENT_EXPORT SimpleTwoWayChannel : boost::noncopyable
 {
 public:
 	typedef boost::shared_ptr<SimpleTwoWayChannel> ptr_t;

@@ -38,8 +38,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Channel.h"
 #include "BasicMessage.h"
+#include "Channel.h"
+#include "Util.h"
 
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -49,7 +50,7 @@
 namespace AmqpClient
 {
 
-class SimplePublisher : boost::noncopyable
+class SIMPLEAMQPCLIENT_EXPORT SimplePublisher : boost::noncopyable
 {
 public:
 	typedef boost::shared_ptr<SimplePublisher> ptr_t;

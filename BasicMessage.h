@@ -38,6 +38,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+#include "Util.h"
+
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
 #include <boost/make_shared.hpp>
@@ -46,10 +48,9 @@
 #include <amqp_framing.h>
 #include <string>
 
-
 namespace AmqpClient {
 
-class BasicMessage : boost::noncopyable
+class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable
 {
 public:
 	typedef boost::shared_ptr<BasicMessage> ptr_t;
