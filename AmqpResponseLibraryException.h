@@ -38,6 +38,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+#include "Util.h"
+
 #include <exception>
 #include <boost/cstdint.hpp>
 #include <amqp.h>
@@ -45,7 +47,7 @@
 
 namespace AmqpClient {
 
-class AmqpResponseLibraryException : public std::exception
+class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::exception
 {
 public:
     AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw();

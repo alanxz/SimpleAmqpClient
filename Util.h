@@ -42,6 +42,16 @@
 #include <amqp.h>
 #include <string>
 
+#ifdef WIN32
+# ifdef BUILDING_SIMPLEAMQPCLIENT
+#  define SIMPLEAMQPCLIENT_EXPORT __declspec(dllexport)
+# else
+#  define SIMPLEAMQPCLIENT_EXPORT __declspec(dllimport)
+# endif
+#else
+#define SIMPLEAMQPCLIENT_EXPORT
+#endif
+
 namespace AmqpClient {
 
 class Util

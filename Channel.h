@@ -39,6 +39,7 @@
  */
 
 #include "BasicMessage.h"
+#include "Util.h"
 
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
@@ -57,7 +58,7 @@ class Connection;
   * A single channel
   * Represents a logical AMQP channel over a connection
   */
-class Channel : boost::noncopyable
+class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable
 {
 public:
 	typedef boost::shared_ptr<Channel> ptr_t;
