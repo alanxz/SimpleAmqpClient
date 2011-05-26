@@ -47,6 +47,11 @@
 #include <boost/make_shared.hpp>
 #include <string>
 
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4275 4251 )
+#endif 
+
 namespace AmqpClient {
 
 
@@ -88,4 +93,9 @@ private:
 };
 
 }
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
+
 #endif // SIMPLERPCSERVER_H

@@ -45,6 +45,11 @@
 #include <string>
 #include <exception>
 
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4251 )
+#endif
+
 namespace AmqpClient {
 
 class SIMPLEAMQPCLIENT_EXPORT AmqpResponseServerException : public std::exception
@@ -66,5 +71,9 @@ private:
 };
 
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
 
 #endif // AMQPRESPONSESERVEREXCEPTION_H

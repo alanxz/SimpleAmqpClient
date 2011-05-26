@@ -51,6 +51,12 @@
 #define BROKER_HEARTBEAT 0
 #define DEFAULT_CHANNEL 1
 
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4251 4275 )
+#endif
+
+
 namespace AmqpClient {
 
 class Connection;
@@ -289,5 +295,9 @@ protected:
 };
 
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
 
 #endif // CHANNEL_H
