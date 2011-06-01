@@ -96,3 +96,18 @@ TARGET_LINK_LIBRARIES(consume_with_timeout simple-amqp-client-shared ${Boost_LIB
 SET(DOXYFILE_LATEX "NO")
 SET(PROJECT_VERSION "1.0.0")
 INCLUDE(UseDoxygen)
+
+INSTALL(TARGETS simple-amqp-client-shared simple-amqp-client-static
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib
+	)
+
+INSTALL(FILES src/SimpleAmqpClient.h
+	DESTINATION include
+	)
+
+INSTALL(DIRECTORY src/SimpleAmqpClient/
+	DESTINATION include/SimpleAmqpClient
+	FILES_MATCHING PATTERN "*.h"
+	)
