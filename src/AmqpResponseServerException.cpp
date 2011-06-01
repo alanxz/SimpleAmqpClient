@@ -36,41 +36,65 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "AmqpResponseLibraryException.h"
+#include "SimpleAmqpClient/AmqpResponseServerException.h"
+
+#include <boost/cstdint.hpp>
+#include <amqp.h>
+#include <amqp_framing.h>
+#include <sstream>
 
 namespace AmqpClient {
 
-AmqpResponseLibraryException::AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw() :
-    m_reply(reply), m_what(context)
+AmqpResponseServerException::AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw() :
+	m_reply(reply)
 {
-	m_what += ": ";
+	std::ostringstream oss;
+	oss << context;
 
-	char* error_string = amqp_error_string(reply.library_error);
+	switch (reply.reply.id)
+	{
+		case AMQP_CONNECTION_CLOSE_METHOD:
+			{
+				amqp_connection_close_t* msg = reinterpret_cast<amqp_connection_close_t*>(reply.reply.decoded);
+				oss << ": Server connection error: " << msg->reply_code << " status: " 
+					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
+			}
+			break;
 
-	m_what += error_string;
+		case AMQP_CHANNEL_CLOSE_METHOD:
+			{
+				amqp_channel_close_t* msg = reinterpret_cast<amqp_channel_close_t*>(reply.reply.decoded);
+				oss << ": Server channel error: " << msg->reply_code << " status: " 
+					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
 
-	free(error_string);
+			}
+			break;
+
+		default:
+			oss << ": Unknown server error, method: " << reply.reply.id;
+
+	}
+	m_what = oss.str();
 }
-AmqpResponseLibraryException::AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw() :
-    m_reply(e.m_reply), m_what(e.m_what)
+
+AmqpResponseServerException::AmqpResponseServerException(const AmqpResponseServerException& e) throw() :
+	m_reply(e.m_reply), m_what(e.m_what)
 {
 }
-
-AmqpResponseLibraryException& AmqpResponseLibraryException::operator=(const AmqpResponseLibraryException& e) throw()
+AmqpResponseServerException& AmqpResponseServerException::operator=(const AmqpResponseServerException& e) throw()
 {
 	if (this == &e)
 	{
 		return *this;
 	}
 
-    m_reply = e.m_reply;
-    m_what = e.m_what;
-    return *this;
+	m_reply = e.m_reply;
+	m_what = e.m_what;
+	return *this;
 }
 
-AmqpResponseLibraryException::~AmqpResponseLibraryException() throw()
+AmqpResponseServerException::~AmqpResponseServerException() throw()
 {
 }
-
 
 } // namespace AmqpClient

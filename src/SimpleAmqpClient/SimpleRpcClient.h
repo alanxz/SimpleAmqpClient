@@ -1,3 +1,5 @@
+#ifndef SIMPLERPCCLIENT_H
+#define SIMPLERPCCLIENT_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -36,55 +38,53 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Util.h"
+#include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Channel.h"
+#include "SimpleAmqpClient/Util.h"
 
-#include "AmqpResponseLibraryException.h"
-#include "AmqpResponseServerException.h"
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#include <string>
 
-#include <stdexcept>
-#include <sstream>
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4275 4251 )
+#endif
 
 namespace AmqpClient {
 
-void Util::CheckRpcReply(amqp_rpc_reply_t reply, const std::string& context)
+
+class SIMPLEAMQPCLIENT_EXPORT SimpleRpcClient : boost::noncopyable
 {
-    switch (reply.reply_type)
-    {
-        case AMQP_RESPONSE_NORMAL:
-            return;
-            break;
+public:
+	typedef boost::shared_ptr<SimpleRpcClient> ptr_t;
+	friend ptr_t boost::make_shared<SimpleRpcClient>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
 
-        case AMQP_RESPONSE_NONE:
-            throw std::logic_error("Got a amqp_rpc_reply_t with no reply_type!");
-            break;
+	static ptr_t Create(Channel::ptr_t channel, const std::string& rpc_name) 
+	{ return boost::make_shared<SimpleRpcClient>(channel, rpc_name); }
 
-        case AMQP_RESPONSE_LIBRARY_EXCEPTION:
-            throw AmqpResponseLibraryException(reply, context);
-            break;
+private:
+	explicit SimpleRpcClient(Channel::ptr_t channel, const std::string& rpc_name);
 
-        case AMQP_RESPONSE_SERVER_EXCEPTION:
-            throw AmqpResponseServerException(reply, context);
-            break;
-        default:
-            throw std::runtime_error("amqp_rpc_reply_t that didn't match!");
-    }
-}
+public:
+	virtual ~SimpleRpcClient();
 
-void Util::CheckLastRpcReply(amqp_connection_state_t connection, const std::string& context)
-{
-    CheckRpcReply(amqp_get_rpc_reply(connection));
-}
+	std::string Call(const std::string& message);
+	BasicMessage::ptr_t Call(BasicMessage::ptr_t message);
 
-void Util::CheckForError(int ret, const std::string& context)
-{
-    if (ret < 0)
-    {
-        char* errstr = amqp_error_string(-ret);
-        std::ostringstream oss;
-        oss << context << ": " << errstr;
-        free(errstr);
-        throw std::runtime_error(oss.str().c_str());
-    }
 
-}
+private:
+	Channel::ptr_t m_channel;
+	const std::string m_outgoing_tag;
+	const std::string m_incoming_tag;
+};
+
+
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
+
+#endif //SIMPLERPCCLIENT_H

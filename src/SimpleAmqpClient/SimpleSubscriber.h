@@ -1,5 +1,5 @@
-#ifndef AMQPRESPONSESERVEREXCEPTION_H
-#define AMQPRESPONSESERVEREXCEPTION_H
+#ifndef SIMPLESUBSCRIBER_H
+#define SIMPLESUBSCRIBER_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,42 +38,55 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Util.h"
+#include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Channel.h"
+#include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
-#include <amqp.h>
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <string>
-#include <exception>
 
 #ifdef _MSC_VER
 # pragma warning ( push )
-# pragma warning ( disable: 4251 )
+# pragma warning ( disable: 4275 4251 )
 #endif
 
-namespace AmqpClient {
+namespace AmqpClient
+{
 
-class SIMPLEAMQPCLIENT_EXPORT AmqpResponseServerException : public std::exception
+class SIMPLEAMQPCLIENT_EXPORT SimpleSubscriber
 {
 public:
-	AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
-	AmqpResponseServerException(const AmqpResponseServerException& e) throw();
-	AmqpResponseServerException& operator=(const AmqpResponseServerException& e) throw();
+	typedef boost::shared_ptr<SimpleSubscriber> ptr_t;
 
-	virtual ~AmqpResponseServerException() throw();
+	friend ptr_t
+		boost::make_shared<SimpleSubscriber>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
 
-	virtual const char* what() const throw() { return m_what.c_str(); }
+	static ptr_t Create(AmqpClient::Channel::ptr_t channel, const std::string& publisher_channel)
+	{ return boost::make_shared<SimpleSubscriber>(channel, publisher_channel); }
+
 
 private:
-	AmqpResponseServerException();
+	SimpleSubscriber(Channel::ptr_t channel, const std::string &publisher_channel);
 
-    amqp_rpc_reply_t m_reply;
-    std::string m_what;
+public:
+	virtual ~SimpleSubscriber();
+
+	std::string WaitForMessageString();
+	BasicMessage::ptr_t WaitForMessage();
+
+private:
+	Channel::ptr_t m_channel;
+	std::string m_consumerQueue;
+
 };
 
-} // namespace AmqpClient
+}
 
 #ifdef _MSC_VER
 # pragma warning ( pop )
 #endif
 
-#endif // AMQPRESPONSESERVEREXCEPTION_H
+#endif // SIMPLESUBSCRIBER_H
+

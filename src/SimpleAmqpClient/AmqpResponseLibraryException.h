@@ -1,5 +1,5 @@
-#ifndef SIMPLEPUBLISHER_H
-#define SIMPLEPUBLISHER_H
+#ifndef AMQPRESPONSELIBRARYEXCEPTION_H
+#define AMQPRESPONSELIBRARYEXCEPTION_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,50 +38,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "BasicMessage.h"
-#include "Channel.h"
-#include "Util.h"
+#include "SimpleAmqpClient/Util.h"
 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+#include <exception>
+#include <boost/cstdint.hpp>
+#include <amqp.h>
 #include <string>
 
 #ifdef _MSC_VER
 # pragma warning ( push )
-# pragma warning ( disable: 4275 4251 )
+# pragma warning ( disable: 4251 )
 #endif
 
-namespace AmqpClient
-{
+namespace AmqpClient {
 
-class SIMPLEAMQPCLIENT_EXPORT SimplePublisher : boost::noncopyable
+class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::exception
 {
 public:
-	typedef boost::shared_ptr<SimplePublisher> ptr_t;
+    AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
+    AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw();
+    AmqpResponseLibraryException& operator=(const AmqpResponseLibraryException& e) throw();
 
-	friend ptr_t boost::make_shared<SimplePublisher>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
+    virtual ~AmqpResponseLibraryException() throw();
 
-	static ptr_t Create(Channel::ptr_t channel, const std::string& publisher_name = "")
-	{ return boost::make_shared<SimplePublisher>(channel, publisher_name); }
-
-private:
-	explicit SimplePublisher(Channel::ptr_t channel, const std::string& publisher_name);
-
-public:
-	virtual ~SimplePublisher();
-
-	std::string getPublisherName() const { return m_publisherExchange; }
-
-	void Publish(const std::string& message);
-	void Publish(BasicMessage::ptr_t message);
+    virtual const char* what() const throw() { return m_what.c_str(); }
 
 private:
-	Channel::ptr_t m_channel;
-	std::string m_publisherExchange;
+    AmqpResponseLibraryException();
 
-
-
+    amqp_rpc_reply_t m_reply;
+    std::string m_what;
 };
 
 } // namespace AmqpClient
@@ -90,5 +76,4 @@ private:
 # pragma warning ( pop )
 #endif
 
-#endif // SIMPLEPUBLISHER_H
-
+#endif // AMQPRESPONSELIBRARYEXCEPTION_H

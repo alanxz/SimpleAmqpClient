@@ -36,8 +36,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Channel.h"
-#include "BasicMessage.h"
+#include "SimpleAmqpClient.h"
 
 #include <iostream>
 #include <stdlib.h>

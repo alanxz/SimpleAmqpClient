@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "BasicMessage.h"
+#include "SimpleAmqpClient/BasicMessage.h"
 
 #include <cstring>
 

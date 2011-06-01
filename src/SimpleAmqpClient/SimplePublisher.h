@@ -1,3 +1,5 @@
+#ifndef SIMPLEPUBLISHER_H
+#define SIMPLEPUBLISHER_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -36,50 +38,57 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleRpcServer.h"
+#include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Channel.h"
+#include "SimpleAmqpClient/Util.h"
 
+#include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+#include <string>
 
-namespace AmqpClient {
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4275 4251 )
+#endif
 
-SimpleRpcServer::SimpleRpcServer(Channel::ptr_t channel, const std::string& rpc_name) :
-	m_channel(channel)
-  , m_incoming_tag(m_channel->DeclareQueue(rpc_name))
-
+namespace AmqpClient
 {
-	m_channel->BindQueue(m_incoming_tag, "amq.direct", m_incoming_tag);
-	m_channel->BasicConsume(m_incoming_tag, m_incoming_tag);
-}
 
-SimpleRpcServer::~SimpleRpcServer()
+class SIMPLEAMQPCLIENT_EXPORT SimplePublisher : boost::noncopyable
 {
-}
+public:
+	typedef boost::shared_ptr<SimplePublisher> ptr_t;
 
-BasicMessage::ptr_t SimpleRpcServer::GetNextIncomingMessage()
-{
-	return m_channel->BasicConsumeMessage();
-}
+	friend ptr_t boost::make_shared<SimplePublisher>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
 
-bool SimpleRpcServer::GetNextIncomingMessage(BasicMessage::ptr_t& message, int timeout)
-{
-	return m_channel->BasicConsumeMessage(message, timeout);
-}
+	static ptr_t Create(Channel::ptr_t channel, const std::string& publisher_name = "")
+	{ return boost::make_shared<SimplePublisher>(channel, publisher_name); }
 
-void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, BasicMessage::ptr_t response)
-{
-	if (request->CorrelationIdIsSet() && !response->CorrelationIdIsSet())
-	{
-		response->CorrelationId(request->CorrelationId());
-	}
+private:
+	explicit SimplePublisher(Channel::ptr_t channel, const std::string& publisher_name);
 
-	m_channel->BasicPublish("amq.direct", request->ReplyTo(), response);
-}
+public:
+	virtual ~SimplePublisher();
 
-void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, const std::string response)
-{
-	BasicMessage::ptr_t response_message = BasicMessage::Create();
-	response_message->Body(response);
+	std::string getPublisherName() const { return m_publisherExchange; }
 
-	RespondToMessage(request, response_message);
-}
+	void Publish(const std::string& message);
+	void Publish(BasicMessage::ptr_t message);
+
+private:
+	Channel::ptr_t m_channel;
+	std::string m_publisherExchange;
+
+
+
+};
 
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
+
+#endif // SIMPLEPUBLISHER_H
+

@@ -1,5 +1,5 @@
-#ifndef SIMPLESUBSCRIBER_H
-#define SIMPLESUBSCRIBER_H
+#ifndef SIMPLEAMQPCLIENT_H
+#define SIMPLEAMQPCLIENT_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,55 +38,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "BasicMessage.h"
-#include "Channel.h"
-#include "Util.h"
+#include "SimpleAmqpClient/Channel.h"
+#include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/SimplePublisher.h"
+#include "SimpleAmqpClient/SimpleSubscriber.h"
+#include "SimpleAmqpClient/SimpleRpcClient.h"
+#include "SimpleAmqpClient/SimpleRpcServer.h"
 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <string>
-
-#ifdef _MSC_VER
-# pragma warning ( push )
-# pragma warning ( disable: 4275 4251 )
-#endif
-
-namespace AmqpClient
-{
-
-class SIMPLEAMQPCLIENT_EXPORT SimpleSubscriber
-{
-public:
-	typedef boost::shared_ptr<SimpleSubscriber> ptr_t;
-
-	friend ptr_t
-		boost::make_shared<SimpleSubscriber>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
-
-	static ptr_t Create(AmqpClient::Channel::ptr_t channel, const std::string& publisher_channel)
-	{ return boost::make_shared<SimpleSubscriber>(channel, publisher_channel); }
-
-
-private:
-	SimpleSubscriber(Channel::ptr_t channel, const std::string &publisher_channel);
-
-public:
-	virtual ~SimpleSubscriber();
-
-	std::string WaitForMessageString();
-	BasicMessage::ptr_t WaitForMessage();
-
-private:
-	Channel::ptr_t m_channel;
-	std::string m_consumerQueue;
-
-};
-
-}
-
-#ifdef _MSC_VER
-# pragma warning ( pop )
-#endif
-
-#endif // SIMPLESUBSCRIBER_H
-
+#endif // SIMPLEAMQPCLIENT_H

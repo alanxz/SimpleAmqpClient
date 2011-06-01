@@ -1,3 +1,5 @@
+#ifndef AMQPRESPONSESERVEREXCEPTION_H
+#define AMQPRESPONSESERVEREXCEPTION_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -36,42 +38,42 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleRpcClient.h"
-#include "BasicMessage.h"
+#include "SimpleAmqpClient/Util.h"
+
+#include <boost/cstdint.hpp>
+#include <amqp.h>
+#include <string>
+#include <exception>
+
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4251 )
+#endif
 
 namespace AmqpClient {
 
-SimpleRpcClient::SimpleRpcClient(Channel::ptr_t channel, const std::string& rpc_name) :
-	m_channel(channel), m_outgoing_tag(rpc_name),
-	// Declare the reply queue, by passing an empty string, the broker will
-	// give us a name
-	m_incoming_tag(m_channel->DeclareQueue(""))
+class SIMPLEAMQPCLIENT_EXPORT AmqpResponseServerException : public std::exception
 {
-	m_channel->BindQueue(m_incoming_tag, "amq.direct", m_incoming_tag);
-	m_channel->BasicConsume(m_incoming_tag, m_incoming_tag);
-}
+public:
+	AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
+	AmqpResponseServerException(const AmqpResponseServerException& e) throw();
+	AmqpResponseServerException& operator=(const AmqpResponseServerException& e) throw();
 
-SimpleRpcClient::~SimpleRpcClient()
-{
-}
+	virtual ~AmqpResponseServerException() throw();
 
-std::string SimpleRpcClient::Call(const std::string& message)
-{
-	BasicMessage::ptr_t outgoing_msg = BasicMessage::Create();
-	outgoing_msg->Body(message);
+	virtual const char* what() const throw() { return m_what.c_str(); }
 
-	BasicMessage::ptr_t reply = Call(outgoing_msg);
-	return reply->Body();
-}
+private:
+	AmqpResponseServerException();
 
-BasicMessage::ptr_t SimpleRpcClient::Call(BasicMessage::ptr_t message)
-{
-	message->ReplyTo(m_incoming_tag);
-	m_channel->BasicPublish("amq.direct", m_outgoing_tag, message);
-
-	BasicMessage::ptr_t incoming_msg = m_channel->BasicConsumeMessage();
-
-	return incoming_msg;
-}
+    amqp_rpc_reply_t m_reply;
+    std::string m_what;
+};
 
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
+
+#endif // AMQPRESPONSESERVEREXCEPTION_H

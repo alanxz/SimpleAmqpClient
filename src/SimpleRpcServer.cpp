@@ -36,65 +36,50 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "AmqpResponseServerException.h"
+#include "SimpleAmqpClient/SimpleRpcServer.h"
 
-#include <boost/cstdint.hpp>
-#include <amqp.h>
-#include <amqp_framing.h>
-#include <sstream>
 
 namespace AmqpClient {
 
-AmqpResponseServerException::AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw() :
-	m_reply(reply)
+SimpleRpcServer::SimpleRpcServer(Channel::ptr_t channel, const std::string& rpc_name) :
+	m_channel(channel)
+  , m_incoming_tag(m_channel->DeclareQueue(rpc_name))
+
 {
-	std::ostringstream oss;
-	oss << context;
-
-	switch (reply.reply.id)
-	{
-		case AMQP_CONNECTION_CLOSE_METHOD:
-			{
-				amqp_connection_close_t* msg = reinterpret_cast<amqp_connection_close_t*>(reply.reply.decoded);
-				oss << ": Server connection error: " << msg->reply_code << " status: " 
-					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
-			}
-			break;
-
-		case AMQP_CHANNEL_CLOSE_METHOD:
-			{
-				amqp_channel_close_t* msg = reinterpret_cast<amqp_channel_close_t*>(reply.reply.decoded);
-				oss << ": Server channel error: " << msg->reply_code << " status: " 
-					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
-
-			}
-			break;
-
-		default:
-			oss << ": Unknown server error, method: " << reply.reply.id;
-
-	}
-	m_what = oss.str();
+	m_channel->BindQueue(m_incoming_tag, "amq.direct", m_incoming_tag);
+	m_channel->BasicConsume(m_incoming_tag, m_incoming_tag);
 }
 
-AmqpResponseServerException::AmqpResponseServerException(const AmqpResponseServerException& e) throw() :
-	m_reply(e.m_reply), m_what(e.m_what)
+SimpleRpcServer::~SimpleRpcServer()
 {
 }
-AmqpResponseServerException& AmqpResponseServerException::operator=(const AmqpResponseServerException& e) throw()
+
+BasicMessage::ptr_t SimpleRpcServer::GetNextIncomingMessage()
 {
-	if (this == &e)
+	return m_channel->BasicConsumeMessage();
+}
+
+bool SimpleRpcServer::GetNextIncomingMessage(BasicMessage::ptr_t& message, int timeout)
+{
+	return m_channel->BasicConsumeMessage(message, timeout);
+}
+
+void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, BasicMessage::ptr_t response)
+{
+	if (request->CorrelationIdIsSet() && !response->CorrelationIdIsSet())
 	{
-		return *this;
+		response->CorrelationId(request->CorrelationId());
 	}
 
-	m_reply = e.m_reply;
-	m_what = e.m_what;
-	return *this;
+	m_channel->BasicPublish("amq.direct", request->ReplyTo(), response);
 }
 
-AmqpResponseServerException::~AmqpResponseServerException() throw()
+void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, const std::string response)
 {
+	BasicMessage::ptr_t response_message = BasicMessage::Create();
+	response_message->Body(response);
+
+	RespondToMessage(request, response_message);
 }
 
 } // namespace AmqpClient
