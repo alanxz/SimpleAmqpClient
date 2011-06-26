@@ -308,6 +308,13 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 
 		if (ret != 0)
 		{
+#ifdef HAVE_WINSOCK2_H
+			int wsa_err = (-ret) & ~(1 << 29);
+			if (wsa_err == WSAETIMEDOUT)
+			{
+				return false;
+			}
+#else // HAVE_WINSOCK2_H
 			// Interrupted system call, just loop around and try it again
 			if (errno_save == EINTR)
 			{
@@ -317,6 +324,7 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 			{
 				return false;
 			}
+#endif
 		}
 
 		Util::CheckForError(ret, "Consume Message: method frame");
