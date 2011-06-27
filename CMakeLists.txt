@@ -68,9 +68,6 @@ SET(SAC_LIB_SRCS
 
 	SimpleTwoWayChannel.h
 	SimpleTwoWayChannel.cpp
-
-	UmroBrokerConfiguration.h
-	UmroBrokerConfiguration.cpp
 	)
 
 
