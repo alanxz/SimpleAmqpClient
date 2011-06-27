@@ -76,11 +76,12 @@ ADD_LIBRARY(simple-amqp-client-static STATIC ${SAC_LIB_SRCS})
 ADD_LIBRARY(simple-amqp-client-shared SHARED ${SAC_LIB_SRCS})
 
 SET_TARGET_PROPERTIES(simple-amqp-client-static PROPERTIES OUTPUT_NAME SimpleAmqpClient)
-SET_TARGET_PROPERTIES(simple-amqp-client-shared PROPERTIES OUTPUT_NAME SimpleAmqpClient)
+SET_TARGET_PROPERTIES(simple-amqp-client-shared PROPERTIES 
+	OUTPUT_NAME SimpleAmqpClient
+	VERSION 1.0)
 
 TARGET_LINK_LIBRARIES(simple-amqp-client-shared ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
 
-LINK_DIRECTORIES(${Boost_LIBRARY_PATH})
 ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
 
 TARGET_LINK_LIBRARIES(simple_connect simple-amqp-client-shared)
