@@ -36,9 +36,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Channel.h"
+#include "SimpleAmqpClient/Channel.h"
 
-#include "Util.h"
+#include "SimpleAmqpClient/Util.h"
 #include "config.h"
 
 #include <amqp_framing.h>

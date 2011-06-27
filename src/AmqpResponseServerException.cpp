@@ -1,5 +1,3 @@
-#ifndef SIMPLEPUBLISHER_H
-#define SIMPLEPUBLISHER_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,57 +36,65 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "BasicMessage.h"
-#include "Channel.h"
-#include "Util.h"
+#include "SimpleAmqpClient/AmqpResponseServerException.h"
 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <string>
+#include <boost/cstdint.hpp>
+#include <amqp.h>
+#include <amqp_framing.h>
+#include <sstream>
 
-#ifdef _MSC_VER
-# pragma warning ( push )
-# pragma warning ( disable: 4275 4251 )
-#endif
+namespace AmqpClient {
 
-namespace AmqpClient
+AmqpResponseServerException::AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw() :
+	m_reply(reply)
 {
+	std::ostringstream oss;
+	oss << context;
 
-class SIMPLEAMQPCLIENT_EXPORT SimplePublisher : boost::noncopyable
+	switch (reply.reply.id)
+	{
+		case AMQP_CONNECTION_CLOSE_METHOD:
+			{
+				amqp_connection_close_t* msg = reinterpret_cast<amqp_connection_close_t*>(reply.reply.decoded);
+				oss << ": Server connection error: " << msg->reply_code << " status: " 
+					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
+			}
+			break;
+
+		case AMQP_CHANNEL_CLOSE_METHOD:
+			{
+				amqp_channel_close_t* msg = reinterpret_cast<amqp_channel_close_t*>(reply.reply.decoded);
+				oss << ": Server channel error: " << msg->reply_code << " status: " 
+					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
+
+			}
+			break;
+
+		default:
+			oss << ": Unknown server error, method: " << reply.reply.id;
+
+	}
+	m_what = oss.str();
+}
+
+AmqpResponseServerException::AmqpResponseServerException(const AmqpResponseServerException& e) throw() :
+	m_reply(e.m_reply), m_what(e.m_what)
 {
-public:
-	typedef boost::shared_ptr<SimplePublisher> ptr_t;
+}
+AmqpResponseServerException& AmqpResponseServerException::operator=(const AmqpResponseServerException& e) throw()
+{
+	if (this == &e)
+	{
+		return *this;
+	}
 
-	friend ptr_t boost::make_shared<SimplePublisher>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
+	m_reply = e.m_reply;
+	m_what = e.m_what;
+	return *this;
+}
 
-	static ptr_t Create(Channel::ptr_t channel, const std::string& publisher_name = "")
-	{ return boost::make_shared<SimplePublisher>(channel, publisher_name); }
-
-private:
-	explicit SimplePublisher(Channel::ptr_t channel, const std::string& publisher_name);
-
-public:
-	virtual ~SimplePublisher();
-
-	std::string getPublisherName() const { return m_publisherExchange; }
-
-	void Publish(const std::string& message);
-	void Publish(BasicMessage::ptr_t message);
-
-private:
-	Channel::ptr_t m_channel;
-	std::string m_publisherExchange;
-
-
-
-};
+AmqpResponseServerException::~AmqpResponseServerException() throw()
+{
+}
 
 } // namespace AmqpClient
-
-#ifdef _MSC_VER
-# pragma warning ( pop )
-#endif
-
-#endif // SIMPLEPUBLISHER_H
-

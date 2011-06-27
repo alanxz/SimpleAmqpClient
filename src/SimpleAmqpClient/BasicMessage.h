@@ -38,7 +38,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Util.h"
+#include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>

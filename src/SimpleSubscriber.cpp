@@ -35,7 +35,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleSubscriber.h"
+#include "SimpleAmqpClient/SimpleSubscriber.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid.hpp>

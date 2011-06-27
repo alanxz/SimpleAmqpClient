@@ -1,3 +1,5 @@
+#ifndef AMQPRESPONSELIBRARYEXCEPTION_H
+#define AMQPRESPONSELIBRARYEXCEPTION_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -36,55 +38,42 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Util.h"
+#include "SimpleAmqpClient/Util.h"
 
-#include "AmqpResponseLibraryException.h"
-#include "AmqpResponseServerException.h"
+#include <exception>
+#include <boost/cstdint.hpp>
+#include <amqp.h>
+#include <string>
 
-#include <stdexcept>
-#include <sstream>
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4251 )
+#endif
 
 namespace AmqpClient {
 
-void Util::CheckRpcReply(amqp_rpc_reply_t reply, const std::string& context)
+class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::exception
 {
-    switch (reply.reply_type)
-    {
-        case AMQP_RESPONSE_NORMAL:
-            return;
-            break;
+public:
+    AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
+    AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw();
+    AmqpResponseLibraryException& operator=(const AmqpResponseLibraryException& e) throw();
 
-        case AMQP_RESPONSE_NONE:
-            throw std::logic_error("Got a amqp_rpc_reply_t with no reply_type!");
-            break;
+    virtual ~AmqpResponseLibraryException() throw();
 
-        case AMQP_RESPONSE_LIBRARY_EXCEPTION:
-            throw AmqpResponseLibraryException(reply, context);
-            break;
+    virtual const char* what() const throw() { return m_what.c_str(); }
 
-        case AMQP_RESPONSE_SERVER_EXCEPTION:
-            throw AmqpResponseServerException(reply, context);
-            break;
-        default:
-            throw std::runtime_error("amqp_rpc_reply_t that didn't match!");
-    }
-}
+private:
+    AmqpResponseLibraryException();
 
-void Util::CheckLastRpcReply(amqp_connection_state_t connection, const std::string& context)
-{
-    CheckRpcReply(amqp_get_rpc_reply(connection));
-}
+    amqp_rpc_reply_t m_reply;
+    std::string m_what;
+};
 
-void Util::CheckForError(int ret, const std::string& context)
-{
-    if (ret < 0)
-    {
-        char* errstr = amqp_error_string(-ret);
-        std::ostringstream oss;
-        oss << context << ": " << errstr;
-        free(errstr);
-        throw std::runtime_error(oss.str().c_str());
-    }
-
-}
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
+
+#endif // AMQPRESPONSELIBRARYEXCEPTION_H

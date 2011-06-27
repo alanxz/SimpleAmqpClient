@@ -1,5 +1,3 @@
-#ifndef AMQPRESPONSELIBRARYEXCEPTION_H
-#define AMQPRESPONSELIBRARYEXCEPTION_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,42 +36,41 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Util.h"
-
-#include <exception>
-#include <boost/cstdint.hpp>
-#include <amqp.h>
-#include <string>
-
-#ifdef _MSC_VER
-# pragma warning ( push )
-# pragma warning ( disable: 4251 )
-#endif
+#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 
 namespace AmqpClient {
 
-class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::exception
+AmqpResponseLibraryException::AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw() :
+    m_reply(reply), m_what(context)
 {
-public:
-    AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
-    AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw();
-    AmqpResponseLibraryException& operator=(const AmqpResponseLibraryException& e) throw();
+	m_what += ": ";
 
-    virtual ~AmqpResponseLibraryException() throw();
+	char* error_string = amqp_error_string(reply.library_error);
 
-    virtual const char* what() const throw() { return m_what.c_str(); }
+	m_what += error_string;
 
-private:
-    AmqpResponseLibraryException();
+	free(error_string);
+}
+AmqpResponseLibraryException::AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw() :
+    m_reply(e.m_reply), m_what(e.m_what)
+{
+}
 
-    amqp_rpc_reply_t m_reply;
-    std::string m_what;
-};
+AmqpResponseLibraryException& AmqpResponseLibraryException::operator=(const AmqpResponseLibraryException& e) throw()
+{
+	if (this == &e)
+	{
+		return *this;
+	}
+
+    m_reply = e.m_reply;
+    m_what = e.m_what;
+    return *this;
+}
+
+AmqpResponseLibraryException::~AmqpResponseLibraryException() throw()
+{
+}
+
 
 } // namespace AmqpClient
-
-#ifdef _MSC_VER
-# pragma warning ( pop )
-#endif
-
-#endif // AMQPRESPONSELIBRARYEXCEPTION_H

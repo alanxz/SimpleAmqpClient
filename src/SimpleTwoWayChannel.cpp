@@ -1,6 +1,3 @@
-#ifndef SIMPLERPCCLIENT_H
-#define SIMPLERPCCLIENT_H
-
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
@@ -38,53 +35,65 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "BasicMessage.h"
-#include "Channel.h"
-#include "Util.h"
+#include "SimpleAmqpClient/SimpleTwoWayChannel.h"
+#include "SimpleAmqpClient/BasicMessage.h"
 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <string>
-
-#ifdef _MSC_VER
-# pragma warning ( push )
-# pragma warning ( disable: 4275 4251 )
-#endif
 
 namespace AmqpClient {
 
+const std::string SimpleTwoWayChannel::ROUTING_KEY = "";
 
-class SIMPLEAMQPCLIENT_EXPORT SimpleRpcClient : boost::noncopyable
+SimpleTwoWayChannel::SimpleTwoWayChannel(Channel::ptr_t channel, const std::string& incoming_name, 
+			const std::string& outgoing_name) :
+	m_channel(channel), m_incoming_tag(incoming_name), m_outgoing_tag(outgoing_name)
 {
-public:
-	typedef boost::shared_ptr<SimpleRpcClient> ptr_t;
-	friend ptr_t boost::make_shared<SimpleRpcClient>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
+	// Receiver:
+	m_channel->DeclareExchange(m_incoming_tag, "fanout");
+	// Have the broker create a queue name for us
+	std::string queue_name = m_channel->DeclareQueue("");
+	m_channel->BindQueue(queue_name, m_incoming_tag);
+	m_channel->BasicConsume(queue_name, m_incoming_tag);
 
-	static ptr_t Create(Channel::ptr_t channel, const std::string& rpc_name) 
-	{ return boost::make_shared<SimpleRpcClient>(channel, rpc_name); }
+	// Sender
+}
 
-private:
-	explicit SimpleRpcClient(Channel::ptr_t channel, const std::string& rpc_name);
+SimpleTwoWayChannel::~SimpleTwoWayChannel() 
+{
+}
 
-public:
-	virtual ~SimpleRpcClient();
+void SimpleTwoWayChannel::Send(const std::string& message)
+{
+	BasicMessage::ptr_t full_message = BasicMessage::Create();
+	full_message->Body(message);
+	Send(full_message);
+}
 
-	std::string Call(const std::string& message);
-	BasicMessage::ptr_t Call(BasicMessage::ptr_t message);
+void SimpleTwoWayChannel::Send(BasicMessage::ptr_t message)
+{
+	m_channel->BasicPublish(m_outgoing_tag, ROUTING_KEY, message);
+}
 
+std::string SimpleTwoWayChannel::Receive()
+{
+	BasicMessage::ptr_t message = ReceiveMessage();
+	return message->Body();
+}
 
-private:
-	Channel::ptr_t m_channel;
-	const std::string m_outgoing_tag;
-	const std::string m_incoming_tag;
-};
+BasicMessage::ptr_t SimpleTwoWayChannel::ReceiveMessage()
+{
+	return m_channel->BasicConsumeMessage();
+}
 
+std::string SimpleTwoWayChannel::SendAndReceive(const std::string& message)
+{
+	Send(message);
+	return Receive();
+}
+
+BasicMessage::ptr_t SimpleTwoWayChannel::SendAndReceive(BasicMessage::ptr_t message)
+{
+	Send(message);
+	return ReceiveMessage();
+}
 
 } // namespace AmqpClient
-
-#ifdef _MSC_VER
-# pragma warning ( pop )
-#endif
-
-#endif //SIMPLERPCCLIENT_H

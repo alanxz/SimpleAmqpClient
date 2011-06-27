@@ -36,41 +36,55 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "AmqpResponseLibraryException.h"
+#include "SimpleAmqpClient/Util.h"
+
+#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
+#include "SimpleAmqpClient/AmqpResponseServerException.h"
+
+#include <stdexcept>
+#include <sstream>
 
 namespace AmqpClient {
 
-AmqpResponseLibraryException::AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw() :
-    m_reply(reply), m_what(context)
+void Util::CheckRpcReply(amqp_rpc_reply_t reply, const std::string& context)
 {
-	m_what += ": ";
+    switch (reply.reply_type)
+    {
+        case AMQP_RESPONSE_NORMAL:
+            return;
+            break;
 
-	char* error_string = amqp_error_string(reply.library_error);
+        case AMQP_RESPONSE_NONE:
+            throw std::logic_error("Got a amqp_rpc_reply_t with no reply_type!");
+            break;
 
-	m_what += error_string;
+        case AMQP_RESPONSE_LIBRARY_EXCEPTION:
+            throw AmqpResponseLibraryException(reply, context);
+            break;
 
-	free(error_string);
-}
-AmqpResponseLibraryException::AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw() :
-    m_reply(e.m_reply), m_what(e.m_what)
-{
-}
-
-AmqpResponseLibraryException& AmqpResponseLibraryException::operator=(const AmqpResponseLibraryException& e) throw()
-{
-	if (this == &e)
-	{
-		return *this;
-	}
-
-    m_reply = e.m_reply;
-    m_what = e.m_what;
-    return *this;
+        case AMQP_RESPONSE_SERVER_EXCEPTION:
+            throw AmqpResponseServerException(reply, context);
+            break;
+        default:
+            throw std::runtime_error("amqp_rpc_reply_t that didn't match!");
+    }
 }
 
-AmqpResponseLibraryException::~AmqpResponseLibraryException() throw()
+void Util::CheckLastRpcReply(amqp_connection_state_t connection, const std::string& context)
 {
+    CheckRpcReply(amqp_get_rpc_reply(connection));
 }
 
+void Util::CheckForError(int ret, const std::string& context)
+{
+    if (ret < 0)
+    {
+        char* errstr = amqp_error_string(-ret);
+        std::ostringstream oss;
+        oss << context << ": " << errstr;
+        free(errstr);
+        throw std::runtime_error(oss.str().c_str());
+    }
 
+}
 } // namespace AmqpClient

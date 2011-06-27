@@ -1,5 +1,3 @@
-#ifndef SIMPLERPCCLIENT_H
-#define SIMPLERPCCLIENT_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,64 +36,42 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Channel.h"
-#include "BasicMessage.h"
-
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <string>
-
-#ifdef _MSC_VER
-# pragma warning ( push )
-# pragma warning ( disable: 4275 4251 )
-#endif
+#include "SimpleAmqpClient/SimpleRpcClient.h"
+#include "SimpleAmqpClient/BasicMessage.h"
 
 namespace AmqpClient {
 
-
-class SIMPLEAMQPCLIENT_EXPORT SimpleTwoWayChannel : boost::noncopyable
+SimpleRpcClient::SimpleRpcClient(Channel::ptr_t channel, const std::string& rpc_name) :
+	m_channel(channel), m_outgoing_tag(rpc_name),
+	// Declare the reply queue, by passing an empty string, the broker will
+	// give us a name
+	m_incoming_tag(m_channel->DeclareQueue(""))
 {
-public:
-	typedef boost::shared_ptr<SimpleTwoWayChannel> ptr_t;
-	friend ptr_t boost::make_shared<SimpleTwoWayChannel>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2, std::string const & a3);
+	m_channel->BindQueue(m_incoming_tag, "amq.direct", m_incoming_tag);
+	m_channel->BasicConsume(m_incoming_tag, m_incoming_tag);
+}
 
-	static ptr_t Create(Channel::ptr_t channel, const std::string& incoming_name, const std::string& outgoing_name)
-	{ return boost::make_shared<SimpleTwoWayChannel>(channel, incoming_name, outgoing_name); }
+SimpleRpcClient::~SimpleRpcClient()
+{
+}
 
-private:
-	static const std::string ROUTING_KEY;
+std::string SimpleRpcClient::Call(const std::string& message)
+{
+	BasicMessage::ptr_t outgoing_msg = BasicMessage::Create();
+	outgoing_msg->Body(message);
 
-	explicit SimpleTwoWayChannel(Channel::ptr_t channel, const std::string& incoming_name, 
-			const std::string& outgoing_name);
+	BasicMessage::ptr_t reply = Call(outgoing_msg);
+	return reply->Body();
+}
 
-public:
-	virtual ~SimpleTwoWayChannel();
+BasicMessage::ptr_t SimpleRpcClient::Call(BasicMessage::ptr_t message)
+{
+	message->ReplyTo(m_incoming_tag);
+	m_channel->BasicPublish("amq.direct", m_outgoing_tag, message);
 
-	std::string getIncomingName() const { return m_incoming_tag; }
-	std::string getOutgoingName() const { return m_outgoing_tag; }
+	BasicMessage::ptr_t incoming_msg = m_channel->BasicConsumeMessage();
 
-	void Send(const std::string& message);
-	void Send(BasicMessage::ptr_t message);
-
-	std::string Receive();
-	BasicMessage::ptr_t ReceiveMessage();
-
-	std::string SendAndReceive(const std::string& message);
-	BasicMessage::ptr_t SendAndReceive(BasicMessage::ptr_t message);
-
-private:
-	Channel::ptr_t m_channel;
-	const std::string m_incoming_tag;
-	const std::string m_outgoing_tag;
-};
-
+	return incoming_msg;
+}
 
 } // namespace AmqpClient
-
-#ifdef _MSC_VER
-# pragma warning ( pop )
-#endif 
-
-#endif //SIMPLERPCCLIENT_H
-

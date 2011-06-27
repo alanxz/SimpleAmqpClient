@@ -5,16 +5,15 @@ PROJECT(SimpleAmqpClient)
 #SET(Boost_DEBUG TRUE)
 #SET(Boost_DETAILED_FAILURE_MSG TRUE)
 SET(Boost_ADDITIONAL_VERSIONS "1.44.0" "1.46.1")
-
 FIND_PACKAGE(Boost 1.44.0 COMPONENTS thread REQUIRED)
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 FIND_PACKAGE(Rabbitmqc REQUIRED)
+INCLUDE_DIRECTORIES(${Rabbitmqc_INCLUDE_DIRS})
 
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}
-					${Rabbitmqc_INCLUDE_DIRS}
-					${CMAKE_CURRENT_SOURCE_DIR}
-					${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(src
+	${CMAKE_CURRENT_BINARY_DIR})
 
 ADD_DEFINITIONS(-DBUILDING_SIMPLEAMQPCLIENT)
 
@@ -37,37 +36,37 @@ CHECK_INCLUDE_FILE(sys/socket.h HAVE_SYS_SOCKET_H)
 CONFIGURE_FILE(config.h.in config.h)
 
 SET(SAC_LIB_SRCS
-	SimpleAmqpClient.h
+	src/SimpleAmqpClient.h
 
-    Channel.h
-    Channel.cpp
+	src/SimpleAmqpClient/Channel.h
+	src/Channel.cpp
 
-    BasicMessage.h
-    BasicMessage.cpp
+	src/SimpleAmqpClient/BasicMessage.h
+	src/BasicMessage.cpp
 
-    Util.h
-    Util.cpp
+	src/SimpleAmqpClient/Util.h
+	src/Util.cpp
 
-    AmqpResponseLibraryException.h
-    AmqpResponseLibraryException.cpp
+	src/SimpleAmqpClient/AmqpResponseLibraryException.h
+	src/AmqpResponseLibraryException.cpp
 
-    AmqpResponseServerException.h
-    AmqpResponseServerException.cpp
+	src/SimpleAmqpClient/AmqpResponseServerException.h
+	src/AmqpResponseServerException.cpp
 
-	SimpleRpcClient.h
-	SimpleRpcClient.cpp
+	src/SimpleAmqpClient/SimpleRpcClient.h
+	src/SimpleRpcClient.cpp
 
-	SimpleRpcServer.h
-	SimpleRpcServer.cpp
+	src/SimpleAmqpClient/SimpleRpcServer.h
+	src/SimpleRpcServer.cpp
 
-	SimplePublisher.h
-	SimplePublisher.cpp
+	src/SimpleAmqpClient/SimplePublisher.h
+	src/SimplePublisher.cpp
 
-	SimpleSubscriber.h
-	SimpleSubscriber.cpp
+	src/SimpleAmqpClient/SimpleSubscriber.h
+	src/SimpleSubscriber.cpp
 
-	SimpleTwoWayChannel.h
-	SimpleTwoWayChannel.cpp
+	src/SimpleAmqpClient/SimpleTwoWayChannel.h
+	src/SimpleTwoWayChannel.cpp
 	)
 
 

@@ -35,9 +35,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Channel.h"
-#include "BasicMessage.h"
-#include "SimpleRpcServer.h"
+#include <SimpleAmqpClient.h>
+#include <SimpleAmqpClient/SimpleRpcServer.h>
 
 #define BOOST_ALL_NO_LIB
 #include <boost/bind.hpp>

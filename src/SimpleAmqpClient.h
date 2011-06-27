@@ -1,5 +1,5 @@
-#ifndef SIMPLERPCSERVER_H
-#define SIMPLERPCSERVER_H
+#ifndef SIMPLEAMQPCLIENT_H
+#define SIMPLEAMQPCLIENT_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,64 +38,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "BasicMessage.h"
-#include "Channel.h"
-#include "Util.h"
+#include "SimpleAmqpClient/Channel.h"
+#include "SimpleAmqpClient/BasicMessage.h"
 
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <string>
-
-#ifdef _MSC_VER
-# pragma warning ( push )
-# pragma warning ( disable: 4275 4251 )
-#endif 
-
-namespace AmqpClient {
-
-
-class SIMPLEAMQPCLIENT_EXPORT SimpleRpcServer : boost::noncopyable
-{
-public:
-	typedef boost::shared_ptr<SimpleRpcServer> ptr_t;
-
-	friend ptr_t boost::make_shared<SimpleRpcServer>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
-
-	static ptr_t Create(Channel::ptr_t channel, const std::string& rpc_name = "") 
-		{ return boost::make_shared<SimpleRpcServer>(channel, rpc_name); }
-
-private:
-	explicit SimpleRpcServer(Channel::ptr_t channel, const std::string& rpc_name);
-
-public:
-	virtual ~SimpleRpcServer();
-
-	std::string GetRpcName() const { return m_incoming_tag; }
-
-	BasicMessage::ptr_t GetNextIncomingMessage();
-
-	bool GetNextIncomingMessage(BasicMessage::ptr_t& message, int timeout);
-
-	void RespondToMessage(BasicMessage::ptr_t request, 
-						  BasicMessage::ptr_t response);
-
-	void RespondToMessage(BasicMessage::ptr_t request,
-						  const std::string response);
-
-private:
-	Channel::ptr_t m_channel;
-	const std::string m_incoming_tag;
-
-
-
-
-};
-
-}
-
-#ifdef _MSC_VER
-# pragma warning ( pop )
-#endif
-
-#endif // SIMPLERPCSERVER_H
+#endif // SIMPLEAMQPCLIENT_H

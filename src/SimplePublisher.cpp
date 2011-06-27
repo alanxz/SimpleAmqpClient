@@ -35,65 +35,49 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleTwoWayChannel.h"
-#include "BasicMessage.h"
+#include "SimpleAmqpClient/SimplePublisher.h"
 
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <string>
+#include <sstream>
 
-namespace AmqpClient {
-
-const std::string SimpleTwoWayChannel::ROUTING_KEY = "";
-
-SimpleTwoWayChannel::SimpleTwoWayChannel(Channel::ptr_t channel, const std::string& incoming_name, 
-			const std::string& outgoing_name) :
-	m_channel(channel), m_incoming_tag(incoming_name), m_outgoing_tag(outgoing_name)
+namespace AmqpClient
 {
-	// Receiver:
-	m_channel->DeclareExchange(m_incoming_tag, "fanout");
-	// Have the broker create a queue name for us
-	std::string queue_name = m_channel->DeclareQueue("");
-	m_channel->BindQueue(queue_name, m_incoming_tag);
-	m_channel->BasicConsume(queue_name, m_incoming_tag);
 
-	// Sender
+SimplePublisher::SimplePublisher(Channel::ptr_t channel, const std::string& publisher_name) :
+	m_channel(channel), m_publisherExchange(publisher_name)
+{
+	if (m_publisherExchange == "")
+	{
+		m_publisherExchange = "SimplePublisher_";
+		boost::uuids::random_generator uuid_gen;
+		boost::uuids::uuid guid(uuid_gen());
+		m_publisherExchange += boost::lexical_cast<std::string>(guid);
+	}
+
+
+	m_channel->DeclareExchange(m_publisherExchange, "fanout", false, false, false);
 }
 
-SimpleTwoWayChannel::~SimpleTwoWayChannel() 
+SimplePublisher::~SimplePublisher()
 {
+	m_channel->DeleteExchange(m_publisherExchange, false, false);
 }
 
-void SimpleTwoWayChannel::Send(const std::string& message)
+void SimplePublisher::Publish(const std::string& message)
 {
-	BasicMessage::ptr_t full_message = BasicMessage::Create();
-	full_message->Body(message);
-	Send(full_message);
+	BasicMessage::ptr_t outgoing_message = BasicMessage::Create();
+	outgoing_message->Body(message);
+
+	Publish(outgoing_message);
 }
 
-void SimpleTwoWayChannel::Send(BasicMessage::ptr_t message)
+void SimplePublisher::Publish(const BasicMessage::ptr_t message)
 {
-	m_channel->BasicPublish(m_outgoing_tag, ROUTING_KEY, message);
-}
-
-std::string SimpleTwoWayChannel::Receive()
-{
-	BasicMessage::ptr_t message = ReceiveMessage();
-	return message->Body();
-}
-
-BasicMessage::ptr_t SimpleTwoWayChannel::ReceiveMessage()
-{
-	return m_channel->BasicConsumeMessage();
-}
-
-std::string SimpleTwoWayChannel::SendAndReceive(const std::string& message)
-{
-	Send(message);
-	return Receive();
-}
-
-BasicMessage::ptr_t SimpleTwoWayChannel::SendAndReceive(BasicMessage::ptr_t message)
-{
-	Send(message);
-	return ReceiveMessage();
+	m_channel->BasicPublish(m_publisherExchange, "", message);
 }
 
 } // namespace AmqpClient
