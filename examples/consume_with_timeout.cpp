@@ -36,6 +36,7 @@
  */
 
 #include <SimpleAmqpClient.h>
+#include <SimpleAmqpClient/SimpleRpcClient.h>
 #include <SimpleAmqpClient/SimpleRpcServer.h>
 
 #define BOOST_ALL_NO_LIB
@@ -63,7 +64,7 @@ class thread_body : boost::noncopyable
 				channel = Channel::Create();
 
 
-			server = SimpleRpcServer::Create(channel);
+			server = SimpleRpcServer::Create(channel, "consume_timeout_test");
 
 			m_thread =
 				boost::make_shared<boost::thread>(boost::bind(&thread_body::run,
@@ -87,6 +88,7 @@ class thread_body : boost::noncopyable
 				if (server->GetNextIncomingMessage(message, 1))
 				{
 					std::cout << "message received.\n";
+          server->RespondToMessage(message, "this is a response");
 				}
 				else
 				{
@@ -103,7 +105,20 @@ int main()
 {
 	boost::shared_ptr<thread_body> body = boost::make_shared<thread_body>();
 
-	boost::this_thread::sleep(boost::posix_time::seconds(3));
+	boost::this_thread::sleep(boost::posix_time::seconds(1));
+
+  char* szBroker = getenv("AMQP_BROKER");
+  Channel::ptr_t channel;
+  if (szBroker != NULL)
+    channel = Channel::Create(szBroker);
+  else
+    channel = Channel::Create();
+
+  SimpleRpcClient::ptr_t client = SimpleRpcClient::Create(channel, "consume_timeout_test");
+  std::string str = client->Call("Here is my message");
+  std::cout << "Got response: " << str << std::endl;
+
+	boost::this_thread::sleep(boost::posix_time::seconds(2));
 
 	return 0;
 }
