@@ -15,8 +15,6 @@ INCLUDE_DIRECTORIES(${Rabbitmqc_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(src
 	${CMAKE_CURRENT_BINARY_DIR})
 
-ADD_DEFINITIONS(-DBUILDING_SIMPLEAMQPCLIENT)
-
 # We need winsock32 if we're compiling on windows
 IF (WIN32)
 	SET(SOCKET_LIBRARY ws2_32)
@@ -71,23 +69,24 @@ SET(SAC_LIB_SRCS
 
 
 
-ADD_LIBRARY(simple-amqp-client-static STATIC ${SAC_LIB_SRCS})
-ADD_LIBRARY(simple-amqp-client-shared SHARED ${SAC_LIB_SRCS})
+ADD_LIBRARY(SimpleAmqpClient SHARED ${SAC_LIB_SRCS})
+TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
+SET_TARGET_PROPERTIES(SimpleAmqpClient PROPERTIES 
+	VERSION "1.0"
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin
+	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib
+	)
 
-SET_TARGET_PROPERTIES(simple-amqp-client-static PROPERTIES OUTPUT_NAME SimpleAmqpClient)
-SET_TARGET_PROPERTIES(simple-amqp-client-shared PROPERTIES 
-	OUTPUT_NAME SimpleAmqpClient
-	VERSION 1.0)
-
-TARGET_LINK_LIBRARIES(simple-amqp-client-shared ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
 
 ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
-
-TARGET_LINK_LIBRARIES(simple_connect simple-amqp-client-shared)
+TARGET_LINK_LIBRARIES(simple_connect SimpleAmqpClient)
+SET_TARGET_PROPERTIES(simple_connect PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 ADD_EXECUTABLE(consume_with_timeout examples/consume_with_timeout.cpp)
-
-TARGET_LINK_LIBRARIES(consume_with_timeout simple-amqp-client-shared ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(consume_with_timeout SimpleAmqpClient ${Boost_LIBRARIES})
+SET_TARGET_PROPERTIES(consume_with_timeout PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 # Documentation generation
 SET(DOXYFILE_LATEX "NO")

@@ -43,7 +43,7 @@
 #include <string>
 
 #ifdef WIN32
-# ifdef BUILDING_SIMPLEAMQPCLIENT
+# ifdef SimpleAmqpClient_EXPORTS
 #  define SIMPLEAMQPCLIENT_EXPORT __declspec(dllexport)
 # else
 #  define SIMPLEAMQPCLIENT_EXPORT __declspec(dllimport)
