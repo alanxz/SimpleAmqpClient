@@ -55,18 +55,28 @@ namespace AmqpClient {
 class SIMPLEAMQPCLIENT_EXPORT AmqpResponseServerException : public std::exception
 {
 public:
-	AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
+  enum ExceptionType
+  {
+    ET_Unknown,
+    ET_ChannelException,
+    ET_ConnectionException
+  };
+
+	explicit AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
 	AmqpResponseServerException(const AmqpResponseServerException& e) throw();
 	AmqpResponseServerException& operator=(const AmqpResponseServerException& e) throw();
 
 	virtual ~AmqpResponseServerException() throw();
 
-	virtual const char* what() const throw() { return m_what.c_str(); }
+	virtual const char* what() const throw();
+
+  ExceptionType exception_type() const throw();
+  int exception_code() const throw();
+  std::string exception_message() const throw();
 
 private:
-	AmqpResponseServerException();
-
     amqp_rpc_reply_t m_reply;
+    const std::string m_context;
     std::string m_what;
 };
 
