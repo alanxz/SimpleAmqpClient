@@ -46,35 +46,8 @@
 namespace AmqpClient {
 
 AmqpResponseServerException::AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw() :
-	m_reply(reply)
+	m_reply(reply), m_context(context)
 {
-	std::ostringstream oss;
-	oss << context;
-
-	switch (reply.reply.id)
-	{
-		case AMQP_CONNECTION_CLOSE_METHOD:
-			{
-				amqp_connection_close_t* msg = reinterpret_cast<amqp_connection_close_t*>(reply.reply.decoded);
-				oss << ": Server connection error: " << msg->reply_code << " status: " 
-					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
-			}
-			break;
-
-		case AMQP_CHANNEL_CLOSE_METHOD:
-			{
-				amqp_channel_close_t* msg = reinterpret_cast<amqp_channel_close_t*>(reply.reply.decoded);
-				oss << ": Server channel error: " << msg->reply_code << " status: " 
-					<< std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
-
-			}
-			break;
-
-		default:
-			oss << ": Unknown server error, method: " << reply.reply.id;
-
-	}
-	m_what = oss.str();
 }
 
 AmqpResponseServerException::AmqpResponseServerException(const AmqpResponseServerException& e) throw() :
@@ -95,6 +68,85 @@ AmqpResponseServerException& AmqpResponseServerException::operator=(const AmqpRe
 
 AmqpResponseServerException::~AmqpResponseServerException() throw()
 {
+}
+
+const char* AmqpResponseServerException::what() const throw()
+{
+	std::ostringstream oss;
+	oss << m_context;
+
+	switch (m_reply.reply.id)
+	{
+		case AMQP_CONNECTION_CLOSE_METHOD:
+			{
+				oss << ": Server connection error: " << exception_code() << " status: " 
+          << exception_message();
+			}
+			break;
+
+		case AMQP_CHANNEL_CLOSE_METHOD:
+			{
+				oss << ": Server channel error: " << exception_code() << " status: " 
+					<< exception_message();
+			}
+			break;
+
+		default:
+			oss << ": Unknown server error, method: " << m_reply.reply.id;
+	}
+  const_cast<std::string&>(m_what) = oss.str();
+  return m_what.c_str();
+}
+
+AmqpResponseServerException::ExceptionType AmqpResponseServerException::exception_type() const throw()
+{
+  switch (m_reply.reply.id)
+  {
+  case AMQP_CONNECTION_CLOSE_METHOD:
+    return ET_ConnectionException;
+  case AMQP_CHANNEL_CLOSE_METHOD:
+    return ET_ChannelException;
+  default:
+    return ET_Unknown;
+  }
+}
+
+int AmqpResponseServerException::exception_code() const throw()
+{
+  switch (m_reply.reply.id)
+  {
+  case AMQP_CONNECTION_CLOSE_METHOD:
+    {
+				amqp_connection_close_t* msg = reinterpret_cast<amqp_connection_close_t*>(m_reply.reply.decoded);
+        return msg->reply_code;
+    }
+  case AMQP_CHANNEL_CLOSE_METHOD:
+    {
+      amqp_channel_close_t* msg = reinterpret_cast<amqp_channel_close_t*>(m_reply.reply.decoded);
+      return msg->reply_code;
+    }
+  default:
+    return 0;
+  }
+}
+
+std::string AmqpResponseServerException::exception_message() const throw()
+{
+  switch (m_reply.reply.id)
+  {
+  case AMQP_CONNECTION_CLOSE_METHOD:
+    {
+      amqp_connection_close_t* msg = reinterpret_cast<amqp_connection_close_t*>(m_reply.reply.decoded);
+      return std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
+    }
+  case AMQP_CHANNEL_CLOSE_METHOD:
+    {
+      amqp_channel_close_t* msg = reinterpret_cast<amqp_channel_close_t*>(m_reply.reply.decoded);
+      return std::string((char*)msg->reply_text.bytes, msg->reply_text.len);
+    }
+  default:
+    return std::string();
+  }
 }
 
 } // namespace AmqpClient
