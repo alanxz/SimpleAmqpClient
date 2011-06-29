@@ -286,6 +286,13 @@ public:
 	  */
 	bool BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout);
 
+  /**
+    * Closes the current channel and reopens immediately opens a new channel
+    * Note this will destroy anything that is bound to a channel (consumers, auto-delete queues, and auto-delete exchanges
+    * This is required after a AmqpResponseServerException with ExceptionType = ET_ChannelException
+    * all other functions will fail otherwise.
+    */
+  void ResetChannel();
 protected:
     amqp_connection_state_t m_connection;
     amqp_channel_t m_channel;
