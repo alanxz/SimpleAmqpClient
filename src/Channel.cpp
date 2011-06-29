@@ -45,6 +45,8 @@
 
 #include <stdexcept>
 
+#include <boost/cstdint.hpp>
+#include <boost/limits.hpp>
 
 // This will get us the posix version of strerror_r() on linux
 #define _XOPEN_SOURCE 600
@@ -61,6 +63,11 @@
 #endif
 
 #include <time.h>
+
+// Win32 headers seem to define this annoyingly...
+#ifdef max
+# undef max
+#endif
 
 namespace AmqpClient {
 
@@ -363,6 +370,14 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 		message = BasicMessage::Create(body, properties, deliver_method->delivery_tag);
 		return true;
 	}
+}
+
+void Channel::ResetChannel()
+{
+  Util::CheckRpcReply(amqp_channel_close(m_connection, m_channel, AMQP_REPLY_SUCCESS), "ResetChannel: closing channel");
+  m_channel = (m_channel + 1) % std::numeric_limits<uint16_t>::max();
+  amqp_channel_open(m_connection, m_channel);
+  Util::CheckLastRpcReply(m_connection, "ResetChannel: opening channel");
 }
 
 } // namespace AmqpClient
