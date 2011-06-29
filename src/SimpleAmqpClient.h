@@ -40,5 +40,7 @@
 
 #include "SimpleAmqpClient/Channel.h"
 #include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/AmqpResponseServerException.h"
+#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 
 #endif // SIMPLEAMQPCLIENT_H
