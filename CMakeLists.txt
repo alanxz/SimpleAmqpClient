@@ -5,18 +5,15 @@ PROJECT(SimpleAmqpClient)
 #SET(Boost_DEBUG TRUE)
 #SET(Boost_DETAILED_FAILURE_MSG TRUE)
 SET(Boost_ADDITIONAL_VERSIONS "1.44.0" "1.46.1")
-
 FIND_PACKAGE(Boost 1.44.0 COMPONENTS thread REQUIRED)
+INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIRS})
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 FIND_PACKAGE(Rabbitmqc REQUIRED)
+INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
 
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS}
-					${Rabbitmqc_INCLUDE_DIRS}
-					${CMAKE_CURRENT_SOURCE_DIR}/src
-					${CMAKE_CURRENT_BINARY_DIR})
-
-ADD_DEFINITIONS(-DBUILDING_SIMPLEAMQPCLIENT)
+INCLUDE_DIRECTORIES(BEFORE src
+	${CMAKE_CURRENT_BINARY_DIR})
 
 # We need winsock32 if we're compiling on windows
 IF (WIN32)
@@ -43,16 +40,16 @@ SET(SAC_LIB_SRCS
 	src/Channel.cpp
 
 	src/SimpleAmqpClient/BasicMessage.h
-    	src/BasicMessage.cpp
+	src/BasicMessage.cpp
 
 	src/SimpleAmqpClient/Util.h
-    	src/Util.cpp
+	src/Util.cpp
 
 	src/SimpleAmqpClient/AmqpResponseLibraryException.h
-    	src/AmqpResponseLibraryException.cpp
+	src/AmqpResponseLibraryException.cpp
 
 	src/SimpleAmqpClient/AmqpResponseServerException.h
-    	src/AmqpResponseServerException.cpp
+	src/AmqpResponseServerException.cpp
 
 	src/SimpleAmqpClient/SimpleRpcClient.h
 	src/SimpleRpcClient.cpp
@@ -68,38 +65,36 @@ SET(SAC_LIB_SRCS
 
 	src/SimpleAmqpClient/SimpleTwoWayChannel.h
 	src/SimpleTwoWayChannel.cpp
-
-	src/SimpleAmqpClient/UmroBrokerConfiguration.h
-	src/UmroBrokerConfiguration.cpp
 	)
 
 
 
-ADD_LIBRARY(simple-amqp-client-static STATIC ${SAC_LIB_SRCS})
-ADD_LIBRARY(simple-amqp-client-shared SHARED ${SAC_LIB_SRCS})
+ADD_LIBRARY(SimpleAmqpClient SHARED ${SAC_LIB_SRCS})
+TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
+SET_TARGET_PROPERTIES(SimpleAmqpClient PROPERTIES 
+	VERSION 1.0
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin
+	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib
+	)
 
-SET_TARGET_PROPERTIES(simple-amqp-client-static PROPERTIES OUTPUT_NAME SimpleAmqpClient)
-SET_TARGET_PROPERTIES(simple-amqp-client-shared PROPERTIES OUTPUT_NAME SimpleAmqpClient)
 
-TARGET_LINK_LIBRARIES(simple-amqp-client-shared ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
-
-LINK_DIRECTORIES(${Boost_LIBRARY_PATH})
 ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
-
-TARGET_LINK_LIBRARIES(simple_connect simple-amqp-client-shared)
+TARGET_LINK_LIBRARIES(simple_connect SimpleAmqpClient)
+SET_TARGET_PROPERTIES(simple_connect PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 ADD_EXECUTABLE(consume_with_timeout examples/consume_with_timeout.cpp)
-
-TARGET_LINK_LIBRARIES(consume_with_timeout simple-amqp-client-shared ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(consume_with_timeout SimpleAmqpClient ${Boost_LIBRARIES})
+SET_TARGET_PROPERTIES(consume_with_timeout PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 # Documentation generation
 SET(DOXYFILE_LATEX "NO")
 SET(PROJECT_VERSION "1.0.0")
 INCLUDE(UseDoxygen)
 
-INSTALL(TARGETS simple-amqp-client-shared simple-amqp-client-static
+INSTALL(TARGETS SimpleAmqpClient
 	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 	)
 
