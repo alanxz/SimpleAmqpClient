@@ -1,3 +1,14 @@
-*.*~
+*~
 .*.sw?
-CVS
+
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
+Debug/
+
+*.vcxproj*
+*.sln
+*.suo
+*.*sdf
+ipch/
+install_manifest.txt
