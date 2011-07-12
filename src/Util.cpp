@@ -72,7 +72,7 @@ void Util::CheckRpcReply(amqp_rpc_reply_t reply, const std::string& context)
 
 void Util::CheckLastRpcReply(amqp_connection_state_t connection, const std::string& context)
 {
-    CheckRpcReply(amqp_get_rpc_reply(connection));
+    CheckRpcReply(amqp_get_rpc_reply(connection), context);
 }
 
 void Util::CheckForError(int ret, const std::string& context)

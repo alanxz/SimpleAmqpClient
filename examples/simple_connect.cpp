@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient.h"
+#include <SimpleAmqpClient.h>
 
 #include <iostream>
 #include <stdlib.h>
