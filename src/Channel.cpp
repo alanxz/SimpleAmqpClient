@@ -54,7 +54,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#ifdef HAVS_SYS_SOCKET_H
+#ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
 #endif
 
@@ -294,7 +294,7 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
         char error_string_buffer[BUFFER_LENGTH] = {0};
         strerror_s(error_string_buffer, errno);
         error_string += error_string_buffer;
-#elif HAVE_STRERROR_R
+#elif defined(HAVE_STRERROR_R)
 				const int BUFFER_LENGTH = 256;
 				char error_string_buffer[BUFFER_LENGTH] = {0};
 				strerror_r(errno, error_string_buffer, BUFFER_LENGTH);
