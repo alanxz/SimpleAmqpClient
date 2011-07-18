@@ -266,7 +266,11 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 {
 
 	int socketno = amqp_get_sockfd(m_connection);
-
+#ifdef HAVE_WINSOCK2_H
+  // Timeouts on Winsock are a DWORD, and are in MS
+  uint32_t tv_timeout = timeout * 1000;
+  uint32_t tv_zero = 0;
+#else
 	struct timeval tv_timeout;
 	memset(&tv_timeout, 0, sizeof(tv_timeout));
 	tv_timeout.tv_sec = timeout;
@@ -274,6 +278,7 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 	struct timeval tv_zero;
 	memset(&tv_zero, 0, sizeof(tv_zero));
 	tv_zero.tv_sec = 0;
+#endif
 
 	while (true)
 	{
