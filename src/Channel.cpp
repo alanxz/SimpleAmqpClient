@@ -264,6 +264,17 @@ BasicMessage::ptr_t Channel::BasicConsumeMessage()
 
 bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 {
+  Envelope::ptr_t envelope;
+  bool ret = BasicConsumeMessage(envelope, timeout);
+  if (ret) 
+  {
+    message = envelope->Message();
+  }
+  return ret;
+}
+
+bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
+{
 
 	int socketno = amqp_get_sockfd(m_connection);
 #ifdef HAVE_WINSOCK2_H
@@ -347,12 +358,21 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 
 		amqp_basic_deliver_t* deliver_method = reinterpret_cast<amqp_basic_deliver_t*>(frame.payload.method.decoded);
 
+    const std::string exchange((char*)deliver_method->exchange.bytes, deliver_method->exchange.len);
+    const std::string routing_key((char*)deliver_method->routing_key.bytes, deliver_method->routing_key.len);
+    const std::string consumer_tag((char*)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
+    const uint64_t delivery_tag = deliver_method->delivery_tag;
+    const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
+
 		// Wait for frame #2, the header frame which contains body size
 		Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: header frame");
 
 		if (frame.frame_type != AMQP_FRAME_HEADER)
 			throw std::runtime_error("Channel::BasicConsumeMessage: receieved unexpected frame type (was expected AMQP_FRAME_HEADER)");
 
+    // The memory for this is allocated in a pool associated with the connection
+    // Its freed in amqp_maybe_release_buffers above
+    // The BasicMessage constructor does a deep copy of the properties structure
 		amqp_basic_properties_t* properties = reinterpret_cast<amqp_basic_properties_t*>(frame.payload.properties.decoded);
 
 		size_t body_size = frame.payload.properties.body_size;
@@ -372,7 +392,7 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 			received_size += frame.payload.body_fragment.len;
 		}
 
-		message = BasicMessage::Create(body, properties, deliver_method->delivery_tag);
+    message = Envelope::Create(BasicMessage::Create(body, properties, delivery_tag), consumer_tag, delivery_tag, exchange, redelivered, routing_key);
 		return true;
 	}
 }

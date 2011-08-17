@@ -65,6 +65,9 @@ SET(SAC_LIB_SRCS
 
 	src/SimpleAmqpClient/SimpleTwoWayChannel.h
 	src/SimpleTwoWayChannel.cpp
+
+	src/SimpleAmqpClient/Envelope.h
+	src/Envelope.cpp
 	)
 
 

@@ -39,6 +39,7 @@
  */
 
 #include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
@@ -285,6 +286,18 @@ public:
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
 	bool BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout);
+
+	/**
+	  * Consumes a single message with a timeout (this gets an envelope object)
+	  * Waits for a single Basic message to be Delivered or the timeout to expire.
+	  * This function only works after BasicConsume as been successfully called.
+    * This function differs in that it returns an envelope object which contains more information
+    * about the message delivered
+	  * @param envelope the message object to save it to. Is ok to be an empty pointer
+	  * @param timeout the timeout for the first part of the message to be delivered in ms
+	  * @returns true if a message was delivered before the timeout, false otherwise
+	  */
+	bool BasicConsumeMessage(Envelope::ptr_t& envelope, int timeout);
 
   /**
     * Closes the current channel and reopens immediately opens a new channel
