@@ -91,6 +91,11 @@ TARGET_LINK_LIBRARIES(consume_with_timeout SimpleAmqpClient ${Boost_LIBRARIES})
 SET_TARGET_PROPERTIES(consume_with_timeout PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
+ADD_EXECUTABLE(envelope_test examples/envelope_test.cpp)
+TARGET_LINK_LIBRARIES(envelope_test SimpleAmqpClient)
+SET_TARGET_PROPERTIES(envelope_test PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
 # Documentation generation
 SET(DOXYFILE_LATEX "NO")
 SET(PROJECT_VERSION "1.0.0")
