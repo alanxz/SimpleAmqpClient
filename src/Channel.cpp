@@ -49,7 +49,9 @@
 #include <boost/limits.hpp>
 
 // This will get us the posix version of strerror_r() on linux
-#define _XOPEN_SOURCE 600
+#ifndef _XOPEN_SOURCE
+# define _XOPEN_SOURCE 600
+#endif
 #include <string.h>
 #include <sys/types.h>
 #include <errno.h>
