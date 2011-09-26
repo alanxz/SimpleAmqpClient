@@ -58,6 +58,7 @@
 
 #ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
+# include <sys/select.h>
 #endif
 
 #ifdef HAVE_WINSOCK2_H
@@ -278,7 +279,8 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
 {
 
-	int socketno = amqp_get_sockfd(m_connection);
+  int socketno = amqp_get_sockfd(m_connection);
+
 #ifdef HAVE_WINSOCK2_H
   // Timeouts on Winsock are a DWORD, and are in MS
   uint32_t tv_timeout = timeout * 1000;
@@ -302,58 +304,48 @@ bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
 		// We only do this on the first frame otherwise we'd confuse
 		// This function if it immediately turns around and gets called again
 		if (timeout > 0)
-		{
-			if (setsockopt(socketno, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_timeout, sizeof(tv_timeout)))
-			{
+    {
+      fd_set fds;
+      FD_ZERO(&fds);
+      FD_SET(socketno, &fds);
 
-				std::string error_string("Setting socket timeout failed (setsockopt) ");
+      int select_return = select(socketno + 1, &fds, NULL, NULL, &tv_timeout);
+
+      if (select_return == 0) // If it times out, return
+      {
+        return false;
+      }
+      else if (select_return == -1)
+      {
+        // If its an interupted system call just try again
+        if (errno == EINTR)
+        {
+          continue;
+        }
+        else
+        {
+          std::string error_string("error calling select on socket: ");
 #ifdef HAVE_STRERROR_S
-        const int BUFFER_LENGTH = 256;
-        char error_string_buffer[BUFFER_LENGTH] = {0};
-        strerror_s(error_string_buffer, errno);
-        error_string += error_string_buffer;
+          const int BUFFER_LENGTH = 256;
+          char error_string_buffer[BUFFER_LENGTH] = {0};
+          strerror_s(error_string_buffer, errno);
+          error_string += error_string_buffer;
 #elif defined(HAVE_STRERROR_R)
-				const int BUFFER_LENGTH = 256;
-				char error_string_buffer[BUFFER_LENGTH] = {0};
-				strerror_r(errno, error_string_buffer, BUFFER_LENGTH);
-        error_string += error_string_buffer;
+          const int BUFFER_LENGTH = 256;
+          char error_string_buffer[BUFFER_LENGTH] = {0};
+          strerror_r(errno, error_string_buffer, BUFFER_LENGTH);
+          error_string += error_string_buffer;
 #else
-        error_string += strerror(errno);
+          error_string += strerror(errno);
 #endif
-				
-				throw std::runtime_error(error_string.c_str());
-			}
-		}
+          throw std::runtime_error(error_string.c_str());
+        }
+      }
+    }
 
 		int ret = amqp_simple_wait_frame(m_connection, &frame);
-		// Save errno as it might be overwritten by setsockopt
-		int errno_save = errno;
-
-		setsockopt(socketno, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_zero, sizeof(tv_zero));
-
-		if (ret != 0)
-		{
-#ifdef HAVE_WINSOCK2_H
-			int wsa_err = (-ret) & ~(1 << 29);
-			if (wsa_err == WSAETIMEDOUT)
-			{
-				return false;
-			}
-#else // HAVE_WINSOCK2_H
-			// Interrupted system call, just loop around and try it again
-			if (errno_save == EINTR)
-			{
-				continue;
-			}
-			else if (errno_save == EAGAIN || errno_save == EWOULDBLOCK)
-			{
-				return false;
-			}
-#endif
-		}
 
 		Util::CheckForError(ret, "Consume Message: method frame");
-
 
 		if (frame.frame_type != AMQP_FRAME_METHOD || frame.payload.method.id != AMQP_BASIC_DELIVER_METHOD)
 			continue;
