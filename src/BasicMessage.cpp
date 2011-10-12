@@ -96,7 +96,10 @@ std::string BasicMessage::Body() const
 }
 void BasicMessage::Body(const std::string& body)
 {
-	m_body = amqp_bytes_malloc_dup(amqp_cstring_bytes(body.c_str()));
+  amqp_bytes_t body_bytes;
+  body_bytes.bytes = const_cast<char*>(body.data());
+  body_bytes.len = body.length();
+	m_body = amqp_bytes_malloc_dup(body_bytes);
 }
 
 std::string BasicMessage::ContentType() const
