@@ -38,6 +38,7 @@
 
 #include "SimpleAmqpClient/Channel.h"
 
+#include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Util.h"
 #include "config.h"
 
@@ -337,48 +338,70 @@ bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
 
 		Util::CheckForError(ret, "Consume Message: method frame");
 
-		if (frame.frame_type != AMQP_FRAME_METHOD || frame.payload.method.id != AMQP_BASIC_DELIVER_METHOD)
-			continue;
+    if (frame.channel != m_channel)
+      continue;
 
-		amqp_basic_deliver_t* deliver_method = reinterpret_cast<amqp_basic_deliver_t*>(frame.payload.method.decoded);
+    if (frame.frame_type != AMQP_FRAME_METHOD)
+      continue;
 
-    const std::string exchange((char*)deliver_method->exchange.bytes, deliver_method->exchange.len);
-    const std::string routing_key((char*)deliver_method->routing_key.bytes, deliver_method->routing_key.len);
-    const std::string consumer_tag((char*)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
-    const uint64_t delivery_tag = deliver_method->delivery_tag;
-    const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
+    if (frame.payload.method.id == AMQP_BASIC_DELIVER_METHOD)
+    {
+      amqp_basic_deliver_t* deliver_method = reinterpret_cast<amqp_basic_deliver_t*>(frame.payload.method.decoded);
 
-		// Wait for frame #2, the header frame which contains body size
-		Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: header frame");
-
-		if (frame.frame_type != AMQP_FRAME_HEADER)
-			throw std::runtime_error("Channel::BasicConsumeMessage: receieved unexpected frame type (was expected AMQP_FRAME_HEADER)");
-
-    // The memory for this is allocated in a pool associated with the connection
-    // Its freed in amqp_maybe_release_buffers above
-    // The BasicMessage constructor does a deep copy of the properties structure
-		amqp_basic_properties_t* properties = reinterpret_cast<amqp_basic_properties_t*>(frame.payload.properties.decoded);
-
-		size_t body_size = frame.payload.properties.body_size;
-		size_t received_size = 0;
-		amqp_bytes_t body = amqp_bytes_malloc(body_size);
-
-		// frame #3 and up:
-		while (received_size < body_size)
-		{
-			Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: body frame");
-
-			if (frame.frame_type != AMQP_FRAME_BODY)
-				throw std::runtime_error("Channel::BasicConsumeMessge: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
-
-			void* body_ptr = reinterpret_cast<char*>(body.bytes) + received_size;
-			memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
-			received_size += frame.payload.body_fragment.len;
-		}
-
-    message = Envelope::Create(BasicMessage::Create(body, properties, delivery_tag), consumer_tag, delivery_tag, exchange, redelivered, routing_key);
-		return true;
+      const std::string exchange((char*)deliver_method->exchange.bytes, deliver_method->exchange.len);
+      const std::string routing_key((char*)deliver_method->routing_key.bytes, deliver_method->routing_key.len);
+      const std::string consumer_tag((char*)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
+      const uint64_t delivery_tag = deliver_method->delivery_tag;
+      const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
+      BasicMessage::ptr_t content = ReadContent();
+      content->DeliveryTag(delivery_tag);
+      message = Envelope::Create(content, consumer_tag, delivery_tag, exchange, redelivered, routing_key);
+      return true;
+    }
+    else if (frame.payload.method.id == AMQP_BASIC_RETURN_METHOD)
+    {
+      amqp_basic_return_t* return_method = reinterpret_cast<amqp_basic_return_t*>(frame.payload.method.decoded);
+      const int reply_code = return_method->reply_code;
+      const std::string reply_text((char*)return_method->reply_text.bytes, return_method->reply_text.len);
+      const std::string exchange((char*)return_method->exchange.bytes, return_method->exchange.len);
+      const std::string routing_key((char*)return_method->routing_key.bytes, return_method->routing_key.len);
+      BasicMessage::ptr_t content = ReadContent();
+      throw MessageReturnedException(content, reply_code, reply_text, exchange, routing_key);
+    }
 	}
+}
+
+BasicMessage::ptr_t Channel::ReadContent()
+{
+  amqp_frame_t frame;
+  // Wait for frame #2, the header frame which contains body size
+  Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: header frame");
+
+  if (frame.frame_type != AMQP_FRAME_HEADER)
+    throw std::runtime_error("Channel::BasicConsumeMessage: receieved unexpected frame type (was expected AMQP_FRAME_HEADER)");
+
+  // The memory for this is allocated in a pool associated with the connection
+  // Its freed in amqp_maybe_release_buffers above
+  // The BasicMessage constructor does a deep copy of the properties structure
+  amqp_basic_properties_t* properties = reinterpret_cast<amqp_basic_properties_t*>(frame.payload.properties.decoded);
+
+  size_t body_size = frame.payload.properties.body_size;
+  size_t received_size = 0;
+  amqp_bytes_t body = amqp_bytes_malloc(body_size);
+
+  // frame #3 and up:
+  while (received_size < body_size)
+  {
+    Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: body frame");
+
+    if (frame.frame_type != AMQP_FRAME_BODY)
+      throw std::runtime_error("Channel::BasicConsumeMessge: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
+
+    void* body_ptr = reinterpret_cast<char*>(body.bytes) + received_size;
+    memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
+    received_size += frame.payload.body_fragment.len;
+  }
+  return BasicMessage::Create(body, properties);
 }
 
 void Channel::ResetChannel()

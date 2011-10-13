@@ -68,6 +68,9 @@ SET(SAC_LIB_SRCS
 
 	src/SimpleAmqpClient/Envelope.h
 	src/Envelope.cpp
+
+	src/SimpleAmqpClient/MessageReturnedException.h
+	src/MessageReturnedException.cpp
 	)
 
 

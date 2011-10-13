@@ -1,5 +1,5 @@
-#ifndef SIMPLEAMQPCLIENT_H
-#define SIMPLEAMQPCLIENT_H
+#ifndef MESSAGE_RETURNED_EXCEPTION_H
+#define MESSAGE_RETURNED_EXCEPTION_H
 
 /*
  * ***** BEGIN LICENSE BLOCK *****
@@ -38,11 +38,42 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/Channel.h"
-#include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/BasicMessage.h"
-#include "SimpleAmqpClient/AmqpResponseServerException.h"
-#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
-#include "SimpleAmqpClient/MessageReturnedException.h"
 
-#endif // SIMPLEAMQPCLIENT_H
+#include <boost/cstdint.hpp>
+
+#include <stdexcept>
+
+namespace AmqpClient
+{
+
+class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException : public std::exception
+{
+public:
+  explicit MessageReturnedException(BasicMessage::ptr_t message, uint32_t reply_code, const std::string& reply_text,
+    const std::string& exchange, const std::string& routing_key) throw();
+
+	MessageReturnedException(const MessageReturnedException& e) throw();
+	MessageReturnedException& operator=(const MessageReturnedException& e) throw();
+
+  virtual ~MessageReturnedException() throw() {}
+
+	virtual const char* what() const throw();
+
+  BasicMessage::ptr_t message() const throw() { return m_message; }
+  uint32_t reply_code() const throw() { return m_reply_code; }
+  std::string reply_text() const throw() { return m_reply_text; }
+  std::string exchange() const throw() { return m_exchange; }
+  std::string routing_key() const throw() { return m_routing_key; }
+
+private:
+  BasicMessage::ptr_t m_message;
+  uint32_t m_reply_code;
+  std::string m_reply_text;
+  std::string m_exchange;
+  std::string m_routing_key;
+  mutable std::string m_what;
+};
+
+} // namespace AmqpClient
+#endif // MESSAGE_RETURNED_EXCEPTION_H
