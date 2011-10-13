@@ -99,6 +99,11 @@ TARGET_LINK_LIBRARIES(envelope_test SimpleAmqpClient)
 SET_TARGET_PROPERTIES(envelope_test PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
+ADD_EXECUTABLE(basic_return_test examples/basic_return_test.cpp)
+TARGET_LINK_LIBRARIES(basic_return_test SimpleAmqpClient)
+SET_TARGET_PROPERTIES(basic_return_test PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
 # Documentation generation
 SET(DOXYFILE_LATEX "NO")
 SET(PROJECT_VERSION "1.0.0")
