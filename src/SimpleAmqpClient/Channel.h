@@ -273,6 +273,7 @@ public:
 	  * Consumes a single message
 	  * Waits for a single Basic message to be Delivered. This function only works after BasicConsume
 	  * has successfully been called.
+    * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns The next message on the queue
 	  */
 	BasicMessage::ptr_t BasicConsumeMessage();
@@ -283,6 +284,7 @@ public:
 	  * This function only works after BasicConsume as been successfully called.
 	  * @param message the message object to save it to. Is ok to be an empty pointer
 	  * @param timeout the timeout for the first part of the message to be delivered in ms
+    * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
 	bool BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout);
@@ -295,6 +297,7 @@ public:
     * about the message delivered
 	  * @param envelope the message object to save it to. Is ok to be an empty pointer
 	  * @param timeout the timeout for the first part of the message to be delivered in ms
+    * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
 	bool BasicConsumeMessage(Envelope::ptr_t& envelope, int timeout);
