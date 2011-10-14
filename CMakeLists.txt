@@ -43,7 +43,6 @@ SET(SAC_LIB_SRCS
 	src/BasicMessage.cpp
 
 	src/SimpleAmqpClient/Util.h
-	src/Util.cpp
 
 	src/SimpleAmqpClient/AmqpResponseLibraryException.h
 	src/AmqpResponseLibraryException.cpp

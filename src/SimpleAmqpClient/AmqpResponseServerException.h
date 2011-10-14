@@ -40,10 +40,12 @@
 
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
 #include <amqp.h>
+#include <amqp_framing.h>
+
+#include <boost/cstdint.hpp>
 #include <string>
-#include <exception>
+#include <stdexcept>
 
 #ifdef _MSC_VER
 # pragma warning ( push )
@@ -52,7 +54,7 @@
 
 namespace AmqpClient {
 
-class SIMPLEAMQPCLIENT_EXPORT AmqpResponseServerException : public std::exception
+class SIMPLEAMQPCLIENT_EXPORT AmqpResponseServerException : public std::runtime_error
 {
 public:
   enum ExceptionType
@@ -63,6 +65,12 @@ public:
   };
 
 	explicit AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
+  AmqpResponseServerException(const amqp_channel_close_t& reply, const std::string& context) throw();
+  AmqpResponseServerException(const amqp_connection_close_t& reply, const std::string& context) throw();
+
+  void InitializeFromConnectionClose(const amqp_connection_close_t& reply);
+  void InitializeFromChannelClose(const amqp_channel_close_t& reply);
+
 	AmqpResponseServerException(const AmqpResponseServerException& e) throw();
 	AmqpResponseServerException& operator=(const AmqpResponseServerException& e) throw();
 
@@ -70,14 +78,24 @@ public:
 
 	virtual const char* what() const throw();
 
-  ExceptionType exception_type() const throw();
-  int exception_code() const throw();
-  std::string exception_message() const throw();
+  uint16_t class_id() const throw() { return m_class_id; }
+  uint16_t method_id() const throw() { return m_method_id; }
+  uint16_t reply_code() const throw() { return m_reply_code; }
+  std::string reply_text() const throw() { return m_reply_text; }
+
+  ExceptionType exception_type() const throw() { return m_type; }
+
+  int exception_code() const throw() { return m_reply_code; }
+  std::string exception_message() const throw() { return m_reply_text; }
 
 private:
-    amqp_rpc_reply_t m_reply;
-    const std::string m_context;
-    std::string m_what;
+  std::string m_reply_text;
+  std::string m_context;
+  mutable std::string m_what;
+  ExceptionType m_type;
+  uint16_t m_class_id;
+  uint16_t m_method_id;
+  uint16_t m_reply_code;
 };
 
 } // namespace AmqpClient

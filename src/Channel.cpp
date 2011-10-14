@@ -38,12 +38,15 @@
 
 #include "SimpleAmqpClient/Channel.h"
 
+#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
+#include "SimpleAmqpClient/AmqpResponseServerException.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Util.h"
 #include "config.h"
 
 #include <amqp_framing.h>
 
+#include <sstream>
 #include <stdexcept>
 
 #include <boost/cstdint.hpp>
@@ -86,21 +89,26 @@ Channel::Channel(const std::string& host,
                  const std::string& password,
                  const std::string& vhost,
                  int frame_max) :
-    m_channel(DEFAULT_CHANNEL)
+    m_channel(DEFAULT_CHANNEL),
+    m_channel_ok(false),
+    m_connection_ok(false)
+      
 {
     m_connection = amqp_new_connection();
 
     int sock = amqp_open_socket(host.c_str(), port);
-    Util::CheckForError(sock, "Channel::Channel amqp_open_socket");
+    CheckForError(sock, "Channel::Channel amqp_open_socket");
 
     amqp_set_sockfd(m_connection, sock);
 
-    Util::CheckRpcReply(amqp_login(m_connection, vhost.c_str(), 2,
+    CheckRpcReply(amqp_login(m_connection, vhost.c_str(), 2,
                                    frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
                                    username.c_str(), password.c_str()), "Amqp Login");
+    m_connection_ok = true;
 
     amqp_channel_open(m_connection, m_channel);
-    Util::CheckLastRpcReply(m_connection, "Channel::Channel creating default channel");
+    CheckLastRpcReply(m_connection, "Channel::Channel creating default channel");
+    m_channel_ok = true;
 }
 
 Channel::~Channel()
@@ -116,26 +124,28 @@ void Channel::DeclareExchange(const std::string& exchange_name,
                               bool durable,
                               bool auto_delete)
 {
+  CheckChannelIsOpen();
     amqp_exchange_declare(m_connection, m_channel,
                           amqp_cstring_bytes(exchange_name.c_str()),
                           amqp_cstring_bytes(exchange_type.c_str()),
                           passive,
                           durable,
                           EMPTY_TABLE);
-	Util::CheckLastRpcReply(m_connection, "Declaring exchange");
+	CheckLastRpcReply(m_connection, "Declaring exchange");
 }
 
 void Channel::DeleteExchange(const std::string& exchange_name,
                              bool if_unused,
                              bool nowait)
 {
+  CheckChannelIsOpen();
 	amqp_method_number_t replies[2] = { AMQP_EXCHANGE_DELETE_OK_METHOD, 0 };
 	amqp_exchange_delete_t req;
 	req.exchange = amqp_cstring_bytes(exchange_name.c_str());
 	req.if_unused = if_unused;
 	req.nowait = nowait;
 
-	Util::CheckRpcReply(amqp_simple_rpc(m_connection, m_channel,
+	CheckRpcReply(amqp_simple_rpc(m_connection, m_channel,
 				AMQP_EXCHANGE_DELETE_METHOD,
 				replies, &req), "Delete Exchange");
 }
@@ -146,6 +156,7 @@ std::string Channel::DeclareQueue(const std::string& queue_name,
 								  bool exclusive,
 								  bool auto_delete)
 {
+  CheckChannelIsOpen();
 
     amqp_queue_declare_ok_t* queue_declare = 
 			amqp_queue_declare(m_connection, m_channel,
@@ -156,7 +167,7 @@ std::string Channel::DeclareQueue(const std::string& queue_name,
 								auto_delete,
 								EMPTY_TABLE);
 
-	Util::CheckLastRpcReply(m_connection, "Declaring queue");
+	CheckLastRpcReply(m_connection, "Declaring queue");
 
 	return std::string((char*)queue_declare->queue.bytes,
 			queue_declare->queue.len);
@@ -166,38 +177,41 @@ void Channel::DeleteQueue(const std::string& queue_name,
                           bool if_unused,
                           bool if_empty)
 {
+  CheckChannelIsOpen();
     amqp_queue_delete(m_connection, m_channel,
                       amqp_cstring_bytes(queue_name.c_str()),
                       if_unused,
                       if_empty);
 
-	Util::CheckLastRpcReply(m_connection, "Deleting Queue");
+	CheckLastRpcReply(m_connection, "Deleting Queue");
 }
 
 void Channel::BindQueue(const std::string& queue_name,
                         const std::string& exchange_name,
                         const std::string& routing_key)
 {
+  CheckChannelIsOpen();
     amqp_queue_bind(m_connection, m_channel,
                     amqp_cstring_bytes(queue_name.c_str()),
                     amqp_cstring_bytes(exchange_name.c_str()),
                     amqp_cstring_bytes(routing_key.c_str()),
                     EMPTY_TABLE);
 
-	Util::CheckLastRpcReply(m_connection, "Binding queue");
+	CheckLastRpcReply(m_connection, "Binding queue");
 }
 
 void Channel::UnbindQueue(const std::string& queue_name,
                           const std::string& exchange_name,
                           const std::string& binding_key)
 {
+  CheckChannelIsOpen();
     amqp_queue_unbind(m_connection, m_channel,
                       amqp_cstring_bytes(queue_name.c_str()),
                       amqp_cstring_bytes(exchange_name.c_str()),
                       amqp_cstring_bytes(binding_key.c_str()),
                       EMPTY_TABLE);
 
-	Util::CheckLastRpcReply(m_connection, "Unbinding queue");
+	CheckLastRpcReply(m_connection, "Unbinding queue");
 }
 
 void Channel::BasicAck(const BasicMessage::ptr_t message)
@@ -207,7 +221,8 @@ void Channel::BasicAck(const BasicMessage::ptr_t message)
 
 void Channel::BasicAck(uint64_t delivery_tag)
 {
-	Util::CheckForError(amqp_basic_ack(m_connection, m_channel,
+  CheckChannelIsOpen();
+	CheckForError(amqp_basic_ack(m_connection, m_channel,
 			delivery_tag,
 			false), "Ack");
 
@@ -218,6 +233,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
                            bool mandatory,
                            bool immediate)
 {
+  CheckChannelIsOpen();
     amqp_basic_publish(m_connection, m_channel,
                        amqp_cstring_bytes(exchange_name.c_str()),
                        amqp_cstring_bytes(routing_key.c_str()),
@@ -226,7 +242,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
                        message->getAmqpProperties(),
                        message->getAmqpBody());
 
-	Util::CheckLastRpcReply(m_connection, "Publishing to queue");
+	CheckLastRpcReply(m_connection, "Publishing to queue");
 }
 
 void Channel::BasicConsume(const std::string& queue,
@@ -235,6 +251,7 @@ void Channel::BasicConsume(const std::string& queue,
 						   bool no_ack,
 						   bool exclusive)
 {
+  CheckChannelIsOpen();
 	amqp_basic_consume(m_connection, m_channel,
 			amqp_cstring_bytes(queue.c_str()),
 			amqp_cstring_bytes(consumer_tag.c_str()),
@@ -243,17 +260,18 @@ void Channel::BasicConsume(const std::string& queue,
 			exclusive,
       EMPTY_TABLE);
 
-	Util::CheckLastRpcReply(m_connection, "Basic Consume");
+	CheckLastRpcReply(m_connection, "Basic Consume");
 }
 
 void Channel::BasicCancel(const std::string& consumer_tag)
 {
+  CheckChannelIsOpen();
 	amqp_method_number_t replies[2] = { AMQP_BASIC_CANCEL_OK_METHOD, 0 };
 	amqp_basic_cancel_t req;
 	req.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
 	req.nowait = 0;
 
-	Util::CheckRpcReply(amqp_simple_rpc(m_connection, m_channel,
+	CheckRpcReply(amqp_simple_rpc(m_connection, m_channel,
 				AMQP_BASIC_CANCEL_METHOD,
 				replies, &req), "Basic Cancel");
 }
@@ -279,6 +297,7 @@ bool Channel::BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout)
 
 bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
 {
+  CheckChannelIsOpen();
 
   int socketno = amqp_get_sockfd(m_connection);
 
@@ -336,7 +355,7 @@ bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
 
 		int ret = amqp_simple_wait_frame(m_connection, &frame);
 
-		Util::CheckForError(ret, "Consume Message: method frame");
+		CheckForError(ret, "Consume Message: method frame");
 
     if (frame.channel != m_channel)
       continue;
@@ -344,7 +363,11 @@ bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
     if (frame.frame_type != AMQP_FRAME_METHOD)
       continue;
 
-    if (frame.payload.method.id == AMQP_BASIC_DELIVER_METHOD)
+    CheckFrameForClose(frame);
+
+    switch (frame.payload.method.id)
+    {
+    case AMQP_BASIC_DELIVER_METHOD:
     {
       amqp_basic_deliver_t* deliver_method = reinterpret_cast<amqp_basic_deliver_t*>(frame.payload.method.decoded);
 
@@ -357,8 +380,9 @@ bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
       content->DeliveryTag(delivery_tag);
       message = Envelope::Create(content, consumer_tag, delivery_tag, exchange, redelivered, routing_key);
       return true;
+      break;
     }
-    else if (frame.payload.method.id == AMQP_BASIC_RETURN_METHOD)
+    case AMQP_BASIC_RETURN_METHOD:
     {
       amqp_basic_return_t* return_method = reinterpret_cast<amqp_basic_return_t*>(frame.payload.method.decoded);
       const int reply_code = return_method->reply_code;
@@ -367,6 +391,8 @@ bool Channel::BasicConsumeMessage(Envelope::ptr_t& message, int timeout)
       const std::string routing_key((char*)return_method->routing_key.bytes, return_method->routing_key.len);
       BasicMessage::ptr_t content = ReadContent();
       throw MessageReturnedException(content, reply_code, reply_text, exchange, routing_key);
+      break;
+    }
     }
 	}
 }
@@ -375,7 +401,8 @@ BasicMessage::ptr_t Channel::ReadContent()
 {
   amqp_frame_t frame;
   // Wait for frame #2, the header frame which contains body size
-  Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: header frame");
+  CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: header frame");
+  CheckFrameForClose(frame);
 
   if (frame.frame_type != AMQP_FRAME_HEADER)
     throw std::runtime_error("Channel::BasicConsumeMessage: receieved unexpected frame type (was expected AMQP_FRAME_HEADER)");
@@ -392,7 +419,8 @@ BasicMessage::ptr_t Channel::ReadContent()
   // frame #3 and up:
   while (received_size < body_size)
   {
-    Util::CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: body frame");
+    CheckForError(amqp_simple_wait_frame(m_connection, &frame), "Consume Message: body frame");
+    CheckFrameForClose(frame);
 
     if (frame.frame_type != AMQP_FRAME_BODY)
       throw std::runtime_error("Channel::BasicConsumeMessge: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
@@ -406,10 +434,122 @@ BasicMessage::ptr_t Channel::ReadContent()
 
 void Channel::ResetChannel()
 {
-  Util::CheckRpcReply(amqp_channel_close(m_connection, m_channel, AMQP_REPLY_SUCCESS), "ResetChannel: closing channel");
+  if (!m_connection_ok)
+  {
+    throw std::runtime_error("Trying to reset a channel when the channel is closed.");
+  }
+
+  if (m_channel_ok)
+  {
+    CheckRpcReply(amqp_channel_close(m_connection, m_channel, AMQP_REPLY_SUCCESS), "ResetChannel: closing channel");
+  }
   m_channel = (m_channel + 1) % std::numeric_limits<uint16_t>::max();
   amqp_channel_open(m_connection, m_channel);
-  Util::CheckLastRpcReply(m_connection, "ResetChannel: opening channel");
+  CheckLastRpcReply(m_connection, "ResetChannel: opening channel");
 }
 
+void Channel::FinishCloseChannel()
+{
+  amqp_channel_close_ok_t close_ok;
+  CheckForError(amqp_send_method(m_connection, m_channel, AMQP_CHANNEL_CLOSE_OK_METHOD, &close_ok));
+
+  m_channel_ok = false;
+}
+
+void Channel::FinishCloseConnection()
+{
+  amqp_connection_close_ok_t close_ok;
+  amqp_send_method(m_connection, 0, AMQP_CONNECTION_CLOSE_OK_METHOD, &close_ok);
+
+  m_channel_ok = false;
+  m_connection_ok = false;
+}
+
+void Channel::CheckChannelIsOpen()
+{
+  if (!m_connection_ok)
+  {
+    throw std::runtime_error("Connection is closed.");
+  }
+  if (!m_channel_ok)
+  {
+    throw std::runtime_error("Channel is closed.");
+  }
+}
+
+void Channel::CheckFrameForClose(amqp_frame_t& frame)
+{
+  if (frame.frame_type == AMQP_FRAME_METHOD)
+  {
+    switch (frame.payload.method.id)
+    {
+    case AMQP_CHANNEL_CLOSE_METHOD:
+      FinishCloseChannel();
+      throw AmqpResponseServerException(*reinterpret_cast<amqp_channel_close_t*>(frame.payload.method.decoded), "Consuming message");
+      break;
+
+    case AMQP_CONNECTION_CLOSE_METHOD:
+      FinishCloseConnection();
+      throw AmqpResponseServerException(*reinterpret_cast<amqp_connection_close_t*>(frame.payload.method.decoded), "Consuming message");
+      break;
+    }
+  }
+}
+
+void Channel::CheckRpcReply(amqp_rpc_reply_t& reply, const std::string& context)
+{
+    switch (reply.reply_type)
+    {
+        case AMQP_RESPONSE_NORMAL:
+            return;
+            break;
+
+        case AMQP_RESPONSE_NONE:
+            throw std::logic_error("Got a amqp_rpc_reply_t with no reply_type!");
+            break;
+
+        case AMQP_RESPONSE_LIBRARY_EXCEPTION:
+          // If we're getting this likely is the socket is already closed
+            m_channel_ok = false;
+            m_connection_ok = false;
+            throw AmqpResponseLibraryException(reply, context);
+
+            break;
+
+        case AMQP_RESPONSE_SERVER_EXCEPTION:
+          if (reply.reply.id == AMQP_CHANNEL_CLOSE_METHOD) 
+          {
+            FinishCloseChannel();
+          }
+          else if (reply.reply.id == AMQP_CONNECTION_CLOSE_METHOD)
+          {
+            FinishCloseConnection();
+          }
+
+            throw AmqpResponseServerException(reply, context);
+            break;
+        default:
+            throw std::runtime_error("amqp_rpc_reply_t that didn't match!");
+    }
+}
+
+void Channel::CheckLastRpcReply(amqp_connection_state_t& connection, const std::string& context)
+{
+    CheckRpcReply(amqp_get_rpc_reply(connection), context);
+}
+
+void Channel::CheckForError(int ret, const std::string& context)
+{
+    if (ret < 0)
+    {
+        char* errstr = amqp_error_string(-ret);
+        std::ostringstream oss;
+        oss << context << ": " << errstr;
+        free(errstr);
+        m_channel_ok = false;
+        m_connection_ok = false;
+        throw std::runtime_error(oss.str().c_str());
+    }
+
+}
 } // namespace AmqpClient
