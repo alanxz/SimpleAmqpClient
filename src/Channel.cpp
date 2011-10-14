@@ -234,15 +234,13 @@ void Channel::BasicPublish(const std::string& exchange_name,
                            bool immediate)
 {
   CheckChannelIsOpen();
-    amqp_basic_publish(m_connection, m_channel,
+  CheckForError(amqp_basic_publish(m_connection, m_channel,
                        amqp_cstring_bytes(exchange_name.c_str()),
                        amqp_cstring_bytes(routing_key.c_str()),
                        mandatory,
                        immediate,
                        message->getAmqpProperties(),
-                       message->getAmqpBody());
-
-	CheckLastRpcReply(m_connection, "Publishing to queue");
+                       message->getAmqpBody()), "Publishing to queue");
 }
 
 void Channel::BasicConsume(const std::string& queue,
