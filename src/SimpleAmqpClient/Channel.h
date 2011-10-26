@@ -45,6 +45,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <amqp.h>
 #include <string>
@@ -60,7 +61,11 @@
 
 namespace AmqpClient {
 
-class Connection;
+namespace Detail
+{
+class ChannelImpl;
+}
+
 /**
   * A single channel
   * Represents a logical AMQP channel over a connection
@@ -136,12 +141,17 @@ public:
       * Deletes an exachange on the AMQP broker
       * @param exchange_name the name of the exchange to be deleteed
       * @param if_unused if true only delete the exchange if it has no queues bound to it
-      * @param nowait if true do not wait for the exchange to become unused before deleting it
       */
     void DeleteExchange(const std::string& exchange_name,
-                        bool if_unused = false,
-                        bool nowait = true);
+                        bool if_unused = false);
 
+    void BindExchange(const std::string& destination,
+                      const std::string& source,
+                      const std::string& routing_key);
+
+    void UnbindExchange(const std::string& destination,
+                        const std::string& source,
+                        const std::string& routing_key);
 	/**
 	  * Declares a queue
 	  * Creates a queue on the AMQP broker if it does not already exist
@@ -311,47 +321,15 @@ public:
   void ResetChannel();
 
 protected:
-	/**
-	  * Checks the result of a librabbitmq-c call that returns a amqp_rpc_reply_t
-	  *
-	  * Checks the result of a librabbitmq-c call that returns an
-	  * amqp_rpc_reply_t struct and throws an exception if it fails.
-	  */
-    void CheckRpcReply(amqp_rpc_reply_t& reply, const std::string& context = "");
-	
-	/**
-	  * Checks the result of a librabbitmq-c that doesn't return a amqp_rpc_reply_t
-	  *
-	  * Checks the result of a librabbitmq-c call that doesn't return an
-	  * amqp_rpc_reply_t struct, but the result is stored as a part of the
-	  * amqp_connection_state_t, and is checked with amqp_check_last_rpc()
-	  * Throws an exception if an error condition is detected
-	  */
-	void CheckLastRpcReply(amqp_connection_state_t& connection, const std::string& context);
-	/**
-	  * Checks the result of a librabbitmq-c call that returns an int
-	  *
-	  * Checks the result of a librabbitmq-c call that returns an int, 
-	  * throws an exception if an error condition is detected.
-	  */
-    void CheckForError(int ret, const std::string& context = "");
 
     void CheckFrameForClose(amqp_frame_t& frame);
     void CheckChannelIsOpen();
 
-    void FinishCloseChannel();
-    void FinishCloseConnection();
-
     BasicMessage::ptr_t Channel::ReadContent();
-
-    amqp_connection_state_t m_connection;
-    amqp_channel_t m_channel;
-
-    bool m_connection_ok;
-    bool m_channel_ok;
 
     static const amqp_table_t EMPTY_TABLE;
 
+    boost::scoped_ptr<Detail::ChannelImpl> m_impl;
 };
 
 } // namespace AmqpClient
