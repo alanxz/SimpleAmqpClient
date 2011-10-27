@@ -50,20 +50,6 @@ SET(SAC_LIB_SRCS
 	src/SimpleAmqpClient/AmqpResponseServerException.h
 	src/AmqpResponseServerException.cpp
 
-	src/SimpleAmqpClient/SimpleRpcClient.h
-	src/SimpleRpcClient.cpp
-
-	src/SimpleAmqpClient/SimpleRpcServer.h
-	src/SimpleRpcServer.cpp
-
-	src/SimpleAmqpClient/SimplePublisher.h
-	src/SimplePublisher.cpp
-
-	src/SimpleAmqpClient/SimpleSubscriber.h
-	src/SimpleSubscriber.cpp
-
-	src/SimpleAmqpClient/SimpleTwoWayChannel.h
-	src/SimpleTwoWayChannel.cpp
 
 	src/SimpleAmqpClient/Envelope.h
 	src/Envelope.cpp
