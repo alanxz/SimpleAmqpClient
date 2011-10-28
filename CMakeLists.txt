@@ -50,6 +50,7 @@ SET(SAC_LIB_SRCS
 	src/SimpleAmqpClient/AmqpResponseServerException.h
 	src/AmqpResponseServerException.cpp
 
+	src/SimpleAmqpClient/ConsumerTagNotFoundException.h
 
 	src/SimpleAmqpClient/Envelope.h
 	src/Envelope.cpp
@@ -89,9 +90,23 @@ TARGET_LINK_LIBRARIES(basic_return_test SimpleAmqpClient)
 SET_TARGET_PROPERTIES(basic_return_test PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
+# Some smoke tests:
+
+enable_testing()
+find_package(GTest 1.5.0)
+
+if (GTEST_FOUND)
+	option(ENABLE_TESTING "Enable smoke tests" ON)
+endif (GTEST_FOUND)
+
+if (ENABLE_TESTING)
+	add_subdirectory(testing)
+endif (ENABLE_TESTING)
+
+
 # Documentation generation
 SET(DOXYFILE_LATEX "NO")
-SET(PROJECT_VERSION "1.0.0")
+SET(PROJECT_VERSION "2.0.0")
 INCLUDE(UseDoxygen)
 
 INSTALL(TARGETS SimpleAmqpClient

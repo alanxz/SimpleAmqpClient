@@ -38,7 +38,6 @@
 
 #include "SimpleAmqpClient/AmqpResponseServerException.h"
 
-#include <boost/cstdint.hpp>
 #include <amqp.h>
 #include <amqp_framing.h>
 #include <assert.h>

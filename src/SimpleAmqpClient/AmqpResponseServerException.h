@@ -40,9 +40,6 @@
 
 #include "SimpleAmqpClient/Util.h"
 
-#include <amqp.h>
-#include <amqp_framing.h>
-
 #include <boost/cstdint.hpp>
 #include <string>
 #include <stdexcept>
@@ -51,6 +48,10 @@
 # pragma warning ( push )
 # pragma warning ( disable: 4251 )
 #endif
+
+struct amqp_rpc_reply_t_;
+struct amqp_channel_close_t_;
+struct amqp_connection_close_t_;
 
 namespace AmqpClient {
 
@@ -64,12 +65,12 @@ public:
     ET_ConnectionException
   };
 
-	explicit AmqpResponseServerException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
-  AmqpResponseServerException(const amqp_channel_close_t& reply, const std::string& context) throw();
-  AmqpResponseServerException(const amqp_connection_close_t& reply, const std::string& context) throw();
+	explicit AmqpResponseServerException(const amqp_rpc_reply_t_& reply, const std::string& context) throw();
+  AmqpResponseServerException(const amqp_channel_close_t_& reply, const std::string& context) throw();
+  AmqpResponseServerException(const amqp_connection_close_t_& reply, const std::string& context) throw();
 
-  void InitializeFromConnectionClose(const amqp_connection_close_t& reply);
-  void InitializeFromChannelClose(const amqp_channel_close_t& reply);
+  void InitializeFromConnectionClose(const amqp_connection_close_t_& reply);
+  void InitializeFromChannelClose(const amqp_channel_close_t_& reply);
 
 	AmqpResponseServerException(const AmqpResponseServerException& e) throw();
 	AmqpResponseServerException& operator=(const AmqpResponseServerException& e) throw();

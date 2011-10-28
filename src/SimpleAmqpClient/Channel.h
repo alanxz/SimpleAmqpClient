@@ -252,6 +252,8 @@ public:
                       bool mandatory = false,
                       bool immediate = false);
 
+    bool BasicGet(BasicMessage::ptr_t message, const std::string& queue, bool no_ack = true);
+
 	/**
 	  * Starts consuming Basic messages on a queue
 	  * Subscribes as a consumer to a queue, so all future messages on a queue will be Basic.Delivered
@@ -265,8 +267,8 @@ public:
 	  *  Defaults to true
 	  * @param exclusive Defaults to true
 	  */
-	void BasicConsume(const std::string& queue,
-					  const std::string& consumer_tag,
+	std::string BasicConsume(const std::string& queue,
+					  const std::string& consumer_tag = "",
 					  bool no_local = true,
 					  bool no_ack = true,
 					  bool exclusive = true);
@@ -286,7 +288,7 @@ public:
     * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns The next message on the queue
 	  */
-	BasicMessage::ptr_t BasicConsumeMessage();
+	BasicMessage::ptr_t BasicConsumeMessage(const std::string& consumer_tag);
 
 	/**
 	  * Consumes a single message with a timeout
@@ -297,7 +299,7 @@ public:
     * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
-	bool BasicConsumeMessage(BasicMessage::ptr_t& message, int timeout);
+	bool BasicConsumeMessage(const std::string& consumer_tag, BasicMessage::ptr_t& message, int timeout);
 
 	/**
 	  * Consumes a single message with a timeout (this gets an envelope object)
@@ -310,25 +312,9 @@ public:
     * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
-	bool BasicConsumeMessage(Envelope::ptr_t& envelope, int timeout);
-
-  /**
-    * Closes the current channel and reopens immediately opens a new channel
-    * Note this will destroy anything that is bound to a channel (consumers, auto-delete queues, and auto-delete exchanges
-    * This is required after a AmqpResponseServerException with ExceptionType = ET_ChannelException
-    * all other functions will fail otherwise.
-    */
-  void ResetChannel();
+	bool BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& envelope, int timeout);
 
 protected:
-
-    void CheckFrameForClose(amqp_frame_t& frame);
-    void CheckChannelIsOpen();
-
-    BasicMessage::ptr_t Channel::ReadContent();
-
-    static const amqp_table_t EMPTY_TABLE;
-
     boost::scoped_ptr<Detail::ChannelImpl> m_impl;
 };
 
