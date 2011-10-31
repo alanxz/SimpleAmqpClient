@@ -149,16 +149,19 @@ amqp_channel_t ChannelImpl::GetNextChannelId()
 {
   int max_channels = amqp_get_channel_max(m_connection);
   int channel_count = m_open_channels.size();
-  if (0 == max_channels && std::numeric_limits<uint16_t>::max() <= channel_count)
+  if (0 == max_channels)
   {
-    throw std::runtime_error("Too many channels open");
+    if (std::numeric_limits<uint16_t>::max() <= channel_count)
+    {
+      throw std::runtime_error("Too many channels open");
+    }
   }
   else if (max_channels <= channel_count)
   {
     throw std::runtime_error("Too many channels open");
   }
 
-  while (m_open_channels.end() == m_open_channels.find(++m_next_channel_id)) { /* Empty */ }
+  while (m_open_channels.end() != m_open_channels.find(++m_next_channel_id)) { /* Empty */ }
 
   m_open_channels.insert(m_next_channel_id);
   return m_next_channel_id;
