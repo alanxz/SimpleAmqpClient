@@ -97,8 +97,6 @@ public:
   amqp_channel_t GetChannel();
   void ReturnChannel(amqp_channel_t channel);
 
-  uint64_t GetPublishId();
-
   void CheckLastRpcReply(amqp_channel_t channel, const std::string& context);
   void CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply, const std::string& context);
   void CheckForError(int ret, const std::string& context);
@@ -124,13 +122,11 @@ private:
   std::set<amqp_channel_t> m_open_channels;
 
   uint16_t m_next_channel_id;
-  uint64_t m_next_publish_id;
   std::map<std::string, amqp_channel_t> m_consumer_channel_map;
 };
 
 ChannelImpl::ChannelImpl() :
-  m_next_channel_id(1),
-  m_next_publish_id(1)
+  m_next_channel_id(1)
 {
   // Channel 0 is always open
   m_open_channels.insert(0);
@@ -138,11 +134,6 @@ ChannelImpl::ChannelImpl() :
 
 ChannelImpl::~ChannelImpl()
 {
-}
-
-uint64_t ChannelImpl::GetPublishId()
-{
-  return m_next_publish_id++;
 }
 
 amqp_channel_t ChannelImpl::GetNextChannelId()
@@ -196,6 +187,7 @@ amqp_channel_t ChannelImpl::GetChannel()
 void ChannelImpl::ReturnChannel(amqp_channel_t channel)
 {
   m_free_channels.push(channel);
+  amqp_maybe_release_buffers(m_connection);
 }
 
 void ChannelImpl::CheckLastRpcReply(amqp_channel_t channel, const std::string& context)
@@ -544,11 +536,6 @@ void Channel::BasicPublish(const std::string& exchange_name,
 {
   amqp_channel_t channel = m_impl->GetChannel();
 
-  if (message->DeliveryTag() == 0)
-  {
-    message->DeliveryTag(m_impl->GetPublishId());
-  }
-
   m_impl->CheckForError(amqp_basic_publish(m_impl->m_connection, channel,
                        amqp_cstring_bytes(exchange_name.c_str()),
                        amqp_cstring_bytes(routing_key.c_str()),
@@ -740,6 +727,7 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
       BasicMessage::ptr_t content = m_impl->ReadContent(channel);
       content->DeliveryTag(delivery_tag);
       message = Envelope::Create(content, consumer_tag, delivery_tag, exchange, redelivered, routing_key);
+      amqp_maybe_release_buffers(m_impl->m_connection);
       return true;
       break;
     }
