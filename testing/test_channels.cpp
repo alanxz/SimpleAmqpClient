@@ -8,6 +8,7 @@ TEST(test_channels, first_channel)
   Channel::ptr_t channel = Channel::Create("localhost");
 
   channel->DeclareExchange("test_channel_exchange", Channel::EXCHANGE_TYPE_FANOUT, false, false, true);
+  channel->DeleteExchange("test_channel_exchange");
 }
 
 // Check to see that channels are reused properly
@@ -17,6 +18,8 @@ TEST(test_channels, channel_reuse)
 
   channel->DeclareExchange("test_channel_exchange1", Channel::EXCHANGE_TYPE_FANOUT, false, false, true);
   channel->DeclareExchange("test_channel_exchange2", Channel::EXCHANGE_TYPE_FANOUT, false, false, true);
+  channel->DeleteExchange("test_channel_exchange1");
+  channel->DeleteExchange("test_channel_exchange2");
 }
 
 // Check to see that a new channel is created when a channel is put in an exception state
@@ -27,6 +30,7 @@ TEST(test_channels, channel_recover_from_error)
   EXPECT_THROW(channel->DeclareExchange("test_channel_exchangedoesnotexist", Channel::EXCHANGE_TYPE_FANOUT, true, false, true), AmqpResponseServerException);
 
   channel->DeclareExchange("test_channel_exchange", Channel::EXCHANGE_TYPE_FANOUT, false, false, true);
+  channel->DeleteExchange("test_channel_exchange");
 }
 
 TEST(test_channels, publish_success1)
