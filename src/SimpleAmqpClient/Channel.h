@@ -254,6 +254,8 @@ public:
 
     bool BasicGet(BasicMessage::ptr_t& message, const std::string& queue, bool no_ack = true);
 
+    void BasicRecover(bool requeue);
+
 	/**
 	  * Starts consuming Basic messages on a queue
 	  * Subscribes as a consumer to a queue, so all future messages on a queue will be Basic.Delivered

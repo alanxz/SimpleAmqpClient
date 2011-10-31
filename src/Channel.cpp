@@ -588,6 +588,15 @@ bool Channel::BasicGet(BasicMessage::ptr_t& message, const std::string& queue, b
   return true;
 }
 
+void Channel::BasicRecover(bool requeue)
+{
+  amqp_channel_t channel = m_impl->GetChannel();
+  amqp_basic_recover(m_impl->m_connection, channel, requeue);
+
+	m_impl->CheckLastRpcReply(channel, "Channel::Recover queue.recover");
+  m_impl->ReturnChannel(channel);
+}
+
 std::string Channel::BasicConsume(const std::string& queue,
 						   const std::string& consumer_tag,
 						   bool no_local,
