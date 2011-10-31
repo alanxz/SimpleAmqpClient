@@ -273,7 +273,10 @@ public:
 					  const std::string& consumer_tag = "",
 					  bool no_local = true,
 					  bool no_ack = true,
-					  bool exclusive = true);
+					  bool exclusive = true,
+            uint16_t message_prefetch_count = 0);
+
+  void BasicQos(const std::string& consumer_tag, uint16_t message_prefetch_count);
 
 	/**
 	  * Cancels a previously created Consumer

@@ -601,9 +601,14 @@ std::string Channel::BasicConsume(const std::string& queue,
 						   const std::string& consumer_tag,
 						   bool no_local,
 						   bool no_ack,
-						   bool exclusive)
+						   bool exclusive,
+               uint16_t message_prefetch_count)
 {
   amqp_channel_t channel = m_impl->GetChannel();
+
+  // Set this before starting the consume as it may have been set by a previous consumer
+  amqp_basic_qos(m_impl->m_connection, channel, 0, message_prefetch_count, false);
+  m_impl->CheckLastRpcReply(channel, "Channel::BasicConsume basic.qos");
 
 	amqp_basic_consume_ok_t* consume_ok = amqp_basic_consume(m_impl->m_connection, channel,
     amqp_cstring_bytes(queue.c_str()),
@@ -619,6 +624,13 @@ std::string Channel::BasicConsume(const std::string& queue,
   m_impl->AddConsumer(tag, channel);
 
   return tag;
+}
+
+void Channel::BasicQos(const std::string& consumer_tag, uint16_t message_prefetch_count)
+{
+  amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
+  amqp_basic_qos(m_impl->m_connection, channel, 0, message_prefetch_count, false);
+  m_impl->CheckLastRpcReply(channel, "Channel::BasicQos basic.qos");
 }
 
 void Channel::BasicCancel(const std::string& consumer_tag)
