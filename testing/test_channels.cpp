@@ -93,3 +93,30 @@ TEST(test_channels, consume_success)
   Envelope::ptr_t consumed_envelope;
   channel->BasicConsumeMessage(consumer, consumed_envelope, 0);
 }
+
+TEST(test_channels, consume_success2)
+{
+  Channel::ptr_t channel = Channel::Create("localhost");
+  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::string queue = channel->DeclareQueue("");
+
+  std::string consumer = channel->BasicConsume(queue);
+  channel->BasicPublish("", queue, message);
+
+  Envelope::ptr_t consumed_envelope;
+  channel->BasicConsumeMessage(consumer, consumed_envelope, 0);
+}
+
+TEST(test_channels, big_message)
+{
+  Channel::ptr_t channel = Channel::Create("localhost", 5672, "guest", "guest", "/", 4096);
+  BasicMessage::ptr_t message = BasicMessage::Create(std::string(4099, 'a'));
+
+  std::string queue = channel->DeclareQueue("");
+
+  std::string consumer = channel->BasicConsume(queue);
+  channel->BasicPublish("", queue, message);
+
+  Envelope::ptr_t consumed_envelope;
+  channel->BasicConsumeMessage(consumer, consumed_envelope, 0);
+}
