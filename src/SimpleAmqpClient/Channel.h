@@ -301,7 +301,7 @@ public:
     * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
-	bool BasicConsumeMessage(const std::string& consumer_tag, BasicMessage::ptr_t& message, int timeout);
+	bool BasicConsumeMessage(const std::string& consumer_tag, BasicMessage::ptr_t& message, int timeout = 0);
 
 	/**
 	  * Consumes a single message with a timeout (this gets an envelope object)
@@ -314,7 +314,7 @@ public:
     * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
-	bool BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& envelope, int timeout);
+	bool BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& envelope, int timeout = 0);
 
 protected:
     boost::scoped_ptr<Detail::ChannelImpl> m_impl;
