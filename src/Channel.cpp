@@ -571,7 +571,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
   m_impl->ReturnChannel(channel);
 }
 
-bool Channel::BasicGet(BasicMessage::ptr_t message, const std::string& queue, bool no_ack)
+bool Channel::BasicGet(BasicMessage::ptr_t& message, const std::string& queue, bool no_ack)
 {
   amqp_channel_t channel = m_impl->GetChannel();
 

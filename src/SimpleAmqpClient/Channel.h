@@ -252,7 +252,7 @@ public:
                       bool mandatory = false,
                       bool immediate = false);
 
-    bool BasicGet(BasicMessage::ptr_t message, const std::string& queue, bool no_ack = true);
+    bool BasicGet(BasicMessage::ptr_t& message, const std::string& queue, bool no_ack = true);
 
 	/**
 	  * Starts consuming Basic messages on a queue
