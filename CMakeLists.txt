@@ -70,25 +70,25 @@ SET_TARGET_PROPERTIES(SimpleAmqpClient PROPERTIES
 	)
 
 
-ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
-TARGET_LINK_LIBRARIES(simple_connect SimpleAmqpClient)
-SET_TARGET_PROPERTIES(simple_connect PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-
-ADD_EXECUTABLE(consume_with_timeout examples/consume_with_timeout.cpp)
-TARGET_LINK_LIBRARIES(consume_with_timeout SimpleAmqpClient ${Boost_LIBRARIES})
-SET_TARGET_PROPERTIES(consume_with_timeout PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-
-ADD_EXECUTABLE(envelope_test examples/envelope_test.cpp)
-TARGET_LINK_LIBRARIES(envelope_test SimpleAmqpClient)
-SET_TARGET_PROPERTIES(envelope_test PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-
-ADD_EXECUTABLE(basic_return_test examples/basic_return_test.cpp)
-TARGET_LINK_LIBRARIES(basic_return_test SimpleAmqpClient)
-SET_TARGET_PROPERTIES(basic_return_test PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+#ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
+#TARGET_LINK_LIBRARIES(simple_connect SimpleAmqpClient)
+#SET_TARGET_PROPERTIES(simple_connect PROPERTIES
+#	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+#
+#ADD_EXECUTABLE(consume_with_timeout examples/consume_with_timeout.cpp)
+#TARGET_LINK_LIBRARIES(consume_with_timeout SimpleAmqpClient ${Boost_LIBRARIES})
+#SET_TARGET_PROPERTIES(consume_with_timeout PROPERTIES
+#	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+#
+#ADD_EXECUTABLE(envelope_test examples/envelope_test.cpp)
+#TARGET_LINK_LIBRARIES(envelope_test SimpleAmqpClient)
+#SET_TARGET_PROPERTIES(envelope_test PROPERTIES
+#	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+#
+#ADD_EXECUTABLE(basic_return_test examples/basic_return_test.cpp)
+#TARGET_LINK_LIBRARIES(basic_return_test SimpleAmqpClient)
+#SET_TARGET_PROPERTIES(basic_return_test PROPERTIES
+#	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 # Some smoke tests:
 

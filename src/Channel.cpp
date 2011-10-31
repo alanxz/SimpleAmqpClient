@@ -100,7 +100,7 @@ public:
   uint64_t GetPublishId();
 
   void CheckLastRpcReply(amqp_channel_t channel, const std::string& context);
-  void CheckRpcReply(amqp_channel_t channel, amqp_rpc_reply_t& reply, const std::string& context);
+  void CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply, const std::string& context);
   void CheckForError(int ret, const std::string& context);
 
   void CheckFrameForClose(amqp_frame_t& frame, amqp_channel_t channel);
@@ -200,7 +200,7 @@ void ChannelImpl::CheckLastRpcReply(amqp_channel_t channel, const std::string& c
   CheckRpcReply(channel, amqp_get_rpc_reply(m_connection), context);
 }
 
-void ChannelImpl::CheckRpcReply(amqp_channel_t channel, amqp_rpc_reply_t& reply, const std::string& context)
+void ChannelImpl::CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply, const std::string& context)
 {
   switch (reply.reply_type)
   {
@@ -331,7 +331,7 @@ void ChannelImpl::AddConsumer(const std::string& consumer_tag, amqp_channel_t ch
 
 amqp_channel_t ChannelImpl::RemoveConsumer(const std::string& consumer_tag)
 {
-  std::map<std::string, amqp_channel_t>::const_iterator it = m_consumer_channel_map.find(consumer_tag);
+  std::map<std::string, amqp_channel_t>::iterator it = m_consumer_channel_map.find(consumer_tag);
   if (it == m_consumer_channel_map.end())
   {
     throw ConsumerTagNotFoundException();
