@@ -67,7 +67,7 @@ public:
 
 	friend ptr_t boost::make_shared<BasicMessage>();
 	friend ptr_t boost::make_shared<BasicMessage>(std::string const & a1);
-	friend ptr_t boost::make_shared<BasicMessage>(amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2, uint64_t const& a3 );
+	friend ptr_t boost::make_shared<BasicMessage>(amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2);
 
 	/**
 	  * Create a new empty BasicMessage object
@@ -84,23 +84,21 @@ public:
 
 	/**
 	  * Create a new BasicMessage object
-	  * Creates a new BasicMessage object with a given body, properties and
-	  * optionally a delivery tag
+	  * Creates a new BasicMessage object with a given body, properties
 	  * @param body the message body. The message body is NOT duplicated.
 	  * Passed in message body is deallocated when: body is set or message is
 	  * destructed.
 	  * @properties the amqp_basic_properties_t struct. Note this makes a deep
 	  * copy of the properties struct
-	  * @param delivery_tag the delivery tag of the message
 	  * @returns a new BasicMessage object
 	  */
-	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag = 0) 
-		{ return boost::make_shared<BasicMessage>(body, properties, delivery_tag); }
+	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties)
+		{ return boost::make_shared<BasicMessage>(body, properties); }
 
 private:
     BasicMessage();
 	BasicMessage(const std::string& body);
-	BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag);
+	BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties);
 
 public:
 	/**
@@ -133,18 +131,6 @@ public:
 	  * Sets the message body as a std::string
 	  */
     void Body(const std::string& body);
-
-	/**
-	  * Gets the message delivery tag
-	  */
-
-	uint64_t DeliveryTag() const { return m_delivery_tag; }
-	/**
-	  * Sets the delivery tag
-	  *
-	  * This should not be used by client programs
-	  */
-	void DeliveryTag(uint64_t delivery_tag) { m_delivery_tag = delivery_tag; }
 
 	/**
 	  * Gets the content type property
@@ -372,8 +358,6 @@ public:
 protected:
     amqp_basic_properties_t m_properties;
     amqp_bytes_t m_body;
-	uint64_t m_delivery_tag;
-
 };
 
 } // namespace AmqpClient

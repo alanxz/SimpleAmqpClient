@@ -96,6 +96,7 @@ public:
 
   amqp_channel_t GetChannel();
   void ReturnChannel(amqp_channel_t channel);
+  bool IsChannelOpen(amqp_channel_t channel);
 
   void CheckLastRpcReply(amqp_channel_t channel, const std::string& context);
   void CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply, const std::string& context);
@@ -188,6 +189,12 @@ void ChannelImpl::ReturnChannel(amqp_channel_t channel)
 {
   m_free_channels.push(channel);
   amqp_maybe_release_buffers(m_connection);
+}
+
+
+bool ChannelImpl::IsChannelOpen(amqp_channel_t channel)
+{
+  return m_open_channels.find(channel) != m_open_channels.end();
 }
 
 void ChannelImpl::CheckLastRpcReply(amqp_channel_t channel, const std::string& context)
@@ -513,19 +520,20 @@ void Channel::UnbindQueue(const std::string& queue_name,
   m_impl->ReturnChannel(channel);
 }
 
-void Channel::BasicAck(const BasicMessage::ptr_t message)
+void Channel::BasicAck(const Envelope::ptr_t& message)
 {
-	BasicAck(message->DeliveryTag());
-}
+  // Delivery tag is local to the channel, so its important to use
+  // that channel, sadly this can cause the channel to throw an exception
+  // which will show up as an unrelated exception in a different method
+  // that actually waits for a response from the broker
+  amqp_channel_t channel = message->DeliveryChannel();
+  if (!m_impl->IsChannelOpen(channel))
+  {
+    throw std::runtime_error("The channel that the message was delivered on has been closed");
+  }
 
-void Channel::BasicAck(uint64_t delivery_tag)
-{
-  amqp_channel_t channel = m_impl->GetChannel();
 	m_impl->CheckForError(amqp_basic_ack(m_impl->m_connection, channel,
-			delivery_tag,
-			false), "Channel::BasicAck basic.ack");
-
-  m_impl->ReturnChannel(channel);
+    message->DeliveryTag(), false), "Channel::BasicAck basic.ack");
 }
 
 void Channel::BasicPublish(const std::string& exchange_name,
@@ -571,7 +579,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
   m_impl->ReturnChannel(channel);
 }
 
-bool Channel::BasicGet(BasicMessage::ptr_t& message, const std::string& queue, bool no_ack)
+bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool no_ack)
 {
   amqp_channel_t channel = m_impl->GetChannel();
 
@@ -583,7 +591,16 @@ bool Channel::BasicGet(BasicMessage::ptr_t& message, const std::string& queue, b
     m_impl->ReturnChannel(channel);
     return false;
   }
-  message = m_impl->ReadContent(channel);
+
+  amqp_basic_get_ok_t* get_ok = (amqp_basic_get_ok_t*)reply.reply.decoded;
+  uint64_t delivery_tag = get_ok->delivery_tag;
+  bool redelivered = get_ok->redelivered;
+  std::string exchange((char*)get_ok->exchange.bytes, get_ok->exchange.len);
+  std::string routing_key((char*)get_ok->routing_key.bytes, get_ok->routing_key.len);
+
+  BasicMessage::ptr_t message = m_impl->ReadContent(channel);
+  envelope = Envelope::Create(message, "", delivery_tag, exchange, redelivered, routing_key, channel);
+
   m_impl->ReturnChannel(channel);
   return true;
 }
@@ -653,22 +670,11 @@ void Channel::BasicCancel(const std::string& consumer_tag)
 }
 
 
-BasicMessage::ptr_t Channel::BasicConsumeMessage(const std::string& consumer_tag)
+Envelope::ptr_t Channel::BasicConsumeMessage(const std::string& consumer_tag)
 {
-	BasicMessage::ptr_t returnval;
+	Envelope::ptr_t returnval;
 	BasicConsumeMessage(consumer_tag, returnval, 0);
 	return returnval;
-}
-
-bool Channel::BasicConsumeMessage(const std::string& consumer_tag, BasicMessage::ptr_t& message, int timeout)
-{
-  Envelope::ptr_t envelope;
-  bool ret = BasicConsumeMessage(consumer_tag, envelope, timeout);
-  if (ret) 
-  {
-    message = envelope->Message();
-  }
-  return ret;
 }
 
 bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& message, int timeout)
@@ -746,8 +752,7 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
       const uint64_t delivery_tag = deliver_method->delivery_tag;
       const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
       BasicMessage::ptr_t content = m_impl->ReadContent(channel);
-      content->DeliveryTag(delivery_tag);
-      message = Envelope::Create(content, consumer_tag, delivery_tag, exchange, redelivered, routing_key);
+      message = Envelope::Create(content, consumer_tag, delivery_tag, exchange, redelivered, routing_key, channel);
       amqp_maybe_release_buffers(m_impl->m_connection);
       return true;
       break;

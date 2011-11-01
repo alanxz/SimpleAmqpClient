@@ -42,23 +42,21 @@
 
 namespace AmqpClient {
 
-BasicMessage::BasicMessage() :
-	m_delivery_tag(0)
+BasicMessage::BasicMessage()
 {
 	m_body.bytes = NULL;
 	m_body.len = 0;
 	m_properties._flags = 0;
 }
 
-BasicMessage::BasicMessage(const std::string& body) :
-	m_delivery_tag(0)
+BasicMessage::BasicMessage(const std::string& body) 
 {
 	Body(body);
 	m_properties._flags = 0;
 }
 
-BasicMessage::BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties, uint64_t delivery_tag) :
-	m_body(body), m_properties(*properties), m_delivery_tag(delivery_tag)
+BasicMessage::BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties) :
+	m_body(body), m_properties(*properties)
 {
 	if (ContentTypeIsSet()) m_properties.content_type = amqp_bytes_malloc_dup(m_properties.content_type);
 	if (ContentEncodingIsSet()) m_properties.content_encoding = amqp_bytes_malloc_dup(m_properties.content_encoding);

@@ -224,14 +224,7 @@ public:
 	  * Acknowledges a message delievered using BasicGet or BasicConsume
 	  * @param message the message that is being ack'ed
 	  */
-	void BasicAck(const BasicMessage::ptr_t message);
-
-	/**
-	  * Acknowledges a Basic message
-	  * Acknowledges a message delievered using BasicGet or BasicConsume
-	  * @param delivery_tag the delivery tage of the message being acknowledged
-	  */
-	void BasicAck(uint64_t delivery_tag);
+	void BasicAck(const Envelope::ptr_t& message);
 
 	/**
 	  * Publishes a Basic message
@@ -252,9 +245,9 @@ public:
                       bool mandatory = false,
                       bool immediate = false);
 
-    bool BasicGet(BasicMessage::ptr_t& message, const std::string& queue, bool no_ack = true);
+    bool BasicGet(Envelope::ptr_t& message, const std::string& queue, bool no_ack = true);
 
-    void BasicRecover(bool requeue);
+    void BasicRecover(const std::string& consumer, bool requeue);
 
 	/**
 	  * Starts consuming Basic messages on a queue
@@ -293,18 +286,7 @@ public:
     * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns The next message on the queue
 	  */
-	BasicMessage::ptr_t BasicConsumeMessage(const std::string& consumer_tag);
-
-	/**
-	  * Consumes a single message with a timeout
-	  * Waits for a single Basic message to be Delivered or the timeout to expire.
-	  * This function only works after BasicConsume as been successfully called.
-	  * @param message the message object to save it to. Is ok to be an empty pointer
-	  * @param timeout the timeout for the first part of the message to be delivered in ms
-    * @throws MessageReturnedException if a basic.return is received while waiting for a message
-	  * @returns true if a message was delivered before the timeout, false otherwise
-	  */
-	bool BasicConsumeMessage(const std::string& consumer_tag, BasicMessage::ptr_t& message, int timeout = 0);
+	Envelope::ptr_t BasicConsumeMessage(const std::string& consumer_tag);
 
 	/**
 	  * Consumes a single message with a timeout (this gets an envelope object)
