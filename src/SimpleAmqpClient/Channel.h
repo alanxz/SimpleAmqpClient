@@ -47,11 +47,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <amqp.h>
 #include <string>
-
-#define BROKER_HEARTBEAT 0
-#define DEFAULT_CHANNEL 1
 
 #ifdef _MSC_VER
 # pragma warning ( push )
@@ -131,7 +127,7 @@ public:
 	  *  bound to it. Defaults to true
 	  */
     void DeclareExchange(const std::string& exchange_name,
-                         const std::string& exchange_type = "amq.direct",
+                         const std::string& exchange_type = Channel::EXCHANGE_TYPE_DIRECT, 
                          bool passive = false,
                          bool durable = false,
                          bool auto_delete = true);

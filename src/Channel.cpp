@@ -62,9 +62,11 @@
 #include <boost/cstdint.hpp>
 #include <boost/limits.hpp>
 
+#define BROKER_HEARTBEAT 0
+
 namespace AmqpClient {
 
-const std::string Channel::EXCHANGE_TYPE_DIRECT("amq.direct");
+const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
