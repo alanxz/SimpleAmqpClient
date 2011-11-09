@@ -202,6 +202,7 @@ void Channel::DeleteQueue(const std::string& queue_name,
   del.queue = amqp_cstring_bytes(queue_name.c_str());
   del.if_unused = if_unused;
   del.if_empty = if_empty;
+  del.nowait = false;
 
   m_impl->DoRpc(AMQP_QUEUE_DELETE_METHOD, &del, DELETE_OK);
   m_impl->MaybeReleaseBuffers();
