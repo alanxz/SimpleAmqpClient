@@ -135,15 +135,29 @@ public:
     /**
       * Deletes an exachange on the AMQP broker
       * @param exchange_name the name of the exchange to be deleteed
-      * @param if_unused if true only delete the exchange if it has no queues bound to it
+      * @param if_unused if true only delete the exchange if it has no queues bound to it, throws
+      *  AmqpResponseServerExeception otherwise
       */
     void DeleteExchange(const std::string& exchange_name,
                         bool if_unused = false);
 
+    /**
+      * Binds one exchange to another exchange using a given key
+      * @param destination the name of the exchange to route messages to
+      * @param source the name of the exchange to route messages from
+      * @param routing_key the routing key to use when binding
+      */
     void BindExchange(const std::string& destination,
                       const std::string& source,
                       const std::string& routing_key);
 
+    /**
+      * Unbind an existing exchange-exchange binding 
+      * @see BindExchange
+      * @param destination the name of the exchange to route messages to
+      * @param source the name of the exchange to route messages from
+      * @param routing_key the routing key to use when binding
+      */
     void UnbindExchange(const std::string& destination,
                         const std::string& source,
                         const std::string& routing_key);
@@ -276,7 +290,6 @@ public:
 	  * Consumes a single message
 	  * Waits for a single Basic message to be Delivered. This function only works after BasicConsume
 	  * has successfully been called.
-    * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns The next message on the queue
 	  */
 	Envelope::ptr_t BasicConsumeMessage(const std::string& consumer_tag);
