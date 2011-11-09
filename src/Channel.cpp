@@ -443,8 +443,12 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
 
   static const boost::array<uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
 
+  boost::chrono::microseconds real_timeout = (timeout >= 0 ? 
+                                         boost::chrono::seconds(timeout) : 
+                                         boost::chrono::microseconds::max());
+
   amqp_frame_t deliver;
-  if (!m_impl->GetMethodOnChannel(channel, deliver, DELIVER, boost::chrono::seconds(timeout)))
+  if (!m_impl->GetMethodOnChannel(channel, deliver, DELIVER, real_timeout))
   {
     return false;
   }

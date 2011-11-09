@@ -296,7 +296,7 @@ public:
     * @throws MessageReturnedException if a basic.return is received while waiting for a message
 	  * @returns true if a message was delivered before the timeout, false otherwise
 	  */
-	bool BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& envelope, int timeout = 0);
+	bool BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& envelope, int timeout = -1);
 
 protected:
     boost::scoped_ptr<Detail::ChannelImpl> m_impl;
