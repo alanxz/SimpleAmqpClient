@@ -95,8 +95,7 @@ public:
 	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties)
 		{ return boost::make_shared<BasicMessage>(body, properties); }
 
-private:
-    BasicMessage();
+  BasicMessage();
 	BasicMessage(const std::string& body);
 	BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties);
 

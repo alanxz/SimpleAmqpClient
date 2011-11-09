@@ -106,7 +106,6 @@ public:
 		return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
 	}
 
-private:
 	explicit Channel(const std::string& host,
 			   int port,
 			   const std::string& username,
