@@ -117,7 +117,9 @@ public:
   amqp_frame_t DoRpc(uint32_t method_id, void* decoded, const ResponseListType& expected_responses)
   {
     amqp_channel_t channel = GetChannel();
-    return DoRpcOnChannel(channel, method_id, decoded, expected_responses);
+    amqp_frame_t ret = DoRpcOnChannel(channel, method_id, decoded, expected_responses);
+    ReturnChannel(channel);
+    return ret;
   }
 
   amqp_channel_t CreateNewChannel();
