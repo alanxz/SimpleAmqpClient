@@ -1,5 +1,6 @@
 #include <SimpleAmqpClient.h>
 #include <gtest/gtest.h>
+#include <iostream>
 
 using namespace AmqpClient;
 TEST(test_consume, create_consumer)
@@ -66,4 +67,57 @@ TEST(test_consume, consume_bad_consumer)
 {
   Channel::ptr_t channel = Channel::Create();
   EXPECT_THROW(channel->BasicConsumeMessage("test_consume_noexistconsumer"), ConsumerTagNotFoundException);
+}
+
+TEST(test_consume, test_initial_qos)
+{
+  Channel::ptr_t channel = Channel::Create();
+  BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
+  BasicMessage::ptr_t message2 = BasicMessage::Create("Message2");
+  BasicMessage::ptr_t message3 = BasicMessage::Create("Message3");
+
+  std::string queue = channel->DeclareQueue("");
+  channel->BasicPublish("", queue, message1, true);
+  channel->BasicPublish("", queue, message2, true);
+  channel->BasicPublish("", queue, message3, true);
+
+  std::string consumer = channel->BasicConsume(queue, "", true, false, true, 1);
+  BasicMessage::ptr_t received1, received2;
+  //EXPECT_TRUE(channel->BasicConsumeMessage(consumer, received1, 1));
+
+  //EXPECT_FALSE(channel->BasicConsumeMessage(consumer, received2, 1));
+  //channel->BasicAck(received1);
+
+  //EXPECT_TRUE(channel->BasicConsumeMessage(consumer, received2, 1));
+}
+
+TEST(test_consume, test_2consumers)
+{
+  Channel::ptr_t channel = Channel::Create();
+  BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
+  BasicMessage::ptr_t message2 = BasicMessage::Create("Message2");
+  BasicMessage::ptr_t message3 = BasicMessage::Create("Message3");
+
+  std::string queue1 = channel->DeclareQueue("");
+  std::string queue2 = channel->DeclareQueue("");
+  std::string queue3 = channel->DeclareQueue("");
+
+  channel->BasicPublish("", queue1, message1);
+  channel->BasicPublish("", queue2, message2);
+  channel->BasicPublish("", queue3, message3);
+
+  std::string consumer1 = channel->BasicConsume(queue1, "");
+  std::string consumer2 = channel->BasicConsume(queue2, "");
+
+  Envelope::ptr_t envelope1;
+  Envelope::ptr_t envelope2;
+  BasicMessage::ptr_t envelope3;
+
+  channel->BasicConsumeMessage(consumer1, envelope1);
+  channel->BasicConsumeMessage(consumer2, envelope2);
+  channel->BasicGet(envelope3, queue3);
+
+  std::cout << "Envelope 1 delivery tag: " << envelope1->DeliveryTag() << std::endl;
+  std::cout << "Envelope 2 delivery tag: " << envelope2->DeliveryTag() << std::endl;
+  std::cout << "Envelope 3 delivery tag: " << envelope3->DeliveryTag() << std::endl;
 }
