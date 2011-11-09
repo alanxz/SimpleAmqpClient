@@ -54,7 +54,7 @@ public:
     boost::chrono::microseconds timeout = boost::chrono::microseconds::max())
   {
     // Check to see a desired frame is in the frame queue for the channel
-    frame_queue_t channel_queue = GetChannelQueueOrThrow(channel)->second;
+    frame_queue_t& channel_queue = GetChannelQueueOrThrow(channel)->second;
 
     frame_queue_t::iterator desired_frame = 
       std::find_if(channel_queue.begin(), channel_queue.end(), 

@@ -321,7 +321,7 @@ start:
   return true;
 }
 
-bool ChannelImpl::GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_frame_t& frame, boost::chrono::microseconds timeout)
+bool ChannelImpl::GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_frame_t& frame_out, boost::chrono::microseconds timeout)
 {
   boost::chrono::steady_clock::time_point end_point;
   boost::chrono::microseconds timeout_left = timeout;
@@ -330,12 +330,12 @@ bool ChannelImpl::GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_f
     end_point = boost::chrono::steady_clock::now() + timeout;
   }
 
-  amqp_frame_t received_frame;
-  while (GetNextFrameFromBroker(received_frame, timeout_left))
+  amqp_frame_t frame;
+  while (GetNextFrameFromBroker(frame, timeout_left))
   {
     if (frame.channel == channel)
     {
-      frame = received_frame;
+      frame_out = frame;
       return true;
     }
 
@@ -351,7 +351,7 @@ bool ChannelImpl::GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_f
     }
     else
     {
-      GetChannelQueueOrThrow(frame.channel)->second.push_back(received_frame);
+      GetChannelQueueOrThrow(frame.channel)->second.push_back(frame);
     }
 
     if (timeout != boost::chrono::microseconds::max())
@@ -369,7 +369,7 @@ bool ChannelImpl::GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_f
 
 bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel, amqp_frame_t& frame, boost::chrono::microseconds timeout)
 {
-  frame_queue_t channel_queue = GetChannelQueueOrThrow(channel)->second;
+  frame_queue_t& channel_queue = GetChannelQueueOrThrow(channel)->second;
 
   if (!channel_queue.empty())
   {
