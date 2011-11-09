@@ -206,17 +206,15 @@ public:
 	  */
     void UnbindQueue(const std::string& queue_name,
                      const std::string& exchange_name,
-                     const std::string& binding_key = "");
+                     const std::string& routing_key = "");
 
 	/**
 	  * Purges a queue
 	  * Removes all the messages in a queue on the broker
 	  * @param queue_name the name of the queue to empty
-	  * @param no_wait whether to do it synchronously (no_wait = false) or asynchronously (no_wait = true)
 	  *  Default is false (synchonous)
 	  */
-    void PurgeQueue(const std::string& queue_name,
-                    bool no_wait = false);
+    void PurgeQueue(const std::string& queue_name);
 
 	/**
 	  * Acknowledges a Basic message
