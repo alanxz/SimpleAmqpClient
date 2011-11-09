@@ -130,7 +130,7 @@ public:
                          const std::string& exchange_type = Channel::EXCHANGE_TYPE_DIRECT, 
                          bool passive = false,
                          bool durable = false,
-                         bool auto_delete = true);
+                         bool auto_delete = false);
 
     /**
       * Deletes an exachange on the AMQP broker
