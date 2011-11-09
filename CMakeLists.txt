@@ -39,6 +39,9 @@ SET(SAC_LIB_SRCS
 	src/SimpleAmqpClient/Channel.h
 	src/Channel.cpp
 
+	src/SimpleAmqpClient/ChannelImpl.h
+	src/ChannelImpl.cpp
+
 	src/SimpleAmqpClient/BasicMessage.h
 	src/BasicMessage.cpp
 
