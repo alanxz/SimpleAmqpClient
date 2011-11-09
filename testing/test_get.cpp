@@ -10,9 +10,9 @@ TEST(test_get, get_ok)
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message, true);
 
-  BasicMessage::ptr_t new_message;
+  Envelope::ptr_t new_message;
   EXPECT_TRUE(channel->BasicGet(new_message, queue));
-  EXPECT_EQ(message->Body(), new_message->Body());
+  EXPECT_EQ(message->Body(), new_message->Message()->Body());
 }
 
 TEST(test_get, get_empty)
@@ -21,7 +21,7 @@ TEST(test_get, get_empty)
   BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
 
-  BasicMessage::ptr_t new_message;
+  Envelope::ptr_t new_message;
   EXPECT_FALSE(channel->BasicGet(new_message, queue));
 }
 
@@ -34,16 +34,29 @@ TEST(test_get, get_big)
   std::string queue = channel->DeclareQueue("");
 
   channel->BasicPublish("", queue, message);
-  BasicMessage::ptr_t new_message;
+  Envelope::ptr_t new_message;
   EXPECT_TRUE(channel->BasicGet(new_message, queue));
-  EXPECT_EQ(message->Body(), new_message->Body());
+  EXPECT_EQ(message->Body(), new_message->Message()->Body());
 }
 
 TEST(test_get, bad_queue)
 {
   Channel::ptr_t channel = Channel::Create();
 
-  BasicMessage::ptr_t new_message;
+  Envelope::ptr_t new_message;
   EXPECT_THROW(channel->BasicGet(new_message, "test_get_nonexistantqueue"), AmqpResponseServerException);
+}
+
+TEST(test_get, ack_message)
+{
+  Channel::ptr_t channel = Channel::Create();
+  BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::string queue = channel->DeclareQueue("");
+  channel->BasicPublish("", queue, message, true);
+
+  Envelope::ptr_t new_message;
+  EXPECT_TRUE(channel->BasicGet(new_message, queue, false));
+  channel->BasicAck(new_message);
+  EXPECT_FALSE(channel->BasicGet(new_message, queue, false));
 
 }
