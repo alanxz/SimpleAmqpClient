@@ -416,6 +416,7 @@ void Channel::BasicCancel(const std::string& consumer_tag)
 
   amqp_basic_cancel_t cancel;
   cancel.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
+  cancel.nowait = false;
 
   m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CANCEL_METHOD, &cancel, CANCEL_OK);
 
