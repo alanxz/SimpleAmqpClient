@@ -137,6 +137,8 @@ public:
   amqp_channel_t RemoveConsumer(const std::string& consumer_tag);
   amqp_channel_t GetConsumerChannel(const std::string& consumer_tag);
 
+  void MaybeReleaseBuffers();
+
   amqp_connection_state_t m_connection;
 
 private:
