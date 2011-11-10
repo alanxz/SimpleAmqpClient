@@ -1,55 +1,48 @@
-#include <SimpleAmqpClient.h>
-#include <gtest/gtest.h>
+#include "connected_test.h"
 #include <iostream>
 
 using namespace AmqpClient;
-TEST(test_consume, create_consumer)
+
+TEST_F(connected_test, basic_consume)
 {
-  Channel::ptr_t channel = Channel::Create();
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue);
 }
 
-TEST(test_consume, bad_queue)
+TEST_F(connected_test, basic_consume_badqueue)
 {
-  Channel::ptr_t channel = Channel::Create();
   EXPECT_THROW(channel->BasicConsume("test_consume_noexistqueue"), AmqpResponseServerException);
 }
 
-TEST(test_consume, duplicate_consumer_tag)
+TEST_F(connected_test, basic_consume_duplicatetag)
 {
-  Channel::ptr_t channel = Channel::Create();
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue);
   EXPECT_THROW(channel->BasicConsume(queue, consumer), AmqpResponseServerException);
 }
 
-TEST(test_consume, cancel_consumer)
+TEST_F(connected_test, basic_cancel_consumer)
 {
-  Channel::ptr_t channel = Channel::Create();
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue);
   channel->BasicCancel(consumer);
 }
 
-TEST(test_consume, cancel_bad_consumer)
+TEST_F(connected_test, basic_cancel_bad_consumer)
 {
-  Channel::ptr_t channel = Channel::Create();
   EXPECT_THROW(channel->BasicCancel("test_consume_noexistconsumer"), ConsumerTagNotFoundException);
 }
 
-TEST(test_consume, cancel_cancelled_consumer)
+TEST_F(connected_test, basic_cancel_cancelled_consumer)
 {
-  Channel::ptr_t channel = Channel::Create();
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue);
   channel->BasicCancel(consumer);
   EXPECT_THROW(channel->BasicCancel(consumer), ConsumerTagNotFoundException);
 }
 
-TEST(test_consume, consume_message)
+TEST_F(connected_test, basic_consume_message)
 {
-  Channel::ptr_t channel = Channel::Create();
   BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue);
@@ -63,15 +56,13 @@ TEST(test_consume, consume_message)
   EXPECT_EQ(message->Body(), delivered->Message()->Body());
 }
 
-TEST(test_consume, consume_bad_consumer)
+TEST_F(connected_test, basic_consume_message_bad_consumer)
 {
-  Channel::ptr_t channel = Channel::Create();
   EXPECT_THROW(channel->BasicConsumeMessage("test_consume_noexistconsumer"), ConsumerTagNotFoundException);
 }
 
-TEST(test_consume, test_initial_qos)
+TEST_F(connected_test, basic_consume_inital_qos)
 {
-  Channel::ptr_t channel = Channel::Create();
   BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
   BasicMessage::ptr_t message2 = BasicMessage::Create("Message2");
   BasicMessage::ptr_t message3 = BasicMessage::Create("Message3");
@@ -91,9 +82,8 @@ TEST(test_consume, test_initial_qos)
   EXPECT_TRUE(channel->BasicConsumeMessage(consumer, received2, 1));
 }
 
-TEST(test_consume, test_2consumers)
+TEST_F(connected_test, basic_consume_2consumers)
 {
-  Channel::ptr_t channel = Channel::Create();
   BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
   BasicMessage::ptr_t message2 = BasicMessage::Create("Message2");
   BasicMessage::ptr_t message3 = BasicMessage::Create("Message3");
@@ -121,13 +111,12 @@ TEST(test_consume, test_2consumers)
   channel->BasicAck(envelope3);
 }
 
-TEST(test_consume, test_1000messages)
+TEST_F(connected_test, basic_consume_1000messages)
 {
-  Channel::ptr_t channel = Channel::Create();
   BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
 
   std::string queue = channel->DeclareQueue("");
-  std::string consumer = channel->BasicConsume(queue, "", true, false, true, 2);
+  std::string consumer = channel->BasicConsume(queue, "");
 
   Envelope::ptr_t msg;
   for (int i = 0; i < 1000; ++i)
