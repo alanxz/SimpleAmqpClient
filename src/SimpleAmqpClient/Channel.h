@@ -115,7 +115,7 @@ public:
 	  * Declares an exchange
 	  * Creates an exchange on the AMQP broker if it does not already exist
 	  * @param exchange_name the name of the exchange
-	  * @param exchange_type the type of exchange to be declared. Defaults to amp.direct 
+	  * @param exchange_type the type of exchange to be declared. Defaults to direct 
 	  *  other types that could be used: fanout and topic
 	  * @param passive Indicates how the broker should react if the exchange does not exist.
 	  *  If passive is true and the exhange does not exist the broker will respond with an error and
@@ -170,24 +170,25 @@ public:
 	  *  If passive is true and the queue does not exist the borker will respond with an error and
 	  *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
 	  *  does not already exist)
-	  * @param exclusive Indicates that only client can use the queue. Defaults to true
-	  * @param auto_delete Indicates whether the queue will automatically be removed when no clients are
-	  *  connected to it. Defaults to true
+	  * @param exclusive Indicates that only client can use the queue. Defaults to true. An
+    *  exclusive queue is deleted when the connection is closed
+	  * @param auto_delete the queue will be deleted after at least one exchange has been bound to it,
+    *  then has been unbound
 	  * @returns the name of the queue created on the broker. Used mostly when the broker is asked to 
 	  *  create a unique queue by not providing a queue name
 	  */
 	std::string DeclareQueue(const std::string& queue_name,
               		         bool passive = false,
-							 bool durable = false,
-							 bool exclusive = true,
-							 bool auto_delete = true);
+							             bool durable = false,
+							             bool exclusive = true,
+							             bool auto_delete = true);
 
 	/**
 	  * Deletes a queue
 	  * Removes a queue from the broker. There is no indication of whether the queue was actually deleted
 	  * on the broker.
 	  * @param queue_name the name of the queue to remove
-	  * @param if_unused only deletes the queue if the queue is not bound to an exchange. Defaults to false.
+	  * @param if_unused only deletes the queue if the queue doesn't have any active consumers. Defaults to false
 	  * @param if_empty only deletes the queue if the queue is empty. Defaults to false.
 	  */
     void DeleteQueue(const std::string& queue_name,
@@ -238,12 +239,12 @@ public:
 	  * @param exchange_name The name of the exchange to publish the message to
 	  * @param routing_key The routing key to publish with, this is used to route to the correct queue
 	  * @param message the BasicMessage object to publish to the queue
-	  * @param mandatory Must deliver to a client. If it cannot be delievered immediatatly fail. Defaults
-	  *  to false
-	  * @param immediate Immediately deliver to a client. If it cannot be immediately Consumed by a client
-	  *  fail. Defaults to false.
+	  * @param mandatory requires the message to be delivered to a queue. A MessageReturnedException is thrown
+    *  if the message cannot be routed to a queue. Defaults to false
+	  * @param immediate requires the message to be both routed to a queue, and immediately delivered via a consumer
+    *  if the message is not routed, or a consumer cannot immediately deliver the message a MessageReturnedException is
+    *  thrown. Defaults to false
 	  * 
-	  * I am unsure what the difference between the mandatory and immediate flags are in this context
 	  */
     void BasicPublish(const std::string& exchange_name,
                       const std::string& routing_key,
@@ -251,8 +252,23 @@ public:
                       bool mandatory = false,
                       bool immediate = false);
 
+    /**
+      * Attempts to get a message from a queue in a synchronous manner
+      * @param message a message envelope pointer that will be populated if a message is
+      *  delivered
+      * @param queue the name of the queue to try to get the message from
+      * @param no_ack if the message does not need to be ack'ed. Default true 
+      *  (message does not need to be acked)
+      * @returns true if a message was delivered, false if the queue was empty
+      */
     bool BasicGet(Envelope::ptr_t& message, const std::string& queue, bool no_ack = true);
 
+    /**
+      * Redeliver any unacknowledged messages delivered from the broker
+      * @param consumer the consumer to recover message from
+      * @param requeue throw the messages back into the queue they were delivered
+      *  from, this may result in the messages being delivered to a different consumer
+      */
     void BasicRecover(const std::string& consumer, bool requeue);
 
 	/**
@@ -262,11 +278,15 @@ public:
 	  *  consumer per channel, calling this more than once per channel may result in undefined results
 	  *  from BasicConsumeMessage
 	  * @param queue the name of the queue to subscribe to
-	  * @param consumer_tag the name of the consumer. This is used to cancel the consumer subscription
+	  * @param consumer_tag the name of the consumer. This is used to do operations with a consumer
 	  * @param no_local Defaults to true
 	  * @param no_ack If true, ack'ing the message is automatically done when the message is delivered.
-	  *  Defaults to true
-	  * @param exclusive Defaults to true
+	  *  Defaults to true (message does not have to be ack'ed)
+	  * @param exclusive means only this consumer can access the queue. Defaults to true
+    * @param message_prefetch_count number of unacked messages the broker will deliver. Setting this to
+    *  more than 1 will allow the broker to deliver messages while a current message is being processed
+    *  for example. A value of 0 means no limit. This option is ignored if no_ack = true
+    * @returns the consumer tag
 	  */
 	std::string BasicConsume(const std::string& queue,
 					  const std::string& consumer_tag = "",
@@ -275,6 +295,14 @@ public:
 					  bool exclusive = true,
             uint16_t message_prefetch_count = 1);
 
+  /**
+    * Sets the number of unacknowledged messages that will be delivered 
+    * by the broker to a consumer. Note this effectively has no effect
+    * for consumer with no_ack set
+    * @param consumer_tag the conumser tag to adjust the prefect
+    * @param message_prefetch_count the number of unacknowledged message the
+    *  broker will deliver. A value of 0 means no limit.
+    */
   void BasicQos(const std::string& consumer_tag, uint16_t message_prefetch_count);
 
 	/**
