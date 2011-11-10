@@ -273,7 +273,7 @@ public:
 					  bool no_local = true,
 					  bool no_ack = true,
 					  bool exclusive = true,
-            uint16_t message_prefetch_count = 0);
+            uint16_t message_prefetch_count = 1);
 
   void BasicQos(const std::string& consumer_tag, uint16_t message_prefetch_count);
 
