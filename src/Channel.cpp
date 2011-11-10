@@ -237,7 +237,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
   unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
   unbind.arguments = AMQP_EMPTY_TABLE;
 
-  m_impl->DoRpc(AMQP_QUEUE_UNBIND_OK_METHOD, &unbind, UNBIND_OK);
+  m_impl->DoRpc(AMQP_QUEUE_UNBIND_METHOD, &unbind, UNBIND_OK);
   m_impl->MaybeReleaseBuffers();
 }
 
