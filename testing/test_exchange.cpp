@@ -1,18 +1,8 @@
+#include "connected_test.h"
+
 #include <SimpleAmqpClient.h>
 #include <gtest/gtest.h>
 
-using namespace AmqpClient;
-
-class connected_test : public ::testing::Test
-{
-public:
-  virtual void SetUp()
-  {
-    channel = Channel::Create();
-  }
-
-  Channel::ptr_t channel;
-};
 
 TEST_F(connected_test, declare_exchange_defaults)
 {
