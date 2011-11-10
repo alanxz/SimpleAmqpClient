@@ -1,6 +1,7 @@
 #ifndef CHANNELIMPL_H_
 #define CHANNELIMPL_H_
 
+#include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
@@ -20,7 +21,6 @@ namespace AmqpClient
 {
 namespace Detail
 {
-
 
 class ChannelImpl : boost::noncopyable
 {
@@ -86,7 +86,7 @@ public:
         AMQP_CHANNEL_CLOSE_METHOD == incoming_frame.payload.method.id)
       {
         FinishCloseChannel(channel);
-        throw AmqpResponseServerException(*reinterpret_cast<amqp_channel_close_t*>(incoming_frame.payload.method.decoded), "ChannelImpl::GetMethodOnChannel");
+        AmqpException::Throw(*reinterpret_cast<amqp_channel_close_t*>(incoming_frame.payload.method.decoded));
       }
       GetChannelQueueOrThrow(channel)->second.push_back(incoming_frame);
 
@@ -106,7 +106,7 @@ public:
   template <class ResponseListType>
   amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, uint32_t method_id, void* decoded, const ResponseListType& expected_responses)
   {
-    CheckForError(amqp_send_method(m_connection, channel, method_id, decoded), "AmqpImpl::DoImpl amqp_send_method");
+    CheckForError(amqp_send_method(m_connection, channel, method_id, decoded));
 
     amqp_frame_t response;
     GetMethodOnChannel(channel, response, expected_responses);
@@ -125,8 +125,8 @@ public:
   amqp_channel_t CreateNewChannel();
   amqp_channel_t GetNextChannelId();
 
-  void CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply, const std::string& context);
-  void CheckForError(int ret, const std::string& context);
+  void CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply);
+  void CheckForError(int ret);
 
   void CheckFrameForClose(amqp_frame_t& frame, amqp_channel_t channel);
   void FinishCloseChannel(amqp_channel_t channel);

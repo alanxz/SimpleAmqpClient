@@ -41,7 +41,7 @@
 #include "SimpleAmqpClient/Channel.h"
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/BasicMessage.h"
-#include "SimpleAmqpClient/AmqpResponseServerException.h"
+#include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"

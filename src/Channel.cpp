@@ -81,13 +81,13 @@ m_impl(new Detail::ChannelImpl)
     m_impl->m_connection = amqp_new_connection();
 
     int sock = amqp_open_socket(host.c_str(), port);
-    m_impl->CheckForError(sock, "Channel::Channel amqp_open_socket");
+    m_impl->CheckForError(sock);
 
     amqp_set_sockfd(m_impl->m_connection, sock);
 
     m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
                                    frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                                   username.c_str(), password.c_str()), "Channel::Channel amqp_login");
+                                   username.c_str(), password.c_str()));
 }
 
 Channel::~Channel()
@@ -266,7 +266,7 @@ void Channel::BasicAck(const Envelope::ptr_t& message)
   }
 
 	m_impl->CheckForError(amqp_basic_ack(m_impl->m_connection, channel,
-    message->DeliveryTag(), false), "Channel::BasicAck basic.ack");
+    message->DeliveryTag(), false));
 }
 
 void Channel::BasicPublish(const std::string& exchange_name,
@@ -283,7 +283,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
                        mandatory,
                        immediate,
                        message->getAmqpProperties(),
-                       message->getAmqpBody()), "Publishing to queue");
+                       message->getAmqpBody()));
 
   // If we've done things correctly we can get one of 4 things back from the broker
   // - basic.ack - our channel is in confirm mode, messsage was 'dealt with' by the broker

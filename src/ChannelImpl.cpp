@@ -1,6 +1,6 @@
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
-#include "SimpleAmqpClient/AmqpResponseServerException.h"
+#include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 
 #include "config.h"
@@ -108,7 +108,7 @@ void ChannelImpl::FinishCloseChannel(amqp_channel_t channel)
 {
   amqp_channel_close_ok_t close_ok;
   m_open_channels.erase(channel);
-  CheckForError(amqp_send_method(m_connection, channel, AMQP_CHANNEL_CLOSE_OK_METHOD, &close_ok), "ChannelImpl::FinishCloseChannel channel.close");
+  CheckForError(amqp_send_method(m_connection, channel, AMQP_CHANNEL_CLOSE_OK_METHOD, &close_ok));
 }
 
 void ChannelImpl::FinishCloseConnection()
@@ -117,7 +117,7 @@ void ChannelImpl::FinishCloseConnection()
   amqp_send_method(m_connection, 0, AMQP_CONNECTION_CLOSE_OK_METHOD, &close_ok);
 }
 
-void ChannelImpl::CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply, const std::string& context)
+void ChannelImpl::CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& reply)
 {
   switch (reply.reply_type)
   {
@@ -125,14 +125,9 @@ void ChannelImpl::CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& 
     return;
     break;
 
-  case AMQP_RESPONSE_NONE:
-    throw std::logic_error("Got a amqp_rpc_reply_t with no reply_type!");
-    break;
-
   case AMQP_RESPONSE_LIBRARY_EXCEPTION:
     // If we're getting this likely is the socket is already closed
-    throw AmqpResponseLibraryException(reply, context);
-
+    throw AmqpResponseLibraryException(reply, "");
     break;
 
   case AMQP_RESPONSE_SERVER_EXCEPTION:
@@ -144,23 +139,20 @@ void ChannelImpl::CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& 
     {
       FinishCloseConnection();
     }
-
-    throw AmqpResponseServerException(reply, context);
+    AmqpException::Throw(reply);
     break;
+
   default:
-    throw std::runtime_error("amqp_rpc_reply_t that didn't match!");
+    AmqpException::Throw(reply);
   }
 }
 
-void ChannelImpl::CheckForError(int ret, const std::string& context)
+void ChannelImpl::CheckForError(int ret)
 {
   if (ret < 0)
   {
     char* errstr = amqp_error_string(-ret);
-    std::ostringstream oss;
-    oss << context << ": " << errstr;
-    free(errstr);
-    throw std::runtime_error(oss.str().c_str());
+    throw std::runtime_error(errstr);
   }
 }
 
@@ -216,12 +208,12 @@ void ChannelImpl::CheckFrameForClose(amqp_frame_t& frame, amqp_channel_t channel
     {
     case AMQP_CHANNEL_CLOSE_METHOD:
       FinishCloseChannel(channel);
-      throw AmqpResponseServerException(*reinterpret_cast<amqp_channel_close_t*>(frame.payload.method.decoded), "Consuming message");
+      AmqpException::Throw(*reinterpret_cast<amqp_channel_close_t*>(frame.payload.method.decoded));
       break;
 
     case AMQP_CONNECTION_CLOSE_METHOD:
       FinishCloseConnection();
-      throw AmqpResponseServerException(*reinterpret_cast<amqp_connection_close_t*>(frame.payload.method.decoded), "Consuming message");
+      AmqpException::Throw(*reinterpret_cast<amqp_connection_close_t*>(frame.payload.method.decoded));
       break;
     }
   }
@@ -317,7 +309,7 @@ start:
     }
   }
 
-  CheckForError(amqp_simple_wait_frame(m_connection, &frame), "ChannelImpl::GetNextFrameOnChannel");
+  CheckForError(amqp_simple_wait_frame(m_connection, &frame));
   return true;
 }
 
@@ -346,7 +338,7 @@ bool ChannelImpl::GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_f
         AMQP_CONNECTION_CLOSE_METHOD == frame.payload.method.id)
       {
         FinishCloseConnection();
-        throw AmqpResponseServerException(*reinterpret_cast<amqp_connection_close_t*>(frame.payload.method.decoded), "ChannelImpl::GetNextFrameFromBrokerOnChannel");
+        AmqpException::Throw(*reinterpret_cast<amqp_connection_close_t*>(frame.payload.method.decoded));
       }
     }
     else
@@ -381,7 +373,7 @@ bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel, amqp_frame_t& fr
       AMQP_CHANNEL_CLOSE_METHOD == frame.payload.method.id)
     {
       FinishCloseChannel(channel);
-      throw AmqpResponseServerException(*reinterpret_cast<amqp_channel_close_t*>(frame.payload.method.decoded), "ChannelImpl::GetNextFrameOnChannel");
+      AmqpException::Throw(*reinterpret_cast<amqp_channel_close_t*>(frame.payload.method.decoded));
     }
     return true;
   }

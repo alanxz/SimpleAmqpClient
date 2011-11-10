@@ -53,9 +53,6 @@ SET(SAC_LIB_SRCS
 	src/SimpleAmqpClient/AmqpResponseLibraryException.h
 	src/AmqpResponseLibraryException.cpp
 
-	src/SimpleAmqpClient/AmqpResponseServerException.h
-	src/AmqpResponseServerException.cpp
-
 	src/SimpleAmqpClient/ConsumerTagNotFoundException.h
 
 	src/SimpleAmqpClient/Envelope.h
