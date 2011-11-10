@@ -23,14 +23,14 @@ TEST_F(connected_test, publish_badexchange)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("message body");
   
-  EXPECT_THROW(channel->BasicPublish("test_publish_notexist", "test_publish_rk", message), AmqpResponseServerException);
+  EXPECT_THROW(channel->BasicPublish("test_publish_notexist", "test_publish_rk", message), ChannelException);
 }
 
 TEST_F(connected_test, publish_recover_from_error)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("message body");
   
-  EXPECT_THROW(channel->BasicPublish("test_publish_notexist", "test_publish_rk", message), AmqpResponseServerException);
+  EXPECT_THROW(channel->BasicPublish("test_publish_notexist", "test_publish_rk", message), ChannelException);
   channel->BasicPublish("", "test_publish_rk", message);
 }
 

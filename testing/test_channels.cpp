@@ -20,7 +20,7 @@ TEST_F(connected_test, channel_reuse)
 // Check to see that a new channel is created when a channel is put in an exception state
 TEST_F(connected_test, channel_recover_from_error)
 {
-  EXPECT_THROW(channel->DeclareExchange("test_channel_exchangedoesnotexist", Channel::EXCHANGE_TYPE_FANOUT, true, false, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareExchange("test_channel_exchangedoesnotexist", Channel::EXCHANGE_TYPE_FANOUT, true, false, true), ChannelException);
 
   channel->DeclareExchange("test_channel_exchange", Channel::EXCHANGE_TYPE_FANOUT, false, false, true);
   channel->DeleteExchange("test_channel_exchange");
@@ -60,14 +60,14 @@ TEST_F(connected_test, channel_publish_bad_exchange)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("Test message");
 
-  EXPECT_THROW(channel->BasicPublish("test_channel_badexchange", "test_channel_rk", message, false, false), AmqpResponseServerException);
+  EXPECT_THROW(channel->BasicPublish("test_channel_badexchange", "test_channel_rk", message, false, false), ChannelException);
 }
 
 TEST_F(connected_test, channel_publish_bad_exchange_recover)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("Test message");
 
-  EXPECT_THROW(channel->BasicPublish("test_channel_badexchange", "test_channel_rk", message, false, false), AmqpResponseServerException);
+  EXPECT_THROW(channel->BasicPublish("test_channel_badexchange", "test_channel_rk", message, false, false), ChannelException);
 
   channel->BasicPublish("", "test_channel_rk", message, false, false);
 }

@@ -11,14 +11,14 @@ TEST_F(connected_test, basic_consume)
 
 TEST_F(connected_test, basic_consume_badqueue)
 {
-  EXPECT_THROW(channel->BasicConsume("test_consume_noexistqueue"), AmqpResponseServerException);
+  EXPECT_THROW(channel->BasicConsume("test_consume_noexistqueue"), ChannelException);
 }
 
 TEST_F(connected_test, basic_consume_duplicatetag)
 {
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue);
-  EXPECT_THROW(channel->BasicConsume(queue, consumer), AmqpResponseServerException);
+  EXPECT_THROW(channel->BasicConsume(queue, consumer), ChannelException);
 }
 
 TEST_F(connected_test, basic_cancel_consumer)

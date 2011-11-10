@@ -24,7 +24,7 @@ TEST_F(connected_test, queue_declare_passive)
 
 TEST_F(connected_test, queue_declare_passive_fail)
 {
-  EXPECT_THROW(channel->DeclareQueue("declare_queue_notexist", true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareQueue("declare_queue_notexist", true), ChannelException);
 }
 
 TEST_F(connected_test, queue_declare_durable)
@@ -52,26 +52,26 @@ TEST_F(connected_test, queue_delete)
 {
   std::string queue = channel->DeclareQueue("delete_queue");
   channel->DeleteQueue(queue);
-  EXPECT_THROW(channel->DeclareQueue(queue, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareQueue(queue, true), ChannelException);
 }
 
 TEST_F(connected_test, queue_delete_badqueue)
 {
-  EXPECT_THROW(channel->DeleteQueue("delete_queue_notexist"), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeleteQueue("delete_queue_notexist"), ChannelException);
 }
 
 TEST_F(connected_test, queue_delete_ifunused)
 {
   std::string queue = channel->DeclareQueue("delete_queue_ifunused");
   channel->DeleteQueue(queue, true);
-  EXPECT_THROW(channel->DeclareQueue(queue, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareQueue(queue, true), ChannelException);
 }
 
 TEST_F(connected_test, queue_delete_ifused)
 {
   std::string queue = channel->DeclareQueue("delete_queue_ifused");
   channel->BasicConsume(queue);
-  EXPECT_THROW(channel->DeleteQueue(queue, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeleteQueue(queue, true), ChannelException);
 
   channel->DeleteQueue(queue);
 }
@@ -81,7 +81,7 @@ TEST_F(connected_test, queue_delete_ifempty)
   std::string queue = channel->DeclareQueue("delete_queue_ifempty");
   channel->DeleteQueue(queue, false, true);
 
-  EXPECT_THROW(channel->DeclareQueue(queue, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareQueue(queue, true), ChannelException);
 }
 
 TEST_F(connected_test, queue_delete_ifnotempty)
@@ -90,7 +90,7 @@ TEST_F(connected_test, queue_delete_ifnotempty)
   BasicMessage::ptr_t message = BasicMessage::Create("Message body");
   channel->BasicPublish("", queue, message, true);
 
-  EXPECT_THROW(channel->DeleteQueue(queue, false, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeleteQueue(queue, false, true), ChannelException);
 
   channel->DeleteQueue(queue);
 }
@@ -110,7 +110,7 @@ TEST_F(connected_test, queue_bind_badexchange)
 {
   std::string queue = channel->DeclareQueue("queue_bind_badexchange");
 
-  EXPECT_THROW(channel->BindQueue(queue, "queue_bind_exchangenotexist", "rk"), AmqpResponseServerException);
+  EXPECT_THROW(channel->BindQueue(queue, "queue_bind_exchangenotexist", "rk"), ChannelException);
 
   channel->DeleteQueue(queue);
 }
@@ -119,7 +119,7 @@ TEST_F(connected_test, queue_bind_badqueue)
 {
   channel->DeclareExchange("queue_bind_badqueue");
 
-  EXPECT_THROW(channel->BindQueue("queue_bind_queuenotexist", "queue_bind_badqueue", "rk"), AmqpResponseServerException);
+  EXPECT_THROW(channel->BindQueue("queue_bind_queuenotexist", "queue_bind_badqueue", "rk"), ChannelException);
 
   channel->DeleteExchange("queue_bind_badqueue");
 }
@@ -149,7 +149,7 @@ TEST_F(connected_test, queue_unbind)
 
 TEST_F(connected_test, queue_unbind_badbinding)
 {
-  EXPECT_THROW(channel->UnbindQueue("queue_unbind_queuenotexist", "queue_unbind_exchangenotexist", "rk"), AmqpResponseServerException);
+  EXPECT_THROW(channel->UnbindQueue("queue_unbind_queuenotexist", "queue_unbind_exchangenotexist", "rk"), ChannelException);
 }
 
 TEST_F(connected_test, queue_purge)
@@ -167,5 +167,5 @@ TEST_F(connected_test, queue_purge)
 
 TEST_F(connected_test, queue_purge_badqueue)
 {
-  EXPECT_THROW(channel->PurgeQueue("purge_queue_queuenotexist"), AmqpResponseServerException);
+  EXPECT_THROW(channel->PurgeQueue("purge_queue_queuenotexist"), ChannelException);
 }

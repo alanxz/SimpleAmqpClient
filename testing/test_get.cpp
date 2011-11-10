@@ -39,7 +39,7 @@ TEST(test_get, get_big)
 TEST_F(connected_test, bad_queue)
 {
   Envelope::ptr_t new_message;
-  EXPECT_THROW(channel->BasicGet(new_message, "test_get_nonexistantqueue"), AmqpResponseServerException);
+  EXPECT_THROW(channel->BasicGet(new_message, "test_get_nonexistantqueue"), ChannelException);
 }
 
 TEST_F(connected_test, ack_message)

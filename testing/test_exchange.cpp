@@ -38,13 +38,13 @@ TEST_F(connected_test, declare_exchange_passive_good)
 
 TEST_F(connected_test, declare_exchange_passive_notexist)
 {
-  EXPECT_THROW(channel->DeclareExchange("declare_passive_notexist", Channel::EXCHANGE_TYPE_DIRECT, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareExchange("declare_passive_notexist", Channel::EXCHANGE_TYPE_DIRECT, true), ChannelException);
 }
 
 TEST_F(connected_test, declare_exchange_typemismatch)
 {
   channel->DeclareExchange("declare_typemismatch", Channel::EXCHANGE_TYPE_DIRECT);
-  EXPECT_THROW(channel->DeclareExchange("declare_typemismatch", Channel::EXCHANGE_TYPE_FANOUT), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareExchange("declare_typemismatch", Channel::EXCHANGE_TYPE_FANOUT), ChannelException);
 
   channel->DeleteExchange("declare_typemismatch");
 }
@@ -52,7 +52,7 @@ TEST_F(connected_test, declare_exchange_typemismatch)
 TEST_F(connected_test, declare_exchange_typemismatch2)
 {
   channel->DeclareExchange("declare_typemismatch", Channel::EXCHANGE_TYPE_DIRECT);
-  EXPECT_THROW(channel->DeclareExchange("declare_typemismatch", Channel::EXCHANGE_TYPE_DIRECT, false, true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeclareExchange("declare_typemismatch", Channel::EXCHANGE_TYPE_DIRECT, false, true), ChannelException);
 
   channel->DeleteExchange("declare_typemismatch");
 }
@@ -79,7 +79,7 @@ TEST_F(connected_test, delete_exchange)
 
 TEST_F(connected_test, delete_exchange_notexist)
 {
-  EXPECT_THROW(channel->DeleteExchange("exchange_notexist"), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeleteExchange("exchange_notexist"), ChannelException);
 }
 
 TEST_F(connected_test, delete_exhange_ifunused)
@@ -95,7 +95,7 @@ TEST_F(connected_test, delete_exhange_ifused)
   std::string queue = channel->DeclareQueue("");
   channel->BindQueue(queue, "exchange_used", "whatever");
   
-  EXPECT_THROW(channel->DeleteExchange("exchange_used", true), AmqpResponseServerException);
+  EXPECT_THROW(channel->DeleteExchange("exchange_used", true), ChannelException);
 
   channel->DeleteQueue(queue);
   channel->DeleteExchange("exchange_used");
@@ -116,7 +116,7 @@ TEST_F(connected_test, bind_exchange_badexchange)
 {
   channel->DeclareExchange("exchange_bind_dest");
 
-  EXPECT_THROW(channel->BindExchange("exchange_bind_dest", "exchange_bind_notexist", "rk"), AmqpResponseServerException);
+  EXPECT_THROW(channel->BindExchange("exchange_bind_dest", "exchange_bind_notexist", "rk"), ChannelException);
 
   channel->DeleteExchange("exchange_bind_dest");
 }
@@ -135,5 +135,5 @@ TEST_F(connected_test, unbind_exchange)
 
 TEST_F(connected_test, unbind_exchange_badbinding)
 {
-  EXPECT_THROW(channel->UnbindExchange("exchange_notexist", "exchange_notexist", "notexist"), AmqpResponseServerException);
+  EXPECT_THROW(channel->UnbindExchange("exchange_notexist", "exchange_notexist", "notexist"), ChannelException);
 }
