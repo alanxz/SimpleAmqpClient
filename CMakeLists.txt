@@ -36,6 +36,9 @@ CONFIGURE_FILE(config.h.in config.h)
 SET(SAC_LIB_SRCS
 	src/SimpleAmqpClient.h
 
+	src/SimpleAmqpClient/AmqpException.h
+	src/AmqpException.cpp
+
 	src/SimpleAmqpClient/Channel.h
 	src/Channel.cpp
 
