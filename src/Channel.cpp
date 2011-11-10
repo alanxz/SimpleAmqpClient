@@ -247,6 +247,7 @@ void Channel::PurgeQueue(const std::string& queue_name)
 
   amqp_queue_purge_t purge;
   purge.queue = amqp_cstring_bytes(queue_name.c_str());
+  purge.nowait = false;
   
   m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
   m_impl->MaybeReleaseBuffers();
