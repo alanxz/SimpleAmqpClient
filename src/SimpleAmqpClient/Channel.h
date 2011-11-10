@@ -222,7 +222,6 @@ public:
 	  * Purges a queue
 	  * Removes all the messages in a queue on the broker
 	  * @param queue_name the name of the queue to empty
-	  *  Default is false (synchonous)
 	  */
     void PurgeQueue(const std::string& queue_name);
 
