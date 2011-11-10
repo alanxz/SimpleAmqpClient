@@ -26,7 +26,7 @@ target_link_libraries(test_consume SimpleAmqpClient ${GTEST_BOTH_LIBRARIES})
 set_target_properties(test_consume PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_test(test_consume test_consume)
 
-add_executable(test_exchange test_exchange.cpp)
+add_executable(test_exchange connected_test.h test_exchange.cpp test_queue.cpp)
 target_link_libraries(test_exchange SimpleAmqpClient ${GTEST_BOTH_LIBRARIES})
 set_target_properties(test_exchange PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_test(test_exchange test_exchange)
