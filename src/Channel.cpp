@@ -355,13 +355,13 @@ bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool
   return true;
 }
 
-void Channel::BasicRecover(const std::string& consumer, bool requeue)
+void Channel::BasicRecover(const std::string& consumer)
 {
   const boost::array<uint32_t, 1> RECOVER_OK = { { AMQP_BASIC_RECOVER_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_basic_recover_t recover;
-  recover.requeue = requeue;
+  recover.requeue = true;
   
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer);
 

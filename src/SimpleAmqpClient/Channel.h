@@ -266,10 +266,8 @@ public:
     /**
       * Redeliver any unacknowledged messages delivered from the broker
       * @param consumer the consumer to recover message from
-      * @param requeue throw the messages back into the queue they were delivered
-      *  from, this may result in the messages being delivered to a different consumer
       */
-    void BasicRecover(const std::string& consumer, bool requeue = false);
+    void BasicRecover(const std::string& consumer);
 
 	/**
 	  * Starts consuming Basic messages on a queue
