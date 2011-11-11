@@ -21,17 +21,13 @@ public:
   static void Throw(const amqp_channel_close_t_& reply);
   static void Throw(const amqp_connection_close_t_& reply);
 
-  explicit AmqpException(const std::string& reply_text, uint16_t class_id, uint16_t method_id) throw() :
-      std::runtime_error(reply_text),
-      m_reply_text(reply_text),
-      m_class_id(class_id),
-      m_method_id(method_id)
-      {}
+  explicit AmqpException(const std::string& reply_text, uint16_t class_id, uint16_t method_id) throw();
   
   virtual bool is_soft_error() const throw() = 0;
   virtual uint16_t reply_code() const throw() = 0;
   virtual uint16_t class_id() const throw() { return m_class_id; }
   virtual uint16_t method_id() const throw() { return m_method_id; }
+  virtual std::string reply_text() const throw() { return m_reply_text; }
 
 protected:
   std::string m_reply_text;
