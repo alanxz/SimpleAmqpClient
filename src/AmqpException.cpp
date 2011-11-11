@@ -99,7 +99,7 @@ void AmqpException::Throw(const amqp_connection_close_t& reply)
   }
 }
 
-AmqpException::AmqpException(const std::string& reply_text, uint16_t class_id, uint16_t method_id) :
+AmqpException::AmqpException(const std::string& reply_text, uint16_t class_id, uint16_t method_id) throw() :
       std::runtime_error(std::string(amqp_method_name((class_id << 16) | method_id)).append(" caused: ").append(reply_text)),
       m_reply_text(reply_text),
       m_class_id(class_id),
