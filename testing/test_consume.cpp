@@ -127,3 +127,48 @@ TEST_F(connected_test, basic_consume_1000messages)
   }
 
 }
+
+TEST_F(connected_test, basic_recover)
+{
+  BasicMessage::ptr_t message = BasicMessage::Create("Message1");
+
+  std::string queue = channel->DeclareQueue("");
+  std::string consumer = channel->BasicConsume(queue, "", true, false);
+  channel->BasicPublish("", queue, message);
+
+  Envelope::ptr_t message1;
+  Envelope::ptr_t message2;
+
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, message1));
+  channel->BasicRecover(consumer);
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, message2));
+
+  channel->DeleteQueue(queue);
+}
+
+TEST_F(connected_test, basic_recover_badconsumer)
+{
+  EXPECT_THROW(channel->BasicRecover("consumer_notexist"), ConsumerTagNotFoundException);
+}
+
+TEST_F(connected_test, basic_qos)
+{
+  std::string queue = channel->DeclareQueue("");
+  std::string consumer = channel->BasicConsume(queue, "", true, false);
+  channel->BasicPublish("", queue, BasicMessage::Create("Message1"));
+  channel->BasicPublish("", queue, BasicMessage::Create("Message2"));
+
+  Envelope::ptr_t incoming;
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, incoming, 1));
+  EXPECT_FALSE(channel->BasicConsumeMessage(consumer, incoming, 1));
+
+  channel->BasicQos(consumer, 2);
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, incoming, 1));
+
+  channel->DeleteQueue(queue);
+}
+
+TEST_F(connected_test, basic_qos_badconsumer)
+{
+  EXPECT_THROW(channel->BasicQos("consumer_notexist", 1), ConsumerTagNotFoundException);
+}
