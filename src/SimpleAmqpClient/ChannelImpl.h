@@ -140,14 +140,17 @@ public:
   amqp_channel_t GetConsumerChannel(const std::string& consumer_tag);
 
   void MaybeReleaseBuffers();
+  void CheckIsConnected();
+  void SetIsConnected(bool state) { m_is_connected = state; }
 
   amqp_connection_state_t m_connection;
 
 private:
-  std::queue<amqp_channel_t> m_free_channels;
-  channel_map_t m_open_channels;
-  uint16_t m_next_channel_id;
   std::map<std::string, amqp_channel_t> m_consumer_channel_map;
+  channel_map_t m_open_channels;
+  std::queue<amqp_channel_t> m_free_channels;
+  bool m_is_connected;
+  uint16_t m_next_channel_id;
 };
 
 } // namespace Detail

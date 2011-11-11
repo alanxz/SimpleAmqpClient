@@ -1,6 +1,7 @@
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 #include "SimpleAmqpClient/AmqpException.h"
+#include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 
 #include "config.h"
@@ -31,7 +32,8 @@ namespace Detail
 {
 
 ChannelImpl::ChannelImpl() :
-  m_next_channel_id(1)
+  m_next_channel_id(1),
+  m_is_connected(false)
 {
   // Channel 0 is always open
   m_open_channels.insert(std::make_pair(0, frame_queue_t()));
@@ -113,6 +115,7 @@ void ChannelImpl::FinishCloseChannel(amqp_channel_t channel)
 
 void ChannelImpl::FinishCloseConnection()
 {
+  SetIsConnected(false);
   amqp_connection_close_ok_t close_ok;
   amqp_send_method(m_connection, 0, AMQP_CONNECTION_CLOSE_OK_METHOD, &close_ok);
 }
@@ -397,6 +400,14 @@ void ChannelImpl::MaybeReleaseBuffers()
   if (buffers_empty)
   {
     amqp_maybe_release_buffers(m_connection);
+  }
+}
+
+void ChannelImpl::CheckIsConnected()
+{
+  if (!m_is_connected)
+  {
+    throw ConnectionClosedException();
   }
 }
 

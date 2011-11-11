@@ -43,6 +43,7 @@
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
+#include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 

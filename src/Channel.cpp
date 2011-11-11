@@ -88,6 +88,7 @@ m_impl(new Detail::ChannelImpl)
     m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
                                    frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
                                    username.c_str(), password.c_str()));
+    m_impl->SetIsConnected(true);
 }
 
 Channel::~Channel()
@@ -103,6 +104,7 @@ void Channel::DeclareExchange(const std::string& exchange_name,
                               bool auto_delete)
 {
   static const boost::array<uint32_t, 1> DECLARE_OK = { { AMQP_EXCHANGE_DECLARE_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_exchange_declare_t declare;
   declare.exchange = amqp_cstring_bytes(exchange_name.c_str());
@@ -122,6 +124,7 @@ void Channel::DeleteExchange(const std::string& exchange_name,
                              bool if_unused)
 {
   static const boost::array<uint32_t, 1> DELETE_OK = { { AMQP_EXCHANGE_DELETE_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_exchange_delete_t del;
   del.exchange = amqp_cstring_bytes(exchange_name.c_str());
@@ -137,6 +140,7 @@ void Channel::BindExchange(const std::string& destination,
                            const std::string& routing_key)
 {
   static const boost::array<uint32_t, 1> BIND_OK = { { AMQP_EXCHANGE_BIND_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_exchange_bind_t bind;
   bind.destination = amqp_cstring_bytes(destination.c_str());
@@ -154,6 +158,7 @@ void Channel::UnbindExchange(const std::string& destination,
                              const std::string& routing_key)
 {
   static const boost::array<uint32_t, 1> UNBIND_OK = { { AMQP_EXCHANGE_UNBIND_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_exchange_unbind_t unbind;
   unbind.destination = amqp_cstring_bytes(destination.c_str());
@@ -173,6 +178,7 @@ std::string Channel::DeclareQueue(const std::string& queue_name,
                                   bool auto_delete)
 {
   static const boost::array<uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_queue_declare_t declare;
   declare.queue = amqp_cstring_bytes(queue_name.c_str());
@@ -197,6 +203,7 @@ void Channel::DeleteQueue(const std::string& queue_name,
                           bool if_empty)
 {
   static const boost::array<uint32_t, 1> DELETE_OK = { { AMQP_QUEUE_DELETE_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_queue_delete_t del;
   del.queue = amqp_cstring_bytes(queue_name.c_str());
@@ -213,6 +220,7 @@ void Channel::BindQueue(const std::string& queue_name,
                         const std::string& routing_key)
 {
   static const boost::array<uint32_t, 1> BIND_OK = { { AMQP_QUEUE_BIND_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_queue_bind_t bind;
   bind.queue = amqp_cstring_bytes(queue_name.c_str());
@@ -230,6 +238,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
                           const std::string& routing_key)
 {
   static const boost::array<uint32_t, 1> UNBIND_OK = { { AMQP_QUEUE_UNBIND_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_queue_unbind_t unbind;
   unbind.queue = amqp_cstring_bytes(queue_name.c_str());
@@ -244,6 +253,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
 void Channel::PurgeQueue(const std::string& queue_name)
 {
   static const boost::array<uint32_t, 1> PURGE_OK = { { AMQP_QUEUE_PURGE_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_queue_purge_t purge;
   purge.queue = amqp_cstring_bytes(queue_name.c_str());
@@ -255,6 +265,7 @@ void Channel::PurgeQueue(const std::string& queue_name)
 
 void Channel::BasicAck(const Envelope::ptr_t& message)
 {
+  m_impl->CheckIsConnected();
   // Delivery tag is local to the channel, so its important to use
   // that channel, sadly this can cause the channel to throw an exception
   // which will show up as an unrelated exception in a different method
@@ -275,6 +286,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
                            bool mandatory,
                            bool immediate)
 {
+  m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
 
   m_impl->CheckForError(amqp_basic_publish(m_impl->m_connection, channel,
@@ -313,6 +325,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
 bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool no_ack)
 {
   static const boost::array<uint32_t, 2> GET_RESPONSES = { { AMQP_BASIC_GET_OK_METHOD, AMQP_BASIC_GET_EMPTY_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_basic_get_t get;
   get.queue = amqp_cstring_bytes(queue.c_str());
@@ -345,6 +358,7 @@ bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool
 void Channel::BasicRecover(const std::string& consumer, bool requeue)
 {
   static const boost::array<uint32_t, 1> RECOVER_OK = { { AMQP_BASIC_RECOVER_OK_METHOD } };
+  m_impl->CheckIsConnected();
 
   amqp_basic_recover_t recover;
   recover.requeue = requeue;
@@ -362,6 +376,7 @@ std::string Channel::BasicConsume(const std::string& queue,
 						   bool exclusive,
                uint16_t message_prefetch_count)
 {
+  m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
 
   // Set this before starting the consume as it may have been set by a previous consumer
@@ -399,6 +414,7 @@ std::string Channel::BasicConsume(const std::string& queue,
 
 void Channel::BasicQos(const std::string& consumer_tag, uint16_t message_prefetch_count)
 {
+  m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
   static const boost::array<uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
@@ -414,6 +430,7 @@ void Channel::BasicQos(const std::string& consumer_tag, uint16_t message_prefetc
 
 void Channel::BasicCancel(const std::string& consumer_tag)
 {
+  m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
   static const boost::array<uint32_t, 1> CANCEL_OK = { { AMQP_BASIC_CANCEL_OK_METHOD } };
@@ -443,6 +460,7 @@ Envelope::ptr_t Channel::BasicConsumeMessage(const std::string& consumer_tag)
 
 bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& message, int timeout)
 {
+  m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
   static const boost::array<uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
