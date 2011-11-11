@@ -44,21 +44,21 @@
 
 #include <stdexcept>
 
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4251 4275 )
+#endif 
+
 namespace AmqpClient
 {
 
-class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException : public std::exception
+class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException : public std::runtime_error
 {
 public:
   explicit MessageReturnedException(BasicMessage::ptr_t message, uint32_t reply_code, const std::string& reply_text,
     const std::string& exchange, const std::string& routing_key) throw();
 
-	MessageReturnedException(const MessageReturnedException& e) throw();
-	MessageReturnedException& operator=(const MessageReturnedException& e) throw();
-
   virtual ~MessageReturnedException() throw() {}
-
-	virtual const char* what() const throw();
 
   BasicMessage::ptr_t message() const throw() { return m_message; }
   uint32_t reply_code() const throw() { return m_reply_code; }
@@ -76,4 +76,9 @@ private:
 };
 
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
+
 #endif // MESSAGE_RETURNED_EXCEPTION_H

@@ -49,7 +49,7 @@
 
 #ifdef _MSC_VER
 # pragma warning ( push )
-# pragma warning ( disable: 4275 )
+# pragma warning ( disable: 4275 4251 )
 #endif 
 
 struct amqp_bytes_t_;

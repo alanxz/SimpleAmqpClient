@@ -7,6 +7,11 @@
 
 #include <stdexcept>
 
+#ifdef _MSC_VER
+# pragma warning ( push )
+# pragma warning ( disable: 4251 4275 )
+#endif 
+
 struct amqp_rpc_reply_t_;
 struct amqp_channel_close_t_;
 struct amqp_connection_close_t_;
@@ -22,6 +27,7 @@ public:
   static void Throw(const amqp_connection_close_t_& reply);
 
   explicit AmqpException(const std::string& reply_text, uint16_t class_id, uint16_t method_id) throw();
+  virtual ~AmqpException() {}
   
   virtual bool is_soft_error() const throw() = 0;
   virtual uint16_t reply_code() const throw() = 0;
@@ -233,4 +239,9 @@ public:
 };
 
 } // namespace AmqpClient
+
+#ifdef _MSC_VER
+# pragma warning ( pop )
+#endif
+
 #endif // CHANNEL_EXCEPTION_H

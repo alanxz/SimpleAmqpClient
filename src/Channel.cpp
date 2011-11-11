@@ -39,7 +39,6 @@
 #include "SimpleAmqpClient/Channel.h"
 
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
-#include "SimpleAmqpClient/AmqpResponseServerException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Util.h"
@@ -343,7 +342,7 @@ bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool
 
   amqp_basic_get_ok_t* get_ok = (amqp_basic_get_ok_t*)response.payload.method.decoded;
   uint64_t delivery_tag = get_ok->delivery_tag;
-  bool redelivered = get_ok->redelivered;
+  bool redelivered = (get_ok->redelivered == 0 ? false : true);
   std::string exchange((char*)get_ok->exchange.bytes, get_ok->exchange.len);
   std::string routing_key((char*)get_ok->routing_key.bytes, get_ok->routing_key.len);
 
