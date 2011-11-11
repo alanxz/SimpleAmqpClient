@@ -1,7 +1,7 @@
 #ifndef CONNECTED_TEST_H
 #define CONNECTED_TEST_H
 
-#include <SimpleAmqpClient.h>
+#include <SimpleAmqpClient/SimpleAmqpClient.h>
 #include <gtest/gtest.h>
 
 using namespace AmqpClient;

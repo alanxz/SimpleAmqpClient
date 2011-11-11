@@ -34,7 +34,7 @@ CHECK_INCLUDE_FILE(sys/socket.h HAVE_SYS_SOCKET_H)
 CONFIGURE_FILE(config.h.in config.h)
 
 SET(SAC_LIB_SRCS
-	src/SimpleAmqpClient.h
+	src/SimpleAmqpClient/SimpleAmqpClient.h
 
 	src/SimpleAmqpClient/AmqpException.h
 	src/AmqpException.cpp
@@ -118,11 +118,16 @@ INSTALL(TARGETS SimpleAmqpClient
 	LIBRARY DESTINATION lib
 	)
 
-INSTALL(FILES src/SimpleAmqpClient.h
-	DESTINATION include
-	)
-
-INSTALL(DIRECTORY src/SimpleAmqpClient/
+INSTALL(FILES
+	src/SimpleAmqpClient/SimpleAmqpClient.h
+	src/SimpleAmqpClient/AmqpException.h
+	src/SimpleAmqpClient/Channel.h
+	src/SimpleAmqpClient/BasicMessage.h
+	src/SimpleAmqpClient/Util.h
+	src/SimpleAmqpClient/AmqpResponseLibraryException.h
+	src/SimpleAmqpClient/ConnectionClosedException.h
+	src/SimpleAmqpClient/ConsumerTagNotFoundException.h
+	src/SimpleAmqpClient/Envelope.h
+	src/SimpleAmqpClient/MessageReturnedException.h
 	DESTINATION include/SimpleAmqpClient
-	FILES_MATCHING PATTERN "*.h"
 	)
