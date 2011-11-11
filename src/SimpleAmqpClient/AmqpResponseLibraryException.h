@@ -40,9 +40,8 @@
 
 #include "SimpleAmqpClient/Util.h"
 
-#include <exception>
 #include <boost/cstdint.hpp>
-#include <amqp.h>
+#include <stdexcept>
 #include <string>
 
 #ifdef _MSC_VER
@@ -50,24 +49,14 @@
 # pragma warning ( disable: 4251 )
 #endif
 
+struct amqp_rpc_reply_t_;
+
 namespace AmqpClient {
 
-class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::exception
+class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::runtime_error
 {
 public:
-    AmqpResponseLibraryException(const amqp_rpc_reply_t& reply, const std::string& context) throw();
-    AmqpResponseLibraryException(const AmqpResponseLibraryException& e) throw();
-    AmqpResponseLibraryException& operator=(const AmqpResponseLibraryException& e) throw();
-
-    virtual ~AmqpResponseLibraryException() throw();
-
-    virtual const char* what() const throw() { return m_what.c_str(); }
-
-private:
-    AmqpResponseLibraryException();
-
-    amqp_rpc_reply_t m_reply;
-    std::string m_what;
+    explicit AmqpResponseLibraryException(const amqp_rpc_reply_t_& reply, const std::string& context) throw();
 };
 
 } // namespace AmqpClient

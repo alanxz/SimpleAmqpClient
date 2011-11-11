@@ -43,9 +43,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
-#include <amqp.h>
-#include <amqp_framing.h>
 #include <string>
 
 #ifdef _MSC_VER
@@ -53,7 +52,15 @@
 # pragma warning ( disable: 4275 )
 #endif 
 
+struct amqp_bytes_t_;
+struct amqp_basic_properties_t_;
+
 namespace AmqpClient {
+
+namespace Detail
+{
+class BasicMessageImpl;
+}
 
 class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable
 {
@@ -67,7 +74,7 @@ public:
 
 	friend ptr_t boost::make_shared<BasicMessage>();
 	friend ptr_t boost::make_shared<BasicMessage>(std::string const & a1);
-	friend ptr_t boost::make_shared<BasicMessage>(amqp_bytes_t const & a1, amqp_basic_properties_t* const & a2);
+	friend ptr_t boost::make_shared<BasicMessage>(amqp_bytes_t_ const & a1, amqp_basic_properties_t_* const & a2);
 
 	/**
 	  * Create a new empty BasicMessage object
@@ -92,12 +99,12 @@ public:
 	  * copy of the properties struct
 	  * @returns a new BasicMessage object
 	  */
-	static ptr_t Create(amqp_bytes_t body, amqp_basic_properties_t* properties)
+	static ptr_t Create(amqp_bytes_t_& body, amqp_basic_properties_t_* properties)
 		{ return boost::make_shared<BasicMessage>(body, properties); }
 
   BasicMessage();
 	BasicMessage(const std::string& body);
-	BasicMessage(amqp_bytes_t body, amqp_basic_properties_t* properties);
+	BasicMessage(const amqp_bytes_t_& body, const amqp_basic_properties_t_* properties);
 
 public:
 	/**
@@ -106,21 +113,21 @@ public:
     virtual ~BasicMessage();
 
 	/**
-	  * Gets the internal amqp_basic_properties_t struct
+	  * INTERNAL INTERFACE: Gets the internal amqp_basic_properties_t struct
 	  *
 	  * Retrieves a reference to the internal structure used to keep track of
 	  * the properties of the message. Changing members of this structure will
 	  * modify the properties on the message.
 	  * @returns the amqp_basic_properties_t* struct 
 	  */
-    const amqp_basic_properties_t* getAmqpProperties() const { return &m_properties; }
+    const amqp_basic_properties_t_* getAmqpProperties() const;
 	/**
-	  * Gets the amqp_bytes_t representation of the message body
+	  * INTERNAL INTERFACE: Gets the amqp_bytes_t representation of the message body
 	  *
 	  * @returns the message body. Note this is owned by the message and will
 	  * be freed when the BasicMessage is destructed
 	  */
-    amqp_bytes_t getAmqpBody() const { return m_body; }
+    const amqp_bytes_t_& getAmqpBody() const;
 
 	/**
 	  * Gets the message body as a std::string
@@ -142,7 +149,7 @@ public:
 	/**
 	  * Determines whether the content type property is set
 	  */
-    bool ContentTypeIsSet() const { return AMQP_BASIC_CONTENT_TYPE_FLAG == (m_properties._flags & AMQP_BASIC_CONTENT_TYPE_FLAG); }
+    bool ContentTypeIsSet() const;
 	/**
 	  * Unsets the content type property if it is set
 	  */
@@ -159,7 +166,7 @@ public:
 	/**
 	  * Determines whether the content encoding property is set
 	  */
-    bool ContentEncodingIsSet() const { return AMQP_BASIC_CONTENT_ENCODING_FLAG == (m_properties._flags & AMQP_BASIC_CONTENT_ENCODING_FLAG); }
+    bool ContentEncodingIsSet() const;
 	/**
 	  * Unsets the content encoding property if it is set
 	  */
@@ -176,11 +183,11 @@ public:
 	/**
 	  * Determines whether the delivery mode property is set
 	  */
-    bool DeliveryModeIsSet() const { return AMQP_BASIC_DELIVERY_MODE_FLAG == (m_properties._flags & AMQP_BASIC_DELIVERY_MODE_FLAG); }
+    bool DeliveryModeIsSet() const;
 	/**
 	  * Unsets the delivery mode property if it is set
 	  */
-    void DeliveryModeClear() { m_properties._flags &= ~AMQP_BASIC_DELIVERY_MODE_FLAG; }
+    void DeliveryModeClear();
 
 	/**
 	  * Gets the priority property
@@ -193,11 +200,11 @@ public:
 	/**
 	  * Determines whether the priority property is set
 	  */
-    bool PriorityIsSet() const { return AMQP_BASIC_PRIORITY_FLAG == (m_properties._flags & AMQP_BASIC_PRIORITY_FLAG); }
+    bool PriorityIsSet() const;
 	/**
 	  * Unsets the priority property if it is set
 	  */
-    void PriorityClear() { m_properties._flags &= ~AMQP_BASIC_PRIORITY_FLAG; }
+    void PriorityClear();
 
 	/**
 	  * Gets the correlation id property
@@ -210,7 +217,7 @@ public:
 	/**
 	  * Determines whether the correlation id property is set
 	  */
-    bool CorrelationIdIsSet() const { return AMQP_BASIC_CORRELATION_ID_FLAG == (m_properties._flags & AMQP_BASIC_CORRELATION_ID_FLAG); }
+    bool CorrelationIdIsSet() const;
 	/**
 	  * Unsets the correlation id property
 	  */
@@ -227,7 +234,7 @@ public:
 	/**
 	  * Determines whether the reply to property is set
 	  */
-    bool ReplyToIsSet() const { return AMQP_BASIC_REPLY_TO_FLAG == (m_properties._flags & AMQP_BASIC_REPLY_TO_FLAG); }
+    bool ReplyToIsSet() const;
 	/**
 	  * Unsets the reply to property
 	  */
@@ -244,7 +251,7 @@ public:
 	/**
 	  * Determines whether the expiration property is set
 	  */
-    bool ExpirationIsSet() const { return AMQP_BASIC_EXPIRATION_FLAG == (m_properties._flags & AMQP_BASIC_EXPIRATION_FLAG); }
+    bool ExpirationIsSet() const;
 	/**
 	  * Unsets the expiration property
 	  */
@@ -261,7 +268,7 @@ public:
 	/**
 	  * Determines if the message id property is set
 	  */
-    bool MessageIdIsSet() const { return AMQP_BASIC_MESSAGE_ID_FLAG == (m_properties._flags & AMQP_BASIC_MESSAGE_ID_FLAG); }
+    bool MessageIdIsSet() const;
 	/**
 	  * Unsets the message id property
 	  */
@@ -278,7 +285,7 @@ public:
 	/**
 	  * Determines whether the timestamp property is set
 	  */
-    bool TimestampIsSet() const { return AMQP_BASIC_TIMESTAMP_FLAG == (m_properties._flags & AMQP_BASIC_TIMESTAMP_FLAG); }
+    bool TimestampIsSet() const;
 	/**
 	  * Unsets the timestamp property
 	  */
@@ -295,7 +302,7 @@ public:
 	/**
 	  * Determines whether the type property is set
 	  */
-    bool TypeIsSet() const { return AMQP_BASIC_TYPE_FLAG == (m_properties._flags & AMQP_BASIC_TYPE_FLAG); }
+    bool TypeIsSet() const;
 	/**
 	  * Unsets the type property
 	  */
@@ -312,7 +319,7 @@ public:
 	/**
 	  * Determines whether the user id property is set
 	  */
-    bool UserIdIsSet() const { return AMQP_BASIC_USER_ID_FLAG == (m_properties._flags & AMQP_BASIC_USER_ID_FLAG); }
+    bool UserIdIsSet() const;
 	/**
 	  * Unsets the user id property
 	  */
@@ -329,7 +336,7 @@ public:
 	/**
 	  * Determines whether the app id property is set
 	  */
-    bool AppIdIsSet() const { return AMQP_BASIC_APP_ID_FLAG == (m_properties._flags & AMQP_BASIC_APP_ID_FLAG); }
+    bool AppIdIsSet() const;
 	/**
 	  * Unsets the app id property
 	  */
@@ -346,17 +353,14 @@ public:
 	/**
 	  * Determines if the cluster id property is set
 	  */
-    bool ClusterIdIsSet() const { return AMQP_BASIC_CLUSTER_ID_FLAG == (m_properties._flags & AMQP_BASIC_CLUSTER_ID_FLAG); }
+    bool ClusterIdIsSet() const;
 	/**
 	  * Unsets the cluster id property
 	  */
     void ClusterIdClear();
 
-
-
 protected:
-    amqp_basic_properties_t m_properties;
-    amqp_bytes_t m_body;
+  boost::scoped_ptr<Detail::BasicMessageImpl> m_impl;
 };
 
 } // namespace AmqpClient
