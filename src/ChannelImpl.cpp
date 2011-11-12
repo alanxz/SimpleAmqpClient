@@ -268,17 +268,18 @@ bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t& frame, boost::chrono::mic
 
 start:
   // Possibly set a timeout on receiving
-  if (timeout != boost::chrono::microseconds::max())
+  if (timeout != boost::chrono::microseconds::max() && !amqp_frames_enqueued(m_connection) && !amqp_data_in_buffer(m_connection))
   {
     struct timeval tv_timeout;
     memset(&tv_timeout, 0, sizeof(tv_timeout));
-    tv_timeout.tv_usec = timeout.count();
+    tv_timeout.tv_sec = boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count();
+    tv_timeout.tv_usec = (timeout - boost::chrono::seconds(tv_timeout.tv_sec)).count();
 
     fd_set fds;
     FD_ZERO(&fds);
     FD_SET(socketno, &fds);
 
-    int select_return = select(socketno + 1, &fds, NULL, NULL, &tv_timeout);
+    int select_return = select(socketno + 1, &fds, NULL, &fds, &tv_timeout);
 
     if (select_return == 0) // If it times out, return
     {
