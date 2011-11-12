@@ -1,6 +1,6 @@
 #include "connected_test.h"
 
-#include <SimpleAmqpClient.h>
+#include <SimpleAmqpClient/SimpleAmqpClient.h>
 #include <gtest/gtest.h>
 
 
