@@ -81,19 +81,19 @@ TEST_F(connected_test, channel_consume_success)
   std::string consumer = channel->BasicConsume(queue);
 
   Envelope::ptr_t consumed_envelope;
-  channel->BasicConsumeMessage(consumer, consumed_envelope, 0);
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope));
 }
 
-TEST_F(connected_test, channel_consume_success2)
+TEST_F(connected_test, channel_consume_success_timeout)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("Test message");
   std::string queue = channel->DeclareQueue("");
 
-  std::string consumer = channel->BasicConsume(queue);
+  std::string consumer = channel->BasicConsume(queue, "", true, false);
   channel->BasicPublish("", queue, message);
 
   Envelope::ptr_t consumed_envelope;
-  channel->BasicConsumeMessage(consumer, consumed_envelope, 0);
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope, 1));
 }
 
 TEST(test_channels, big_message)
@@ -107,5 +107,5 @@ TEST(test_channels, big_message)
   channel->BasicPublish("", queue, message);
 
   Envelope::ptr_t consumed_envelope;
-  channel->BasicConsumeMessage(consumer, consumed_envelope, 0);
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope));
 }

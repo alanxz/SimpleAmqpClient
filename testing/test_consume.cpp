@@ -72,9 +72,9 @@ TEST_F(connected_test, basic_consume_inital_qos)
   channel->BasicPublish("", queue, message2, true);
   channel->BasicPublish("", queue, message3, true);
 
-  std::string consumer = channel->BasicConsume(queue, "", true, false, true, 1);
+  std::string consumer = channel->BasicConsume(queue, "", true, false);
   Envelope::ptr_t received1, received2;
-  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, received1, 1));
+  ASSERT_TRUE(channel->BasicConsumeMessage(consumer, received1, 1));
 
   EXPECT_FALSE(channel->BasicConsumeMessage(consumer, received2, 0));
   channel->BasicAck(received1);
