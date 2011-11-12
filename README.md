@@ -3,9 +3,9 @@ SimpleAmqpClient
 
 [SimpleAmqpClient](https://github.com/alanxz/SimpleAmqpClient) is an easy-to-use C++
 wrapper around the [rabbitmq-c](https://github.com/rabbitmq/rabbitmq-c) C library.
-It derives inspiration from the [puka]() AMQP library in that it abstracts away the
-underlying AMQP wire concept of channels and uses them as an error/consumer scope.
-This should make writing simple single-threaded AMQP-enabled apps easy.
+It derives inspiration from the [puka](http://majek.github.com/puka/puka.html) AMQP library 
+in that it abstracts away the underlying AMQP wire concept of channels and uses them
+as an error/consumer scope. This should make writing simple single-threaded AMQP-enabled apps easy.
 
 Installing
 ----------------
@@ -16,7 +16,7 @@ Known to work in the following environments:
 - Mac OS X (10.7, 10.6, gcc-4.2, 32 and 64-bit). Likely to work on older version, but has not been tested
 
 ### Pre-requisites
-+  [boost-1.47.0](http://www.boost.org/) or newer (uses chrono, system internally in addition to other header based libraries such as shared_ptr and noncopyable)
++  [boost-1.47.0](http://www.boost.org/) or newer (uses chrono, system internally in addition to other header based libraries such as sharedptr and noncopyable)
 +  [librabbitmq-c](http://www.rabbitmq.org/) you need a version of the library that includes support for select.confirm. Bonus points for using a cmake built version (it'll work on MSVC Win32/64)
 +  [cmake 2.8+](http://www.cmake.org/) what is needed for the build system
 +  [gtest 1.5+](http://code.google.com/p/googletest/) OPTIONAL only necessary if you want to run the tests. The tests also require a broker to be running.
@@ -26,9 +26,9 @@ Known to work in the following environments:
 This is a typical cmake project, it should work like most typical cmake projects:
 
 In a sibiling directory to where you extracted the source code:
-  mkdir simpleamqpclient-build
-  cd simpleamqpclient-build
-  cmake ..\SimpleAmqpClient
+    mkdir simpleamqpclient-build
+    cd simpleamqpclient-build
+    cmake ..\SimpleAmqpClient
 
 Then use your the appropriate build utility to build the library (make, msbuild)
 
@@ -40,7 +40,7 @@ Interesting targets
 Using the library
 -----------------
 
- #include <SimpleAmqpClient/SimpleAmqpClient.h>
+    #include <SimpleAmqpClient/SimpleAmqpClient.h>
 
 Will include all the headers necessary to use the library.
 The corresponding library is SimpleAmqpClient
@@ -49,7 +49,7 @@ The main interface to the library is the AmqpClient::Channel class.  It represen
 a connection to an AMQP broker, the connection is established on contruction of an
 instance of this class.
 
-  AmqpClient::Channel::ptr_t connection = AmqpClient::Channel::Create("localhost");
+    AmqpClient::Channel::ptr_t connection = AmqpClient::Channel::Create("localhost");
 
 All classes have a typedef ptr_t which is equivalent to boost::shared_ptr<> of the 
 containing class.  All classes also have a Create() method does the job creating a new
@@ -68,9 +68,9 @@ Consuming messages is done by setting up a consumer using the BasicConsume metho
 This method returns a consumer tag that should be used with the BasicConsumeMessage
 BasicQos, BasicRecover, and BasicCancel.
 
-  std::string consumer_tag = channel->BasicConsume("my_queue", "");
-  Envelope::ptr_t envelope = channel->BasicConsumeMessage(consumer_tag);
-  envelope = channel->BasicConsumeMessage(consumer_tag);
-  channel->BasicCancel(consumer_tag);
+    std::string consumer_tag = channel->BasicConsume("my_queue", "");
+    Envelope::ptr_t envelope = channel->BasicConsumeMessage(consumer_tag);
+    envelope = channel->BasicConsumeMessage(consumer_tag);
+    channel->BasicCancel(consumer_tag);
 
 
