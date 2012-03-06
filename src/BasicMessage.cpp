@@ -36,10 +36,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/BasicMessage.h"
-
+// Put these first to avoid warnings about INT#_C macro redefinition
 #include <amqp.h>
 #include <amqp_framing.h>
+
+#include "SimpleAmqpClient/BasicMessage.h"
+
 
 #include <cstring>
 

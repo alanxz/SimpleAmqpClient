@@ -36,6 +36,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// Put these first to avoid warnings about INT#_C macro redefinition
+#include <amqp.h>
+#include <amqp_framing.h>
+
 #include "SimpleAmqpClient/Channel.h"
 
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
@@ -44,9 +48,6 @@
 #include "SimpleAmqpClient/Util.h"
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "config.h"
-
-#include <amqp.h>
-#include <amqp_framing.h>
 
 #include <map>
 #include <queue>

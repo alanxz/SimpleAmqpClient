@@ -37,13 +37,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// Put these first to avoid warnings about INT#_C macro redefinition
+#include <amqp.h>
+#include <amqp_framing.h>
+
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
-
-#include <amqp.h>
-#include <amqp_framing.h>
 
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
