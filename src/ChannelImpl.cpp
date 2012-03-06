@@ -86,7 +86,7 @@ amqp_channel_t ChannelImpl::GetNextChannelId()
   int channel_count = m_open_channels.size();
   if (0 == max_channels)
   {
-    if (std::numeric_limits<uint16_t>::max() <= channel_count)
+    if (std::numeric_limits<boost::uint16_t>::max() <= channel_count)
     {
       throw std::runtime_error("Too many channels open");
     }
@@ -106,13 +106,13 @@ amqp_channel_t ChannelImpl::CreateNewChannel()
 {
   amqp_channel_t new_channel = GetNextChannelId();
 
-  static const boost::array<uint32_t, 1> OPEN_OK = { { AMQP_CHANNEL_OPEN_OK_METHOD } };
+  static const boost::array<boost::uint32_t, 1> OPEN_OK = { { AMQP_CHANNEL_OPEN_OK_METHOD } };
   amqp_channel_open_t channel_open = { 0 /* Out of band = false */ };
-  DoRpcOnChannel<boost::array<uint32_t, 1> >(new_channel, AMQP_CHANNEL_OPEN_METHOD, &channel_open, OPEN_OK);
+  DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(new_channel, AMQP_CHANNEL_OPEN_METHOD, &channel_open, OPEN_OK);
 
-  static const boost::array<uint32_t, 1> CONFIRM_OK = { { AMQP_CONFIRM_SELECT_OK_METHOD } };
+  static const boost::array<boost::uint32_t, 1> CONFIRM_OK = { { AMQP_CONFIRM_SELECT_OK_METHOD } };
   amqp_confirm_select_t confirm_select = { 0 /* nowait = false */ };
-  DoRpcOnChannel<boost::array<uint32_t, 1> >(new_channel, AMQP_CONFIRM_SELECT_METHOD, &confirm_select, CONFIRM_OK);
+  DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(new_channel, AMQP_CONFIRM_SELECT_METHOD, &confirm_select, CONFIRM_OK);
 
   return new_channel;
 }
