@@ -192,11 +192,11 @@ public:
 	/**
 	  * Gets the priority property
 	  */
-    uint8_t Priority() const;
+    boost::uint8_t Priority() const;
 	/**
 	  * Sets the priority property
 	  */
-    void Priority(uint8_t priority);
+    void Priority(boost::uint8_t priority);
 	/**
 	  * Determines whether the priority property is set
 	  */
@@ -277,11 +277,11 @@ public:
 	/**
 	  * Gets the timestamp property 
 	  */
-    uint64_t Timestamp() const;
+    boost::uint64_t Timestamp() const;
 	/**
 	  * Sets the timestamp property
 	  */
-    void Timestamp(uint64_t timestamp);
+    void Timestamp(boost::uint64_t timestamp);
 	/**
 	  * Determines whether the timestamp property is set
 	  */

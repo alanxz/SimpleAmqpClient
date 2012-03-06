@@ -140,7 +140,7 @@ public:
   }
 
   template <class ResponseListType>
-  amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, uint32_t method_id, void* decoded, const ResponseListType& expected_responses)
+  amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, boost::uint32_t method_id, void* decoded, const ResponseListType& expected_responses)
   {
     CheckForError(amqp_send_method(m_connection, channel, method_id, decoded));
 
@@ -150,7 +150,7 @@ public:
   }
 
   template <class ResponseListType>
-  amqp_frame_t DoRpc(uint32_t method_id, void* decoded, const ResponseListType& expected_responses)
+  amqp_frame_t DoRpc(boost::uint32_t method_id, void* decoded, const ResponseListType& expected_responses)
   {
     amqp_channel_t channel = GetChannel();
     amqp_frame_t ret = DoRpcOnChannel(channel, method_id, decoded, expected_responses);
@@ -186,7 +186,7 @@ private:
   channel_map_t m_open_channels;
   std::queue<amqp_channel_t> m_free_channels;
   bool m_is_connected;
-  uint16_t m_next_channel_id;
+  boost::uint16_t m_next_channel_id;
 };
 
 } // namespace Detail

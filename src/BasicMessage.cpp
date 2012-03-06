@@ -205,14 +205,14 @@ void BasicMessage::DeliveryModeClear()
   m_impl->m_properties._flags &= ~AMQP_BASIC_DELIVERY_MODE_FLAG;
 }
 
-uint8_t BasicMessage::Priority() const
+boost::uint8_t BasicMessage::Priority() const
 {
     if (PriorityIsSet())
         return m_impl->m_properties.priority;
     else
         return 0;
 }
-void BasicMessage::Priority(uint8_t priority)
+void BasicMessage::Priority(boost::uint8_t priority)
 {
     m_impl->m_properties.priority = priority;
     m_impl->m_properties._flags |= AMQP_BASIC_PRIORITY_FLAG;
@@ -329,14 +329,14 @@ void BasicMessage::MessageIdClear()
     m_impl->m_properties._flags &= ~AMQP_BASIC_MESSAGE_ID_FLAG;
 }
 
-uint64_t BasicMessage::Timestamp() const
+boost::uint64_t BasicMessage::Timestamp() const
 {
     if (ReplyToIsSet())
         return m_impl->m_properties.timestamp;
     else
         return 0;
 }
-void BasicMessage::Timestamp(uint64_t timestamp)
+void BasicMessage::Timestamp(boost::uint64_t timestamp)
 {
     m_impl->m_properties.timestamp = timestamp;
     m_impl->m_properties._flags |= AMQP_BASIC_TIMESTAMP_FLAG;
