@@ -291,7 +291,7 @@ public:
 					  bool no_local = true,
 					  bool no_ack = true,
 					  bool exclusive = true,
-            uint16_t message_prefetch_count = 1);
+            boost::uint16_t message_prefetch_count = 1);
 
   /**
     * Sets the number of unacknowledged messages that will be delivered 
@@ -301,7 +301,7 @@ public:
     * @param message_prefetch_count the number of unacknowledged message the
     *  broker will deliver. A value of 0 means no limit.
     */
-  void BasicQos(const std::string& consumer_tag, uint16_t message_prefetch_count);
+  void BasicQos(const std::string& consumer_tag, boost::uint16_t message_prefetch_count);
 
 	/**
 	  * Cancels a previously created Consumer

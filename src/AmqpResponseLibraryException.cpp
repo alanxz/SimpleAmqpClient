@@ -36,9 +36,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// Put these first to avoid warnings about INT#_C macro redefinition
+#include <amqp.h>
+
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 
-#include <amqp.h>
 
 namespace AmqpClient {
 

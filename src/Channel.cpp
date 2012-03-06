@@ -36,6 +36,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// Put these first to avoid warnings about INT#_C macro redefinition
+#include <amqp.h>
+#include <amqp_framing.h>
+
 #include "SimpleAmqpClient/Channel.h"
 
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
@@ -44,9 +48,6 @@
 #include "SimpleAmqpClient/Util.h"
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "config.h"
-
-#include <amqp.h>
-#include <amqp_framing.h>
 
 #include <map>
 #include <queue>
@@ -102,7 +103,7 @@ void Channel::DeclareExchange(const std::string& exchange_name,
                               bool durable,
                               bool auto_delete)
 {
-  const boost::array<uint32_t, 1> DECLARE_OK = { { AMQP_EXCHANGE_DECLARE_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_EXCHANGE_DECLARE_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_exchange_declare_t declare;
@@ -122,7 +123,7 @@ void Channel::DeclareExchange(const std::string& exchange_name,
 void Channel::DeleteExchange(const std::string& exchange_name,
                              bool if_unused)
 {
-  const boost::array<uint32_t, 1> DELETE_OK = { { AMQP_EXCHANGE_DELETE_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> DELETE_OK = { { AMQP_EXCHANGE_DELETE_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_exchange_delete_t del;
@@ -138,7 +139,7 @@ void Channel::BindExchange(const std::string& destination,
                            const std::string& source,
                            const std::string& routing_key)
 {
-  const boost::array<uint32_t, 1> BIND_OK = { { AMQP_EXCHANGE_BIND_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_EXCHANGE_BIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_exchange_bind_t bind;
@@ -156,7 +157,7 @@ void Channel::UnbindExchange(const std::string& destination,
                              const std::string& source,
                              const std::string& routing_key)
 {
-  const boost::array<uint32_t, 1> UNBIND_OK = { { AMQP_EXCHANGE_UNBIND_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_EXCHANGE_UNBIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_exchange_unbind_t unbind;
@@ -176,7 +177,7 @@ std::string Channel::DeclareQueue(const std::string& queue_name,
                                   bool exclusive,
                                   bool auto_delete)
 {
-  const boost::array<uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_queue_declare_t declare;
@@ -201,7 +202,7 @@ void Channel::DeleteQueue(const std::string& queue_name,
                           bool if_unused,
                           bool if_empty)
 {
-  const boost::array<uint32_t, 1> DELETE_OK = { { AMQP_QUEUE_DELETE_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> DELETE_OK = { { AMQP_QUEUE_DELETE_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_queue_delete_t del;
@@ -218,7 +219,7 @@ void Channel::BindQueue(const std::string& queue_name,
                         const std::string& exchange_name,
                         const std::string& routing_key)
 {
-  const boost::array<uint32_t, 1> BIND_OK = { { AMQP_QUEUE_BIND_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_QUEUE_BIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_queue_bind_t bind;
@@ -236,7 +237,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
                           const std::string& exchange_name,
                           const std::string& routing_key)
 {
-  const boost::array<uint32_t, 1> UNBIND_OK = { { AMQP_QUEUE_UNBIND_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_QUEUE_UNBIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_queue_unbind_t unbind;
@@ -251,7 +252,7 @@ void Channel::UnbindQueue(const std::string& queue_name,
 
 void Channel::PurgeQueue(const std::string& queue_name)
 {
-  const boost::array<uint32_t, 1> PURGE_OK = { { AMQP_QUEUE_PURGE_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> PURGE_OK = { { AMQP_QUEUE_PURGE_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_queue_purge_t purge;
@@ -301,7 +302,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
   // - basic.return then basic.ack - the message wasn't delievered, but was dealt with
   // - channel.close - probably tried to publish to a non-existant exchange, in any case error!
   // - connection.clsoe - something really bad happened
-  const boost::array<uint32_t, 2> PUBLISH_ACK = { { AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD } };
+  const boost::array<boost::uint32_t, 2> PUBLISH_ACK = { { AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD } };
   amqp_frame_t response;
   m_impl->GetMethodOnChannel(channel, response, PUBLISH_ACK);
 
@@ -310,7 +311,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
     MessageReturnedException message_returned = 
       m_impl->CreateMessageReturnedException(*(reinterpret_cast<amqp_basic_return_t*>(response.payload.method.decoded)), channel);
 
-    const boost::array<uint32_t, 1> BASIC_ACK = { { AMQP_BASIC_ACK_METHOD } };
+    const boost::array<boost::uint32_t, 1> BASIC_ACK = { { AMQP_BASIC_ACK_METHOD } };
     m_impl->GetMethodOnChannel(channel, response, BASIC_ACK);
     m_impl->ReturnChannel(channel);
     m_impl->MaybeReleaseBuffers();
@@ -323,7 +324,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
 
 bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool no_ack)
 {
-  const boost::array<uint32_t, 2> GET_RESPONSES = { { AMQP_BASIC_GET_OK_METHOD, AMQP_BASIC_GET_EMPTY_METHOD } };
+  const boost::array<boost::uint32_t, 2> GET_RESPONSES = { { AMQP_BASIC_GET_OK_METHOD, AMQP_BASIC_GET_EMPTY_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_basic_get_t get;
@@ -341,7 +342,7 @@ bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool
   }
 
   amqp_basic_get_ok_t* get_ok = (amqp_basic_get_ok_t*)response.payload.method.decoded;
-  uint64_t delivery_tag = get_ok->delivery_tag;
+  boost::uint64_t delivery_tag = get_ok->delivery_tag;
   bool redelivered = (get_ok->redelivered == 0 ? false : true);
   std::string exchange((char*)get_ok->exchange.bytes, get_ok->exchange.len);
   std::string routing_key((char*)get_ok->routing_key.bytes, get_ok->routing_key.len);
@@ -356,7 +357,7 @@ bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool
 
 void Channel::BasicRecover(const std::string& consumer)
 {
-  const boost::array<uint32_t, 1> RECOVER_OK = { { AMQP_BASIC_RECOVER_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> RECOVER_OK = { { AMQP_BASIC_RECOVER_OK_METHOD } };
   m_impl->CheckIsConnected();
 
   amqp_basic_recover_t recover;
@@ -373,13 +374,13 @@ std::string Channel::BasicConsume(const std::string& queue,
 						   bool no_local,
 						   bool no_ack,
 						   bool exclusive,
-               uint16_t message_prefetch_count)
+               boost::uint16_t message_prefetch_count)
 {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
 
   // Set this before starting the consume as it may have been set by a previous consumer
-  const boost::array<uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
   
   amqp_basic_qos_t qos;
   qos.prefetch_size = 0;
@@ -389,7 +390,7 @@ std::string Channel::BasicConsume(const std::string& queue,
   m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
   m_impl->MaybeReleaseBuffers();
 
-  const boost::array<uint32_t, 1> CONSUME_OK = { { AMQP_BASIC_CONSUME_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> CONSUME_OK = { { AMQP_BASIC_CONSUME_OK_METHOD } };
 
   amqp_basic_consume_t consume;
   consume.queue = amqp_cstring_bytes(queue.c_str());
@@ -411,12 +412,12 @@ std::string Channel::BasicConsume(const std::string& queue,
   return tag;
 }
 
-void Channel::BasicQos(const std::string& consumer_tag, uint16_t message_prefetch_count)
+void Channel::BasicQos(const std::string& consumer_tag, boost::uint16_t message_prefetch_count)
 {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-  const boost::array<uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
 
   amqp_basic_qos_t qos;
   qos.prefetch_size = 0;
@@ -432,7 +433,7 @@ void Channel::BasicCancel(const std::string& consumer_tag)
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-  const boost::array<uint32_t, 1> CANCEL_OK = { { AMQP_BASIC_CANCEL_OK_METHOD } };
+  const boost::array<boost::uint32_t, 1> CANCEL_OK = { { AMQP_BASIC_CANCEL_OK_METHOD } };
 
   amqp_basic_cancel_t cancel;
   cancel.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
@@ -462,7 +463,7 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-  const boost::array<uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
+  const boost::array<boost::uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
 
   boost::chrono::microseconds real_timeout = (timeout >= 0 ? 
                                          boost::chrono::seconds(timeout) : 
@@ -479,7 +480,7 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
   const std::string exchange((char*)deliver_method->exchange.bytes, deliver_method->exchange.len);
   const std::string routing_key((char*)deliver_method->routing_key.bytes, deliver_method->routing_key.len);
   const std::string in_consumer_tag((char*)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
-  const uint64_t delivery_tag = deliver_method->delivery_tag;
+  const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
   const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
   m_impl->MaybeReleaseBuffers();
   

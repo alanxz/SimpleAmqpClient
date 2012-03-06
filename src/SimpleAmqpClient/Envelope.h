@@ -60,8 +60,8 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable
 public:
   typedef boost::shared_ptr<Envelope> ptr_t;
 
-  friend ptr_t boost::make_shared<Envelope>(AmqpClient::BasicMessage::ptr_t const & a1, std::string const & a2, uint64_t const & a3,
-    std::string const & a4, bool const & a5, std::string const & a6, uint16_t const & a7);
+  friend ptr_t boost::make_shared<Envelope>(AmqpClient::BasicMessage::ptr_t const & a1, std::string const & a2, boost::uint64_t const & a3,
+    std::string const & a4, bool const & a5, std::string const & a6, boost::uint16_t const & a7);
 
   /**
     * Creates an new envelope object
@@ -74,11 +74,11 @@ public:
     * @returns a boost::shared_ptr to an envelope object
     */
   static ptr_t Create(const BasicMessage::ptr_t message, const std::string& consumer_tag, 
-    const uint64_t delivery_tag, const std::string& exchange, bool redelivered, const std::string& routing_key, const uint16_t delivery_channel)
+    const boost::uint64_t delivery_tag, const std::string& exchange, bool redelivered, const std::string& routing_key, const boost::uint16_t delivery_channel)
   {   return boost::make_shared<Envelope>(message, consumer_tag, delivery_tag, exchange, redelivered, routing_key, delivery_channel); }
 
   explicit Envelope(const BasicMessage::ptr_t message, const std::string& consumer_tag,
-    const uint64_t delivery_tag, const std::string& exchange, bool redelivered, const std::string& routing_key, const uint16_t delivery_channel);
+    const boost::uint64_t delivery_tag, const std::string& exchange, bool redelivered, const std::string& routing_key, const boost::uint16_t delivery_channel);
 
 public:
   /**
@@ -108,7 +108,7 @@ public:
     *
     * @returns the delivery tag for a message
     */
-  inline uint64_t DeliveryTag() const { return m_deliveryTag; }
+  inline boost::uint64_t DeliveryTag() const { return m_deliveryTag; }
 
   /**
     * Get the name of the exchange that the message was published to
@@ -136,15 +136,15 @@ public:
     */
   inline std::string RoutingKey() const { return m_routingKey; }
 
-  inline uint16_t DeliveryChannel() const { return m_deliveryChannel; }
+  inline boost::uint16_t DeliveryChannel() const { return m_deliveryChannel; }
 private:
   const BasicMessage::ptr_t m_message;
   const std::string m_consumerTag;
-  const uint64_t m_deliveryTag;
+  const boost::uint64_t m_deliveryTag;
   const std::string m_exchange;
   const bool m_redelivered;
   const std::string m_routingKey;
-  const uint16_t m_deliveryChannel;
+  const boost::uint16_t m_deliveryChannel;
 };
 
 } // namespace AmqpClient
