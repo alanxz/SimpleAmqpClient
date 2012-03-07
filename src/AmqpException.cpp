@@ -35,12 +35,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+#include <amqp.h>
+#include <amqp_framing.h>
+
 #include "SimpleAmqpClient/AmqpException.h"
 
 #include <boost/lexical_cast.hpp>
 
-#include <amqp.h>
-#include <amqp_framing.h>
 #include <assert.h>
 
 namespace AmqpClient
