@@ -33,6 +33,12 @@ CHECK_INCLUDE_FILE(sys/socket.h HAVE_SYS_SOCKET_H)
 
 CONFIGURE_FILE(config.h.in config.h)
 
+option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
+
+if (WIN32 AND NOT BUILD_SHARED_LIBS)
+  message(FATAL_ERROR "The SimpleAmqpClient library cannot be built as a static library on Win32. Set BUILD_SHARED_LIBS=ON to get around this.")
+endif()
+
 SET(SAC_LIB_SRCS
 	src/SimpleAmqpClient/SimpleAmqpClient.h
 
@@ -64,7 +70,7 @@ SET(SAC_LIB_SRCS
 	)
 
 
-ADD_LIBRARY(SimpleAmqpClient SHARED ${SAC_LIB_SRCS})
+ADD_LIBRARY(SimpleAmqpClient ${SAC_LIB_SRCS})
 TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${Boost_LIBRARIES} ${SOCKET_LIBRARY})
 SET_TARGET_PROPERTIES(SimpleAmqpClient PROPERTIES 
 	VERSION 2.0
