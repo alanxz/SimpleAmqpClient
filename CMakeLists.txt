@@ -78,6 +78,8 @@ SET_TARGET_PROPERTIES(SimpleAmqpClient PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib
 	)
 
+add_library(SimpleAmqpClient-static STATIC ${SAC_LIB_SRCS})
+set_target_properties(SimpleAmqpClient-static PROPERTIES OUTPUT_NAME SimpleAmqpClient)
 
 #ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
 #TARGET_LINK_LIBRARIES(simple_connect SimpleAmqpClient)
@@ -118,7 +120,7 @@ SET(DOXYFILE_LATEX "NO")
 SET(PROJECT_VERSION "2.0.0")
 INCLUDE(UseDoxygen)
 
-INSTALL(TARGETS SimpleAmqpClient
+INSTALL(TARGETS SimpleAmqpClient SimpleAmqpClient-static
 	RUNTIME DESTINATION bin
 	ARCHIVE DESTINATION lib
 	LIBRARY DESTINATION lib
