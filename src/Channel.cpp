@@ -50,6 +50,7 @@
 #include "config.h"
 
 #include <map>
+#include <new>
 #include <queue>
 #include <sstream>
 #include <stdexcept>
@@ -80,14 +81,28 @@ m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
 
-    int sock = amqp_open_socket(host.c_str(), port);
-    m_impl->CheckForError(sock);
+    if (NULL == m_impl->m_connection)
+    {
+      throw std::bad_alloc();
+    }
 
-    amqp_set_sockfd(m_impl->m_connection, sock);
+    try
+    {
+      int sock = amqp_open_socket(host.c_str(), port);
+      m_impl->CheckForError(sock);
 
-    m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
-                                   frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                                   username.c_str(), password.c_str()));
+      amqp_set_sockfd(m_impl->m_connection, sock);
+
+      m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
+            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
+            username.c_str(), password.c_str()));
+    }
+    catch (...)
+    {
+      amqp_destroy_connection(m_impl->m_connection);
+      throw;
+    }
+
     m_impl->SetIsConnected(true);
 }
 
