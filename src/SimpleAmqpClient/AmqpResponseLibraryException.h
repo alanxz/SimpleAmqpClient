@@ -56,7 +56,9 @@ namespace AmqpClient {
 class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::runtime_error
 {
 public:
-    explicit AmqpResponseLibraryException(const amqp_rpc_reply_t_& reply, const std::string& context) throw();
+    static AmqpResponseLibraryException CreateException(const amqp_rpc_reply_t_& reply, const std::string& context);
+protected:
+    explicit AmqpResponseLibraryException(const std::string& message) throw();
 };
 
 } // namespace AmqpClient
