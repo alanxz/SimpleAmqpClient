@@ -167,7 +167,7 @@ void ChannelImpl::CheckRpcReply(amqp_channel_t channel, const amqp_rpc_reply_t& 
 
   case AMQP_RESPONSE_LIBRARY_EXCEPTION:
     // If we're getting this likely is the socket is already closed
-    throw AmqpResponseLibraryException(reply, "");
+    throw AmqpResponseLibraryException::CreateException(reply, "");
     break;
 
   case AMQP_RESPONSE_SERVER_EXCEPTION:
@@ -192,7 +192,9 @@ void ChannelImpl::CheckForError(int ret)
   if (ret < 0)
   {
     char* errstr = amqp_error_string(-ret);
-    throw std::runtime_error(errstr);
+    std::runtime_error error(errstr);
+    free(errstr);
+    throw error;
   }
 }
 
