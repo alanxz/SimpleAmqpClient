@@ -37,7 +37,6 @@
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Util.h"
 #include "SimpleAmqpClient/ChannelImpl.h"
-#include "config.h"
 
 #include <map>
 #include <new>
