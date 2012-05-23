@@ -41,8 +41,6 @@
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 
-#include "config.h"
-
 #include <boost/array.hpp>
 
 // This will get us the posix version of strerror_r() on linux
