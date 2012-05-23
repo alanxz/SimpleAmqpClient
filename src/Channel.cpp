@@ -1,4 +1,3 @@
-
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1
@@ -47,7 +46,6 @@
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Util.h"
 #include "SimpleAmqpClient/ChannelImpl.h"
-#include "config.h"
 
 #include <map>
 #include <new>
