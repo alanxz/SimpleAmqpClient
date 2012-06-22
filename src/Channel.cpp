@@ -470,7 +470,7 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
   const boost::array<boost::uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
 
   boost::chrono::microseconds real_timeout = (timeout >= 0 ? 
-                                         boost::chrono::seconds(timeout) : 
+                                         boost::chrono::milliseconds(timeout) : 
                                          boost::chrono::microseconds::max());
 
   amqp_frame_t deliver;
