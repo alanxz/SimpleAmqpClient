@@ -76,22 +76,40 @@ void AmqpException::Throw(const amqp_rpc_reply_t& reply)
 
 void AmqpException::Throw(const amqp_channel_close_t& reply)
 {
+  std::ostringstream what;
+
+  std::string reply_text;
+  if (reply.reply_text.bytes != NULL)
+  {
+    reply_text = std::string((char*)reply.reply_text.bytes, reply.reply_text.len);
+  }
+
+  const char* method_name = amqp_method_name(((reply.class_id << 16) | reply.method_id));
+  if (method_name != NULL)
+  {
+    what << "channel error: " << reply.reply_code << ": " << method_name << " caused: " << reply_text;
+  }
+  else
+  {
+    what << "channel error: " << reply.reply_code << ": " << reply_text;
+  }
+
   switch (reply.reply_code)
   {
   case ContentTooLargeException::REPLY_CODE:
-    throw ContentTooLargeException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw ContentTooLargeException(what.str(), reply_text, reply.class_id, reply.method_id);
   case NoRouteException::REPLY_CODE:
-    throw NoRouteException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw NoRouteException(what.str(), reply_text, reply.class_id, reply.method_id);
   case NoConsumersException::REPLY_CODE:
-    throw NoConsumersException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw NoConsumersException(what.str(), reply_text, reply.class_id, reply.method_id);
   case AccessRefusedException::REPLY_CODE:
-    throw AccessRefusedException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw AccessRefusedException(what.str(), reply_text, reply.class_id, reply.method_id);
   case NotFoundException::REPLY_CODE:
-    throw NotFoundException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw NotFoundException(what.str(), reply_text, reply.class_id, reply.method_id);
   case ResourceLockedException::REPLY_CODE:
-    throw ResourceLockedException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw ResourceLockedException(what.str(), reply_text, reply.class_id, reply.method_id);
   case PreconditionFailedException::REPLY_CODE:
-    throw PreconditionFailedException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw PreconditionFailedException(what.str(), reply_text, reply.class_id, reply.method_id);
   default:
     throw std::logic_error(std::string("Programming error: unknown channel reply code: ").append(boost::lexical_cast<std::string>(reply.reply_code)));
   }
@@ -99,37 +117,55 @@ void AmqpException::Throw(const amqp_channel_close_t& reply)
 
 void AmqpException::Throw(const amqp_connection_close_t& reply)
 {
+  std::ostringstream what;
+  const char* method_name = amqp_method_name(((reply.class_id << 16) | reply.method_id));
+
+  std::string reply_text;
+  if (reply.reply_text.bytes != NULL)
+  {
+    reply_text = std::string((char*)reply.reply_text.bytes, reply.reply_text.len);
+  }
+
+  if (method_name != NULL)
+  {
+    what << "connection error: " << reply.reply_code << ": " << method_name << " caused: " << reply_text;
+  }
+  else
+  {
+    what << "connection error: " << reply.reply_code << ": " << reply_text;
+  }
+
   switch (reply.reply_code)
   {
   case ConnectionForcedException::REPLY_CODE:
-    throw ConnectionForcedException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw ConnectionForcedException(what.str(), reply_text, reply.class_id, reply.method_id);
   case InvalidPathException::REPLY_CODE:
-    throw InvalidPathException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw InvalidPathException(what.str(), reply_text, reply.class_id, reply.method_id);
   case FrameErrorException::REPLY_CODE:
-    throw FrameErrorException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw FrameErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
   case SyntaxErrorException::REPLY_CODE:
-    throw SyntaxErrorException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw SyntaxErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
   case CommandInvalidException::REPLY_CODE:
-    throw CommandInvalidException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw CommandInvalidException(what.str(), reply_text, reply.class_id, reply.method_id);
   case ChannelErrorException::REPLY_CODE:
-    throw ChannelErrorException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw ChannelErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
   case UnexpectedFrameException::REPLY_CODE:
-    throw UnexpectedFrameException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw UnexpectedFrameException(what.str(), reply_text, reply.class_id, reply.method_id);
   case ResourceErrorException::REPLY_CODE:
-    throw ResourceErrorException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw ResourceErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
   case NotAllowedException::REPLY_CODE:
-    throw NotAllowedException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw NotAllowedException(what.str(), reply_text, reply.class_id, reply.method_id);
   case NotImplementedException::REPLY_CODE:
-    throw NotImplementedException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw NotImplementedException(what.str(), reply_text, reply.class_id, reply.method_id);
   case InternalErrorException::REPLY_CODE:
-    throw InternalErrorException(std::string((char*)reply.reply_text.bytes, reply.reply_text.len), reply.class_id, reply.method_id);
+    throw InternalErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
   default:
     throw std::logic_error(std::string("Programming error: unknown connection reply code: ").append(boost::lexical_cast<std::string>(reply.reply_code)));
   }
 }
 
-AmqpException::AmqpException(const std::string& reply_text, boost::uint16_t class_id, boost::uint16_t method_id) throw() :
-      std::runtime_error(std::string(amqp_method_name((class_id << 16) | method_id)).append(" caused: ").append(reply_text)),
+AmqpException::AmqpException(const std::string& what, const std::string& reply_text, boost::uint16_t class_id, boost::uint16_t method_id) throw() :
+      std::runtime_error(what),
       m_reply_text(reply_text),
       m_class_id(class_id),
       m_method_id(method_id)
