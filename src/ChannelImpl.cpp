@@ -60,8 +60,8 @@ namespace Detail
 {
 
 ChannelImpl::ChannelImpl() :
-  m_next_channel_id(1),
   m_is_connected(false)
+, m_next_channel_id(1)
 {
   // Channel 0 is always open
   m_open_channels.insert(std::make_pair(0, frame_queue_t()));
@@ -74,7 +74,7 @@ ChannelImpl::~ChannelImpl()
 amqp_channel_t ChannelImpl::GetNextChannelId()
 {
   int max_channels = amqp_get_channel_max(m_connection);
-  int channel_count = m_open_channels.size();
+  int channel_count = static_cast<int>(m_open_channels.size());
   if (0 == max_channels)
   {
     if (std::numeric_limits<boost::uint16_t>::max() <= channel_count)
@@ -98,7 +98,7 @@ amqp_channel_t ChannelImpl::CreateNewChannel()
   amqp_channel_t new_channel = GetNextChannelId();
 
   static const boost::array<boost::uint32_t, 1> OPEN_OK = { { AMQP_CHANNEL_OPEN_OK_METHOD } };
-  amqp_channel_open_t channel_open = { 0 /* Out of band = false */ };
+  amqp_channel_open_t channel_open = { { 0, 0 } /* Out of band = false */ };
   DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(new_channel, AMQP_CHANNEL_OPEN_METHOD, &channel_open, OPEN_OK);
 
   static const boost::array<boost::uint32_t, 1> CONFIRM_OK = { { AMQP_CONFIRM_SELECT_OK_METHOD } };
@@ -213,7 +213,7 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel)
   // The BasicMessage constructor does a deep copy of the properties structure
   amqp_basic_properties_t* properties = reinterpret_cast<amqp_basic_properties_t*>(frame.payload.properties.decoded);
 
-  size_t body_size = frame.payload.properties.body_size;
+  size_t body_size = static_cast<size_t>(frame.payload.properties.body_size);
   size_t received_size = 0;
   amqp_bytes_t body = amqp_bytes_malloc(body_size);
 
@@ -302,12 +302,12 @@ start:
   {
     struct timeval tv_timeout;
     memset(&tv_timeout, 0, sizeof(tv_timeout));
-    tv_timeout.tv_sec = boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count();
-    tv_timeout.tv_usec = (timeout - boost::chrono::seconds(tv_timeout.tv_sec)).count();
+    tv_timeout.tv_sec = static_cast<long>(boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count());
+    tv_timeout.tv_usec = static_cast<long>((timeout - boost::chrono::seconds(tv_timeout.tv_sec)).count());
 
     fd_set fds;
     FD_ZERO(&fds);
-    FD_SET(socketno, &fds);
+    FD_SET(static_cast<unsigned int>(socketno), &fds);
 
     int select_return = select(socketno + 1, &fds, NULL, &fds, &tv_timeout);
 
