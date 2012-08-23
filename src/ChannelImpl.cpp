@@ -60,8 +60,8 @@ namespace Detail
 {
 
 ChannelImpl::ChannelImpl() :
-  m_next_channel_id(1),
   m_is_connected(false)
+, m_next_channel_id(1)
 {
   // Channel 0 is always open
   m_open_channels.insert(std::make_pair(0, frame_queue_t()));
@@ -74,7 +74,7 @@ ChannelImpl::~ChannelImpl()
 amqp_channel_t ChannelImpl::GetNextChannelId()
 {
   int max_channels = amqp_get_channel_max(m_connection);
-  int channel_count = m_open_channels.size();
+  int channel_count = static_cast<int>(m_open_channels.size());
   if (0 == max_channels)
   {
     if (std::numeric_limits<boost::uint16_t>::max() <= channel_count)
@@ -98,11 +98,11 @@ amqp_channel_t ChannelImpl::CreateNewChannel()
   amqp_channel_t new_channel = GetNextChannelId();
 
   static const boost::array<boost::uint32_t, 1> OPEN_OK = { { AMQP_CHANNEL_OPEN_OK_METHOD } };
-  amqp_channel_open_t channel_open = { 0 /* Out of band = false */ };
+  amqp_channel_open_t channel_open = {};
   DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(new_channel, AMQP_CHANNEL_OPEN_METHOD, &channel_open, OPEN_OK);
 
   static const boost::array<boost::uint32_t, 1> CONFIRM_OK = { { AMQP_CONFIRM_SELECT_OK_METHOD } };
-  amqp_confirm_select_t confirm_select = { 0 /* nowait = false */ };
+  amqp_confirm_select_t confirm_select = {};
   DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(new_channel, AMQP_CONFIRM_SELECT_METHOD, &confirm_select, CONFIRM_OK);
 
   return new_channel;
@@ -213,8 +213,12 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel)
   // The BasicMessage constructor does a deep copy of the properties structure
   amqp_basic_properties_t* properties = reinterpret_cast<amqp_basic_properties_t*>(frame.payload.properties.decoded);
 
-  size_t body_size = frame.payload.properties.body_size;
+  // size_t could possibly be 32-bit, body_size is always 64-bit
+  assert(frame.payload.properties.body_size < static_cast<uint64_t>(std::numeric_limits<size_t>::max()));
+
+  size_t body_size = static_cast<size_t>(frame.payload.properties.body_size);
   size_t received_size = 0;
+
   amqp_bytes_t body = amqp_bytes_malloc(body_size);
 
   // frame #3 and up:
@@ -302,12 +306,20 @@ start:
   {
     struct timeval tv_timeout;
     memset(&tv_timeout, 0, sizeof(tv_timeout));
-    tv_timeout.tv_sec = boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count();
-    tv_timeout.tv_usec = (timeout - boost::chrono::seconds(tv_timeout.tv_sec)).count();
+
+    // boost::chrono::seconds.count() returns boost::int_atleast64_t,
+    // long can be 32 or 64 bit depending on the platform/arch
+    // unless the timeout is something absurd cast to long will be ok, but
+    // lets guard against the case where someone does something silly
+    assert(boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count() <
+            static_cast<boost::chrono::seconds::rep>(std::numeric_limits<long>::max()));
+
+    tv_timeout.tv_sec = static_cast<long>(boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count());
+    tv_timeout.tv_usec = static_cast<long>((timeout - boost::chrono::seconds(tv_timeout.tv_sec)).count());
 
     fd_set fds;
     FD_ZERO(&fds);
-    FD_SET(socketno, &fds);
+    FD_SET(static_cast<unsigned int>(socketno), &fds);
 
     int select_return = select(socketno + 1, &fds, NULL, &fds, &tv_timeout);
 
