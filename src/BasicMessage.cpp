@@ -183,7 +183,7 @@ BasicMessage::delivery_mode_t BasicMessage::DeliveryMode() const
 
 void BasicMessage::DeliveryMode(delivery_mode_t delivery_mode)
 {
-    m_impl->m_properties.delivery_mode = delivery_mode;
+    m_impl->m_properties.delivery_mode = static_cast<uint8_t>(delivery_mode);
     m_impl->m_properties._flags |= AMQP_BASIC_DELIVERY_MODE_FLAG;
 }
 
