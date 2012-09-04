@@ -33,6 +33,7 @@
 #include <boost/cstdint.hpp>
 
 #include <stdexcept>
+#include <string>
 
 #ifdef _MSC_VER
 # pragma warning ( push )
