@@ -43,6 +43,10 @@ namespace Detail
 class BasicMessageImpl
 {
 public:
+  BasicMessageImpl()
+    : m_properties()
+    , m_body()
+  {}
   amqp_basic_properties_t m_properties;
   amqp_bytes_t m_body;
 };
@@ -115,6 +119,10 @@ std::string BasicMessage::Body() const
 }
 void BasicMessage::Body(const std::string& body)
 {
+  if (NULL != m_impl->m_body.bytes)
+  {
+      amqp_bytes_free(m_impl->m_body);
+  }
   amqp_bytes_t body_bytes;
   body_bytes.bytes = const_cast<char*>(body.data());
   body_bytes.len = body.length();
