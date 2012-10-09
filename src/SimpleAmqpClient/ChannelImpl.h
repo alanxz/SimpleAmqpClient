@@ -114,7 +114,15 @@ public:
         AMQP_CHANNEL_CLOSE_METHOD == incoming_frame.payload.method.id)
       {
         FinishCloseChannel(channel);
-        AmqpException::Throw(*reinterpret_cast<amqp_channel_close_t*>(incoming_frame.payload.method.decoded));
+        try
+        {
+          AmqpException::Throw(*reinterpret_cast<amqp_channel_close_t*>(incoming_frame.payload.method.decoded));
+        }
+        catch (AmqpException&)
+        {
+          MaybeReleaseBuffers();
+          throw;
+        }
       }
       GetChannelQueueOrThrow(channel)->second.push_back(incoming_frame);
 
