@@ -121,13 +121,10 @@ endif ()
 # Some smoke tests:
 
 enable_testing()
-find_package(GTest 1.5.0)
-
-if (GTEST_FOUND)
-	option(ENABLE_TESTING "Enable smoke tests" ON)
-endif (GTEST_FOUND)
+option(ENABLE_TESTING "Enable smoke tests" ON)
 
 if (ENABLE_TESTING)
+  add_subdirectory(third-party/gtest-1.6.0)
 	add_subdirectory(testing)
 endif (ENABLE_TESTING)
 
