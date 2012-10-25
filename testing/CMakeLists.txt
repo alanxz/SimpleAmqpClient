@@ -13,5 +13,4 @@ add_executable(test_api
   test_message.cpp
 	)
 target_link_libraries(test_api SimpleAmqpClient ${GTEST_BOTH_LIBRARIES})
-set_target_properties(test_api PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_test(test_api test_api)
