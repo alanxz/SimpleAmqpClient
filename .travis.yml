@@ -7,22 +7,26 @@ compiler:
   - gcc
   - clang
 
-# Make sure CMake is installed
+services: rabbitmq
+
+# install pre-reqs
 install:
- - sudo apt-get install libboost1.48-dev libboost-chrono1.48-dev libboost-system1.48-dev
- - mkdir -p _prereqs
- - pushd _prereqs
- - git clone https://github.com/alanxz/rabbitmq-c
- - cd rabbitmq-c
- - git submodule init && git submodule update
- - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../_install -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF .
- - make install
- - popd
+  - sudo apt-get install libboost1.48-dev libboost-chrono1.48-dev libboost-system1.48-dev
+  - mkdir -p _prereqs
+  - pushd _prereqs
+  - git clone https://github.com/alanxz/rabbitmq-c
+  - cd rabbitmq-c
+  - git submodule init && git submodule update
+  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../_install -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF .
+  - make install
+  - popd
 
 # Run the Build script
 script:
- - mkdir _build
- - cd _build
- - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DRabbitmqc_DIR=../_install ..
- - make install
+  - mkdir _build
+  - cd _build
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DRabbitmqc_DIR=../_install ..
+  - make install
 
+after_script:
+  - LD_LIBRARY_PATH=../_install/lib AMQP_BROKER=`hostname` ctest -V .
