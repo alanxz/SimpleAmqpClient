@@ -1,0 +1,28 @@
+# Travis-CI Build for SimpleAmqpClient
+# see travis-ci.org for details
+
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+# Make sure CMake is installed
+install:
+ - sudo apt-get install libboost1.48-dev libboost-chrono1.48-dev libboost-system1.48-dev
+ - mkdir -p _prereqs
+ - pushd _prereqs
+ - git clone https://github.com/alanxz/rabbitmq-c
+ - cd rabbitmq-c
+ - git submodule init && git submodule update
+ - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../_install -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF .
+ - make install
+ - popd
+
+# Run the Build script
+script:
+ - mkdir _build
+ - cd _build
+ - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DRabbitmqc_DIR=../_install ..
+ - make install
+
