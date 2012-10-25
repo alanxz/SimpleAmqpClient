@@ -2,6 +2,25 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(SimpleAmqpClient)
 
+# Follow all steps below in order to calculate new ABI version when updating the library
+# NOTE: THIS IS UNRELATED to the actual project version
+#
+# 1. If the library source code has changed at all since the last update, then increment revision
+# 2. If any interfaces have been added, removed, or changed since the last update, increment current and set revision to 0.
+# 3. If any interfaces have been added since the last public release, then increment age.
+# 4. If any interfaces have been removed since the last public release, then set age to 0.
+
+set(SAC_SOVERSION_CURRENT   2)
+set(SAC_SOVERSION_REVISION  0)
+set(SAC_SOVERSION_AGE       0)
+
+math(EXPR SAC_SOVERSION_MAJOR "${SAC_SOVERSION_CURRENT} - ${SAC_SOVERSION_AGE}")
+math(EXPR SAC_SOVERSION_MINOR "${SAC_SOVERSION_AGE}")
+math(EXPR SAC_SOVERSION_PATCH "${SAC_SOVERSION_REVISION}")
+
+set(SAC_VERSION ${SAC_SOVERSION_MAJOR}.${SAC_SOVERSION_MINOR}.${SAC_SOVERSION_PATCH})
+set(SAC_SOVERSION ${SAC_SOVERSION_MAJOR})
+
 FIND_PACKAGE(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
 INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIRS})
 
@@ -72,10 +91,15 @@ SET(SAC_LIB_SRCS
 ADD_LIBRARY(SimpleAmqpClient ${SAC_LIB_SRCS})
 TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${Boost_LIBRARIES} ${SOCKET_LIBRARY})
 SET_TARGET_PROPERTIES(SimpleAmqpClient PROPERTIES 
-	VERSION 2.0
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib
 	)
+
+if (WIN32)
+  set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
+else ()
+  set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} SOVERSION ${SAC_SOVERSION})
+endif ()
 
 
 #ADD_EXECUTABLE(simple_connect examples/simple_connect.cpp)
@@ -114,7 +138,7 @@ endif (ENABLE_TESTING)
 
 # Documentation generation
 SET(DOXYFILE_LATEX "NO")
-SET(PROJECT_VERSION "2.0.0")
+SET(PROJECT_VERSION ${SAC_VERSION})
 INCLUDE(UseDoxygen)
 
 INSTALL(TARGETS SimpleAmqpClient
