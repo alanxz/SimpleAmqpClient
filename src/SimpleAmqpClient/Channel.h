@@ -161,6 +161,8 @@ public:
 	  *  If passive is true and the queue does not exist the borker will respond with an error and
 	  *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
 	  *  does not already exist)
+	  * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
+	  *  Defaults to false
 	  * @param exclusive Indicates that only client can use the queue. Defaults to true. An
     *  exclusive queue is deleted when the connection is closed
 	  * @param auto_delete the queue will be deleted after at least one exchange has been bound to it,
