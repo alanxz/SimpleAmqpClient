@@ -1,6 +1,6 @@
 project(gtest CXX)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(gtest STATIC gtest/gtest-all.cc)
 add_library(gtest_main STATIC gtest/gtest_main.cc)
 

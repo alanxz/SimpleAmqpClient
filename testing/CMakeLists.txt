@@ -1,4 +1,4 @@
-include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(BEFORE SYSTEM ${GTEST_INCLUDE_DIRS})
 include_directories(../src)
 
 add_executable(test_api 
