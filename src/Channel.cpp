@@ -458,7 +458,7 @@ void Channel::BasicCancel(const std::string& consumer_tag)
 Envelope::ptr_t Channel::BasicConsumeMessage(const std::string& consumer_tag)
 {
 	Envelope::ptr_t returnval;
-	BasicConsumeMessage(consumer_tag, returnval, 0);
+	BasicConsumeMessage(consumer_tag, returnval);
 	return returnval;
 }
 
