@@ -94,6 +94,15 @@ public:
 		return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
 	}
 
+  /**
+   * Create a new Channel object from an AMQP URI
+   *
+   * @param uri [in] a URI of the form: amqp://[username:password@]{HOSTNAME}[:PORT][/VHOST]
+   * @param frame_max [in] requests that the broker limit the maximum size of any frame to this value
+   * @returns a new Channel object
+   */
+  static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
+
 	explicit Channel(const std::string& host,
 			   int port,
 			   const std::string& username,
