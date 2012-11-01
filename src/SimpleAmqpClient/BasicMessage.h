@@ -29,6 +29,7 @@
  */
 
 
+#include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
@@ -349,6 +350,24 @@ public:
 	  * Unsets the cluster id property
 	  */
     void ClusterIdClear();
+
+	/**
+	  * Gets the cluster id property
+	  */
+    Table HeaderTable() const;
+	/**
+	  * Sets the custer id property
+	  */
+    void HeaderTable(const Table& header_table);
+  /**
+    * Is there a header table associated with the message
+    */
+    bool HeaderTableIsSet() const;
+	/**
+	  * Unsets the cluster id property
+	  */
+    void HeaderTableClear();
+
 
 protected:
   boost::scoped_ptr<Detail::BasicMessageImpl> m_impl;

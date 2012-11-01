@@ -31,6 +31,7 @@
 #include <amqp_framing.h>
 
 #include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/TableImpl.h"
 
 
 #include <cstring>
@@ -49,6 +50,7 @@ public:
   {}
   amqp_basic_properties_t m_properties;
   amqp_bytes_t m_body;
+  amqp_pool_ptr_t m_table_pool;
 };
 
 }
@@ -83,6 +85,7 @@ BasicMessage::BasicMessage(const amqp_bytes_t& body, const amqp_basic_properties
 	if (UserIdIsSet()) m_impl->m_properties.user_id = amqp_bytes_malloc_dup(m_impl->m_properties.user_id);
 	if (AppIdIsSet()) m_impl->m_properties.app_id = amqp_bytes_malloc_dup(m_impl->m_properties.app_id);
 	if (ClusterIdIsSet()) m_impl->m_properties.cluster_id = amqp_bytes_malloc_dup(m_impl->m_properties.cluster_id);
+  if (HeaderTableIsSet()) m_impl->m_properties.headers = Detail::TableValueImpl::CopyTable(m_impl->m_properties.headers, m_impl->m_table_pool);
 }
 
 BasicMessage::~BasicMessage()
@@ -452,4 +455,35 @@ void BasicMessage::ClusterIdClear()
 	if (ClusterIdIsSet()) amqp_bytes_free(m_impl->m_properties.cluster_id);
     m_impl->m_properties._flags &= ~AMQP_BASIC_CLUSTER_ID_FLAG;
 }
+
+Table BasicMessage::HeaderTable() const
+{
+  if (HeaderTableIsSet())
+    return Detail::TableValueImpl::CreateTable(m_impl->m_properties.headers);
+  else
+    return Table();
+}
+
+void BasicMessage::HeaderTable(const Table& header_table)
+{
+  m_impl->m_properties.headers = Detail::TableValueImpl::CreateAmqpTable(header_table, m_impl->m_table_pool);
+  m_impl->m_properties._flags |= AMQP_BASIC_HEADERS_FLAG;
+}
+
+bool BasicMessage::HeaderTableIsSet() const
+{
+  return AMQP_BASIC_HEADERS_FLAG == (m_impl->m_properties._flags & AMQP_BASIC_HEADERS_FLAG);
+}
+
+void BasicMessage::HeaderTableClear()
+{
+  if (HeaderTableIsSet())
+  {
+    m_impl->m_table_pool.reset();
+    m_impl->m_properties.headers.num_entries = 0;
+    m_impl->m_properties.headers.entries = NULL;
+  }
+  m_impl->m_properties._flags &= ~ AMQP_BASIC_HEADERS_FLAG;
+}
+
 } // namespace AmqpClient

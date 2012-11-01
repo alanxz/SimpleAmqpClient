@@ -37,6 +37,7 @@
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Util.h"
 #include "SimpleAmqpClient/ChannelImpl.h"
+#include "SimpleAmqpClient/TableImpl.h"
 
 #include <map>
 #include <new>
@@ -107,6 +108,16 @@ void Channel::DeclareExchange(const std::string& exchange_name,
                               bool durable,
                               bool auto_delete)
 {
+  DeclareExchange(exchange_name, exchange_type, passive, durable, auto_delete, Table());
+}
+
+void Channel::DeclareExchange(const std::string& exchange_name,
+                              const std::string& exchange_type,
+                              bool passive,
+                              bool durable,
+                              bool auto_delete,
+                              const Table &arguments)
+{
   const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_EXCHANGE_DECLARE_OK_METHOD } };
   m_impl->CheckIsConnected();
 
@@ -118,8 +129,10 @@ void Channel::DeclareExchange(const std::string& exchange_name,
   declare.auto_delete = auto_delete;
   declare.internal = false;
   declare.nowait = false;
-  declare.arguments = AMQP_EMPTY_TABLE;
-  
+
+  Detail::amqp_pool_ptr_t table_pool;
+  declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+
   m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
   m_impl->MaybeReleaseBuffers();
 }
@@ -143,6 +156,14 @@ void Channel::BindExchange(const std::string& destination,
                            const std::string& source,
                            const std::string& routing_key)
 {
+  BindExchange(destination, source, routing_key, Table());
+}
+
+void Channel::BindExchange(const std::string& destination,
+                           const std::string& source,
+                           const std::string& routing_key,
+                           const Table &arguments)
+{
   const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_EXCHANGE_BIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
@@ -151,7 +172,9 @@ void Channel::BindExchange(const std::string& destination,
   bind.source = amqp_cstring_bytes(source.c_str());
   bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
   bind.nowait = false;
-  bind.arguments = AMQP_EMPTY_TABLE;
+
+  Detail::amqp_pool_ptr_t table_pool;
+  bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
   m_impl->DoRpc(AMQP_EXCHANGE_BIND_METHOD, &bind, BIND_OK);
   m_impl->MaybeReleaseBuffers();
@@ -161,6 +184,14 @@ void Channel::UnbindExchange(const std::string& destination,
                              const std::string& source,
                              const std::string& routing_key)
 {
+  UnbindExchange(destination, source, routing_key, Table());
+}
+
+void Channel::UnbindExchange(const std::string& destination,
+                             const std::string& source,
+                             const std::string& routing_key,
+                             const Table &arguments)
+{
   const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_EXCHANGE_UNBIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
@@ -169,7 +200,9 @@ void Channel::UnbindExchange(const std::string& destination,
   unbind.source = amqp_cstring_bytes(source.c_str());
   unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
   unbind.nowait = false;
-  unbind.arguments = AMQP_EMPTY_TABLE;
+
+  Detail::amqp_pool_ptr_t table_pool;
+  unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
   m_impl->DoRpc(AMQP_EXCHANGE_UNBIND_METHOD, &unbind, UNBIND_OK);
   m_impl->MaybeReleaseBuffers();
@@ -181,6 +214,16 @@ std::string Channel::DeclareQueue(const std::string& queue_name,
                                   bool exclusive,
                                   bool auto_delete)
 {
+  return DeclareQueue(queue_name, passive, durable, exclusive, auto_delete, Table());
+}
+
+std::string Channel::DeclareQueue(const std::string& queue_name,
+                                  bool passive,
+                                  bool durable,
+                                  bool exclusive,
+                                  bool auto_delete,
+                                  const Table &arguments)
+{
   const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
   m_impl->CheckIsConnected();
 
@@ -191,7 +234,9 @@ std::string Channel::DeclareQueue(const std::string& queue_name,
   declare.exclusive = exclusive;
   declare.auto_delete = auto_delete;
   declare.nowait = false;
-  declare.arguments = AMQP_EMPTY_TABLE;
+
+  Detail::amqp_pool_ptr_t table_pool;
+  declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
   amqp_frame_t response = m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
 
@@ -223,6 +268,14 @@ void Channel::BindQueue(const std::string& queue_name,
                         const std::string& exchange_name,
                         const std::string& routing_key)
 {
+  BindQueue(queue_name, exchange_name, routing_key, Table());
+}
+
+void Channel::BindQueue(const std::string& queue_name,
+                        const std::string& exchange_name,
+                        const std::string& routing_key,
+                        const Table &arguments)
+{
   const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_QUEUE_BIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
@@ -231,7 +284,9 @@ void Channel::BindQueue(const std::string& queue_name,
   bind.exchange = amqp_cstring_bytes(exchange_name.c_str());
   bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
   bind.nowait = false;
-  bind.arguments = AMQP_EMPTY_TABLE;
+
+  Detail::amqp_pool_ptr_t table_pool;
+  bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
   m_impl->DoRpc(AMQP_QUEUE_BIND_METHOD, &bind, BIND_OK);
   m_impl->MaybeReleaseBuffers();
@@ -241,6 +296,14 @@ void Channel::UnbindQueue(const std::string& queue_name,
                           const std::string& exchange_name,
                           const std::string& routing_key)
 {
+  UnbindQueue(queue_name, exchange_name, routing_key, Table());
+}
+
+void Channel::UnbindQueue(const std::string& queue_name,
+                          const std::string& exchange_name,
+                          const std::string& routing_key,
+                          const Table &arguments)
+{
   const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_QUEUE_UNBIND_OK_METHOD } };
   m_impl->CheckIsConnected();
 
@@ -248,7 +311,9 @@ void Channel::UnbindQueue(const std::string& queue_name,
   unbind.queue = amqp_cstring_bytes(queue_name.c_str());
   unbind.exchange = amqp_cstring_bytes(exchange_name.c_str());
   unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
-  unbind.arguments = AMQP_EMPTY_TABLE;
+
+  Detail::amqp_pool_ptr_t table_pool;
+  unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
   m_impl->DoRpc(AMQP_QUEUE_UNBIND_METHOD, &unbind, UNBIND_OK);
   m_impl->MaybeReleaseBuffers();
@@ -380,6 +445,16 @@ std::string Channel::BasicConsume(const std::string& queue,
 						   bool exclusive,
                boost::uint16_t message_prefetch_count)
 {
+  return BasicConsume(queue, consumer_tag, no_local, no_ack, exclusive, message_prefetch_count, Table());
+}
+std::string Channel::BasicConsume(const std::string& queue,
+						   const std::string& consumer_tag,
+						   bool no_local,
+						   bool no_ack,
+						   bool exclusive,
+               boost::uint16_t message_prefetch_count,
+               const Table &arguments)
+{
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
 
@@ -403,7 +478,9 @@ std::string Channel::BasicConsume(const std::string& queue,
   consume.no_ack = no_ack;
   consume.exclusive = exclusive;
   consume.nowait = false;
-  consume.arguments = AMQP_EMPTY_TABLE;
+
+  Detail::amqp_pool_ptr_t table_pool;
+  consume.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
   amqp_frame_t response = m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CONSUME_METHOD, &consume, CONSUME_OK);
 
