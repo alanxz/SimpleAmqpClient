@@ -31,6 +31,7 @@
 
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Envelope.h"
+#include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
@@ -123,6 +124,29 @@ public:
                          bool durable = false,
                          bool auto_delete = false);
 
+	/**
+	  * Declares an exchange
+	  * Creates an exchange on the AMQP broker if it does not already exist
+	  * @param exchange_name the name of the exchange
+	  * @param exchange_type the type of exchange to be declared. Defaults to direct
+	  *  other types that could be used: fanout and topic
+	  * @param passive Indicates how the broker should react if the exchange does not exist.
+	  *  If passive is true and the exhange does not exist the broker will respond with an error and
+	  *  not create the exchange, exchange is created otherwise. Defaults to false (exchange is created
+	  *  if it does not already exist)
+	  * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
+	  *  Defaults to false
+	  * @param auto_delete Indicates whether the exchange will automatically be removed when no queues are
+	  *  bound to it. Defaults to true
+    * @param arguments A table of additional arguments used when creating the exchange
+	  */
+  void DeclareExchange(const std::string& exchange_name,
+                         const std::string& exchange_type,
+                         bool passive,
+                         bool durable,
+                         bool auto_delete,
+                         const Table &arguments);
+
     /**
       * Deletes an exachange on the AMQP broker
       * @param exchange_name the name of the exchange to be deleteed
@@ -143,6 +167,18 @@ public:
                       const std::string& routing_key);
 
     /**
+      * Binds one exchange to another exchange using a given key
+      * @param destination the name of the exchange to route messages to
+      * @param source the name of the exchange to route messages from
+      * @param routing_key the routing key to use when binding
+      * @param arguments A table of additional arguments used when creating the binding
+      */
+  void BindExchange(const std::string& destination,
+                      const std::string& source,
+                      const std::string& routing_key,
+                      const Table &arguments);
+
+    /**
       * Unbind an existing exchange-exchange binding 
       * @see BindExchange
       * @param destination the name of the exchange to route messages to
@@ -152,6 +188,19 @@ public:
     void UnbindExchange(const std::string& destination,
                         const std::string& source,
                         const std::string& routing_key);
+
+    /**
+      * Unbind an existing exchange-exchange binding
+      * @see BindExchange
+      * @param destination the name of the exchange to route messages to
+      * @param source the name of the exchange to route messages from
+      * @param routing_key the routing key to use when binding
+      * @param arguments A table of additional arguments when unbinding the exchange
+      */
+  void UnbindExchange(const std::string& destination,
+                        const std::string& source,
+                        const std::string& routing_key,
+                        const Table &arguments);
 	/**
 	  * Declares a queue
 	  * Creates a queue on the AMQP broker if it does not already exist
@@ -175,6 +224,32 @@ public:
 							             bool durable = false,
 							             bool exclusive = true,
 							             bool auto_delete = true);
+
+	/**
+	  * Declares a queue
+	  * Creates a queue on the AMQP broker if it does not already exist
+	  * @param queue_name the desired name of the queue. If this is a zero-length string the broker
+	  *  will generate a queue name and it will be returned as a result from this metho
+	  * @param passive Indicated how the broker should react if the queue does not exist.
+	  *  If passive is true and the queue does not exist the borker will respond with an error and
+	  *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
+	  *  does not already exist)
+	  * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
+	  *  Defaults to false
+	  * @param exclusive Indicates that only client can use the queue. Defaults to true. An
+    *  exclusive queue is deleted when the connection is closed
+	  * @param auto_delete the queue will be deleted after at least one exchange has been bound to it,
+    *  then has been unbound
+    * @param arguments A table of additional arguments used when declaring a queue
+	  * @returns the name of the queue created on the broker. Used mostly when the broker is asked to 
+	  *  create a unique queue by not providing a queue name
+	  */
+	std::string DeclareQueue(const std::string& queue_name,
+							             bool passive,
+							             bool durable,
+							             bool exclusive,
+							             bool auto_delete,
+							             const Table &arguments);
 
 	/**
 	  * Deletes a queue
@@ -201,6 +276,20 @@ public:
                    const std::string& routing_key = "");
 
 	/**
+	  * Binds a queue to an exchange
+	  * Connects an exchange to a queue on the broker
+	  * @param queue_name the name of the queue to bind
+	  * @param exchange_name the name of the exchange to bind
+	  * @param routing_key only messages sent to the exchange with this routing key will be delivered to
+	  *  the queue. Defaults to "" which means all messages will be delivered
+    * @param arguments A table of additional arguments used when binding the queue
+	  */
+  void BindQueue(const std::string& queue_name,
+                   const std::string& exchange_name,
+                   const std::string& routing_key,
+                   const Table &arguments);
+
+	/**
 	  * Unbinds a queue from an exchange
 	  * Disconnects an exchange from a queue
 	  * @param queue_name the name of the queue to unbind
@@ -211,6 +300,20 @@ public:
     void UnbindQueue(const std::string& queue_name,
                      const std::string& exchange_name,
                      const std::string& routing_key = "");
+
+	/**
+	  * Unbinds a queue from an exchange
+	  * Disconnects an exchange from a queue
+	  * @param queue_name the name of the queue to unbind
+	  * @param exchange_name the name of the exchange to unbind
+	  * @param routing_key this must match the routing_key used when creating the binding
+    * @param arguments A table of additional arguments used when unbinding a queue
+	  * @see BindQueue
+	  */
+  void UnbindQueue(const std::string& queue_name,
+                     const std::string& exchange_name,
+                     const std::string& routing_key,
+                     const Table &arguments);
 
 	/**
 	  * Purges a queue
@@ -285,6 +388,32 @@ public:
 					  bool no_ack = true,
 					  bool exclusive = true,
             boost::uint16_t message_prefetch_count = 1);
+
+	/**
+	  * Starts consuming Basic messages on a queue
+	  * Subscribes as a consumer to a queue, so all future messages on a queue will be Basic.Delivered
+	  * Note: due to a limitation to how things are done, it is only possible to reliably have a single
+	  *  consumer per channel, calling this more than once per channel may result in undefined results
+	  *  from BasicConsumeMessage
+	  * @param queue the name of the queue to subscribe to
+	  * @param consumer_tag the name of the consumer. This is used to do operations with a consumer
+	  * @param no_local Defaults to true
+	  * @param no_ack If true, ack'ing the message is automatically done when the message is delivered.
+	  *  Defaults to true (message does not have to be ack'ed)
+	  * @param exclusive means only this consumer can access the queue. Defaults to true
+    * @param message_prefetch_count number of unacked messages the broker will deliver. Setting this to
+    *  more than 1 will allow the broker to deliver messages while a current message is being processed
+    *  for example. A value of 0 means no limit. This option is ignored if no_ack = true
+    * @param arguments A table of additional arguments when creating the consumer
+    * @returns the consumer tag
+	  */
+	std::string BasicConsume(const std::string& queue,
+					  const std::string& consumer_tag,
+					  bool no_local,
+					  bool no_ack,
+					  bool exclusive,
+            boost::uint16_t message_prefetch_count,
+            const Table &arguments);
 
   /**
     * Sets the number of unacknowledged messages that will be delivered 
