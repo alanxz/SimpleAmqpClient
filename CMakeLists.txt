@@ -28,6 +28,12 @@ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 FIND_PACKAGE(Rabbitmqc REQUIRED)
 INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
 
+if (CMAKE_GENERATOR MATCHES ".*(Make|Ninja).*"
+    AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel" FORCE)
+  message(STATUS "CMAKE_BUILD_TYPE not specified. Using ${CMAKE_BUILD_TYPE} build")
+endif ()
+
 INCLUDE_DIRECTORIES(BEFORE src
 	${CMAKE_CURRENT_BINARY_DIR})
 
