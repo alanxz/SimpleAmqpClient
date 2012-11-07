@@ -17,9 +17,8 @@ Known to work in the following environments:
 
 ### Pre-requisites
 +  [boost-1.47.0](http://www.boost.org/) or newer (uses chrono, system internally in addition to other header based libraries such as sharedptr and noncopyable)
-+  [librabbitmq-c](http://www.rabbitmq.org/) you need a version of the library that includes support for select.confirm. Bonus points for using a cmake built version (it'll work on MSVC Win32/64)
++  [rabbitmq-c](http://github.com/alanxz/rabbitmq-c) you'll need version 0.2 or better.
 +  [cmake 2.8+](http://www.cmake.org/) what is needed for the build system
-+  [gtest 1.5+](http://code.google.com/p/googletest/) OPTIONAL only necessary if you want to run the tests. The tests also require a broker to be running.
 +  [Doxygen](http://www.stack.nl/~dimitri/doxygen/) OPTIONAL only necessary to generate API documentation
 
 ### Build procedure
@@ -28,7 +27,7 @@ This is a typical cmake project, it should work like most typical cmake projects
 In a sibiling directory to where you extracted the source code:
     mkdir simpleamqpclient-build
     cd simpleamqpclient-build
-    cmake ..\SimpleAmqpClient
+    cmake ../SimpleAmqpClient
 
 Then use your the appropriate build utility to build the library (make, msbuild)
 
@@ -36,6 +35,10 @@ Interesting targets
 +  test - will build and run the tests
 +  install - will install the library and headers to whatever CMAKE_INSTALL_PREFIX is defined to
 +  doc - will generate API documentation if you have doxygen setup
+
+Notes:
++ The test google-test based test suite can be enabled by passing ```-DENABLE_TESTING=ON``` to
+  cmake
 
 Using the library
 -----------------
