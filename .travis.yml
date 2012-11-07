@@ -25,7 +25,7 @@ install:
 script:
   - mkdir _build
   - cd _build
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DRabbitmqc_DIR=../_install ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=../_install ..
   - make install
 
 after_script:
