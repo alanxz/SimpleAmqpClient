@@ -561,6 +561,17 @@ TEST(table, convert_to_rabbitmq)
   EXPECT_TRUE(std::equal(table_in.begin(), table_in.end(), table_out.begin()));
 }
 
+TEST(table, convert_to_rabbitmq_empty)
+{
+  Table table_in;
+
+  BasicMessage::ptr_t message = BasicMessage::Create();
+  message->HeaderTable(table_in);
+
+  Table table_out = message->HeaderTable();
+  EXPECT_EQ(0, table_out.size());
+}
+
 TEST_F(connected_test, basic_message_header_roundtrip)
 {
   Table table_in;
@@ -592,6 +603,27 @@ TEST_F(connected_test, basic_message_header_roundtrip)
 
   BasicMessage::ptr_t message_in = BasicMessage::Create("Body");
   message_in->HeaderTable(table_in);
+
+  channel->BasicPublish("", queue, message_in);
+
+  Envelope::ptr_t envelope = channel->BasicConsumeMessage(tag);
+  BasicMessage::ptr_t message_out = envelope->Message();
+  Table table_out = message_out->HeaderTable();
+
+  EXPECT_EQ(table_in.size(), table_out.size());
+  EXPECT_TRUE(std::equal(table_in.begin(), table_in.end(), table_out.begin()));
+}
+
+TEST_F(connected_test, basic_message_empty_table_roundtrip)
+{
+  std::string queue = channel->DeclareQueue("");
+  std::string tag = channel->BasicConsume(queue, "");
+
+  Table table_in;
+
+  BasicMessage::ptr_t message_in = BasicMessage::Create("Body");
+  message_in->HeaderTable(table_in);
+
 
   channel->BasicPublish("", queue, message_in);
 
