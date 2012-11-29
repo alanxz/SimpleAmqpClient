@@ -11,7 +11,7 @@ PROJECT(SimpleAmqpClient)
 # 4. If any interfaces have been removed since the last public release, then set age to 0.
 
 set(SAC_SOVERSION_CURRENT   3)
-set(SAC_SOVERSION_REVISION  0)
+set(SAC_SOVERSION_REVISION  1)
 set(SAC_SOVERSION_AGE       1)
 
 math(EXPR SAC_SOVERSION_MAJOR "${SAC_SOVERSION_CURRENT} - ${SAC_SOVERSION_AGE}")
