@@ -77,7 +77,7 @@ TEST_F(connected_test, publish_mandatory_success)
   channel->BasicPublish("", queue, message, true);
 }
 
-TEST_F(connected_test, publish_immediate_fail1)
+TEST_F(connected_test, DISABLED_publish_immediate_fail1)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("message body");
 
@@ -85,7 +85,7 @@ TEST_F(connected_test, publish_immediate_fail1)
   EXPECT_THROW(channel->BasicPublish("", "test_publish_notexist", message, false, true), MessageReturnedException);
 }
 
-TEST_F(connected_test, publish_immediate_fail2)
+TEST_F(connected_test, DISABLED_publish_immediate_fail2)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("message body");
   std::string queue = channel->DeclareQueue("");

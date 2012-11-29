@@ -76,7 +76,7 @@ TEST_F(connected_test, channel_publish_returned_mandatory)
   EXPECT_THROW(channel->BasicPublish("", "test_channel_noqueue", message, true, false), MessageReturnedException);
 }
 
-TEST_F(connected_test, channel_publish_returned_immediate)
+TEST_F(connected_test, DISABLED_channel_publish_returned_immediate)
 {
   BasicMessage::ptr_t message = BasicMessage::Create("Test message");
   std::string queue_name = channel->DeclareQueue("");
