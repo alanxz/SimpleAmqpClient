@@ -269,6 +269,11 @@ TableValue TableValueImpl::CreateTableValue(const amqp_field_value_t &entry)
 
 amqp_table_t TableValueImpl::CopyTable(const amqp_table_t &table, amqp_pool_ptr_t &pool)
 {
+  if (0 == table.num_entries)
+  {
+    return AMQP_EMPTY_TABLE;
+  }
+
   pool = boost::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
   init_amqp_pool(pool.get(), 1024);
 
