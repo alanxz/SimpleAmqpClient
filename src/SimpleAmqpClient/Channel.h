@@ -350,6 +350,11 @@ public:
 
     /**
       * Attempts to get a message from a queue in a synchronous manner
+      *
+      * Note that this function effectively polls the broker for a message, in general
+      * better performance is realized using BasicConsume/BasicConsumeMessage. This function
+      * will not wait for a message to arrive in a queue, it will return false if the queue
+      * is empty.
       * @param message a message envelope pointer that will be populated if a message is
       *  delivered
       * @param queue the name of the queue to try to get the message from
