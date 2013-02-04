@@ -31,6 +31,7 @@
  */
 
 #include <SimpleAmqpClient.h>
+#include <iostream>
 
 using namespace AmqpClient;
 
@@ -44,19 +45,18 @@ int main()
     channel = Channel::Create();
 
   BasicMessage::ptr_t the_message = BasicMessage::Create("Body Content");
-  
+  try {  
   channel->DeclareQueue("BasicReturnTestQueue");
   channel->BasicConsume("BasicReturnTestQueue", "consumer_tag1");
 
   channel->BasicPublish("", "BasicReturnTestQueue", the_message, true, false);
   channel->BasicPublish("", "ThisDoesntExist", the_message, true, false);
   
-  try
-  {
+
     for (int i = 0; i < 2; ++i)
     {
       Envelope::ptr_t env;
-      if (channel->BasicConsumeMessage(env, 0))
+      if (channel->BasicConsumeMessage("consumer_tag1", env, 0))
       {
         std::cout << "Received message with body: " << env->Message()->Body() << std::endl;
       }
