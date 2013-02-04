@@ -77,18 +77,15 @@ class thread_body : boost::noncopyable
 
 		void run()
 		{
+			std::cout << "Waiting for message... " << std::flush;
 			while (!boost::this_thread::interruption_requested())
-			{
-				std::cout << "Waiting for message... " << std::flush;
+			{				
 				BasicMessage::ptr_t message;
 				if (server->GetNextIncomingMessage(message, 1))
 				{
 					std::cout << "message received.\n";
-          server->RespondToMessage(message, "this is a response");
-				}
-				else
-				{
-					std::cout << "message not received.\n";
+          			server->RespondToMessage(message, "this is a response");
+          			std::cout << "Body: " << message->Body() << std::endl;          			
 				}
 			}
 		}
@@ -99,22 +96,26 @@ class thread_body : boost::noncopyable
 };
 int main()
 {
-	boost::shared_ptr<thread_body> body = boost::make_shared<thread_body>();
+	try {
+		boost::shared_ptr<thread_body> body = boost::make_shared<thread_body>();
 
-	boost::this_thread::sleep(boost::posix_time::seconds(1));
+		boost::this_thread::sleep(boost::posix_time::seconds(1));
 
-  char* szBroker = getenv("AMQP_BROKER");
-  Channel::ptr_t channel;
-  if (szBroker != NULL)
-    channel = Channel::Create(szBroker);
-  else
-    channel = Channel::Create();
+		char* szBroker = getenv("AMQP_BROKER");
+		Channel::ptr_t channel;
+		if (szBroker != NULL)
+			channel = Channel::Create(szBroker);
+		else
+			channel = Channel::Create();
 
-  SimpleRpcClient::ptr_t client = SimpleRpcClient::Create(channel, "consume_timeout_test");
-  std::string str = client->Call("Here is my message");
-  std::cout << "Got response: " << str << std::endl;
+		SimpleRpcClient::ptr_t client = SimpleRpcClient::Create(channel, "consume_timeout_test");
+		std::string str = client->Call("Here is my message");
+		std::cout << "Got response: " << str << std::endl;
 
-	boost::this_thread::sleep(boost::posix_time::seconds(2));
+		boost::this_thread::sleep(boost::posix_time::seconds(2));
+	} catch (AmqpException &e) {
+		std::cout << "error: " << e.what();
+	}
 
 	return 0;
 }

@@ -30,7 +30,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/SimpleRpcServer.h"
+#include "SimpleRpcServer.h"
 
 
 namespace AmqpClient {
@@ -50,12 +50,18 @@ SimpleRpcServer::~SimpleRpcServer()
 
 BasicMessage::ptr_t SimpleRpcServer::GetNextIncomingMessage()
 {
-	return m_channel->BasicConsumeMessage();
+	return m_channel->BasicConsumeMessage(m_incoming_tag)->Message();
 }
 
 bool SimpleRpcServer::GetNextIncomingMessage(BasicMessage::ptr_t& message, int timeout)
 {
-	return m_channel->BasicConsumeMessage(message, timeout);
+	Envelope::ptr_t env;
+	if (m_channel->BasicConsumeMessage(m_incoming_tag, env, timeout)) {
+		message = env->Message();
+		return true;
+	} else {
+		return false;
+	}
 }
 
 void SimpleRpcServer::RespondToMessage(BasicMessage::ptr_t request, BasicMessage::ptr_t response)

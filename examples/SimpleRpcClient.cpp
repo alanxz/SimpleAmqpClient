@@ -30,8 +30,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/SimpleRpcClient.h"
-#include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleRpcClient.h"
+#include "BasicMessage.h"
 
 namespace AmqpClient {
 
@@ -63,7 +63,7 @@ BasicMessage::ptr_t SimpleRpcClient::Call(BasicMessage::ptr_t message)
 	message->ReplyTo(m_incoming_tag);
 	m_channel->BasicPublish("amq.direct", m_outgoing_tag, message);
 
-	BasicMessage::ptr_t incoming_msg = m_channel->BasicConsumeMessage();
+	BasicMessage::ptr_t incoming_msg = m_channel->BasicConsumeMessage(m_incoming_tag)->Message();
 
 	return incoming_msg;
 }
