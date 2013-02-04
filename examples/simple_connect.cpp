@@ -56,7 +56,7 @@ int main()
 
 	channel->BasicConsume("alanqueue", "consumertag");
 
-	BasicMessage::ptr_t msg_out = channel->BasicConsumeMessage();
+	BasicMessage::ptr_t msg_out = channel->BasicConsumeMessage("consumertag")->Message();
 
 	std::cout << "Message text: " << msg_out->Body() << std::endl;
 
