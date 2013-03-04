@@ -94,6 +94,15 @@ public:
 		return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
 	}
 
+  /**
+   * Create a new Channel object from an AMQP URI
+   *
+   * @param uri [in] a URI of the form: amqp://[username:password@]{HOSTNAME}[:PORT][/VHOST]
+   * @param frame_max [in] requests that the broker limit the maximum size of any frame to this value
+   * @returns a new Channel object
+   */
+  static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
+
 	explicit Channel(const std::string& host,
 			   int port,
 			   const std::string& username,
@@ -107,7 +116,7 @@ public:
 	  * Declares an exchange
 	  * Creates an exchange on the AMQP broker if it does not already exist
 	  * @param exchange_name the name of the exchange
-	  * @param exchange_type the type of exchange to be declared. Defaults to direct 
+	  * @param exchange_type the type of exchange to be declared. Defaults to direct
 	  *  other types that could be used: fanout and topic
 	  * @param passive Indicates how the broker should react if the exchange does not exist.
 	  *  If passive is true and the exhange does not exist the broker will respond with an error and
@@ -115,11 +124,11 @@ public:
 	  *  if it does not already exist)
 	  * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
 	  *  Defaults to false
-	  * @param auto_delete Indicates whether the exchange will automatically be removed when no queues are 
+	  * @param auto_delete Indicates whether the exchange will automatically be removed when no queues are
 	  *  bound to it. Defaults to true
 	  */
     void DeclareExchange(const std::string& exchange_name,
-                         const std::string& exchange_type = Channel::EXCHANGE_TYPE_DIRECT, 
+                         const std::string& exchange_type = Channel::EXCHANGE_TYPE_DIRECT,
                          bool passive = false,
                          bool durable = false,
                          bool auto_delete = false);
@@ -179,7 +188,7 @@ public:
                       const Table &arguments);
 
     /**
-      * Unbind an existing exchange-exchange binding 
+      * Unbind an existing exchange-exchange binding
       * @see BindExchange
       * @param destination the name of the exchange to route messages to
       * @param source the name of the exchange to route messages from
@@ -216,7 +225,7 @@ public:
     *  exclusive queue is deleted when the connection is closed
 	  * @param auto_delete the queue will be deleted after at least one exchange has been bound to it,
     *  then has been unbound
-	  * @returns the name of the queue created on the broker. Used mostly when the broker is asked to 
+	  * @returns the name of the queue created on the broker. Used mostly when the broker is asked to
 	  *  create a unique queue by not providing a queue name
 	  */
 	std::string DeclareQueue(const std::string& queue_name,
@@ -241,7 +250,7 @@ public:
 	  * @param auto_delete the queue will be deleted after at least one exchange has been bound to it,
     *  then has been unbound
     * @param arguments A table of additional arguments used when declaring a queue
-	  * @returns the name of the queue created on the broker. Used mostly when the broker is asked to 
+	  * @returns the name of the queue created on the broker. Used mostly when the broker is asked to
 	  *  create a unique queue by not providing a queue name
 	  */
 	std::string DeclareQueue(const std::string& queue_name,
@@ -329,6 +338,14 @@ public:
 	  */
 	void BasicAck(const Envelope::ptr_t& message);
 
+    /**
+     * Acknowledges a Basic message
+     * Acknowledges a message delivered using BasicGet or BasicConsume, this overload
+     * doesn't require the Envelope object to Acknowledge
+     * @param delivery_info
+     */
+	void BasicAck(const Envelope::DeliveryInfo &info);
+
 	/**
 	  * Publishes a Basic message
 	  * Publishes a Basic message to an exchange
@@ -340,7 +357,7 @@ public:
 	  * @param immediate requires the message to be both routed to a queue, and immediately delivered via a consumer
     *  if the message is not routed, or a consumer cannot immediately deliver the message a MessageReturnedException is
     *  thrown. Defaults to false
-	  * 
+	  *
 	  */
     void BasicPublish(const std::string& exchange_name,
                       const std::string& routing_key,
@@ -358,7 +375,7 @@ public:
       * @param message a message envelope pointer that will be populated if a message is
       *  delivered
       * @param queue the name of the queue to try to get the message from
-      * @param no_ack if the message does not need to be ack'ed. Default true 
+      * @param no_ack if the message does not need to be ack'ed. Default true
       *  (message does not need to be acked)
       * @returns true if a message was delivered, false if the queue was empty
       */
@@ -421,7 +438,7 @@ public:
             const Table &arguments);
 
   /**
-    * Sets the number of unacknowledged messages that will be delivered 
+    * Sets the number of unacknowledged messages that will be delivered
     * by the broker to a consumer. Note this effectively has no effect
     * for consumer with no_ack set
     * @param consumer_tag the conumser tag to adjust the prefect

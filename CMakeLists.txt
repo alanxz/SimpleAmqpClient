@@ -92,6 +92,7 @@ SET(SAC_LIB_SRCS
 	src/SimpleAmqpClient/AmqpResponseLibraryException.h
 	src/AmqpResponseLibraryException.cpp
 
+  src/SimpleAmqpClient/BadUriException.h
 	src/SimpleAmqpClient/ConnectionClosedException.h
 	src/SimpleAmqpClient/ConsumerTagNotFoundException.h
 

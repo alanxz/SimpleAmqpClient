@@ -26,41 +26,38 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/SimpleAmqpClient.h"
-#include <gtest/gtest.h>
-
 #include "connected_test.h"
+#include <iostream>
 
 using namespace AmqpClient;
 
-TEST(connecting_test, connect_default)
+TEST_F(connected_test, basic_ack_envelope)
 {
-  Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost());
+    const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+    std::string queue = channel->DeclareQueue("");
+    channel->BasicPublish("", queue, message);
+
+    std::string consumer = channel->BasicConsume(queue, "", true, false);
+
+    Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
+
+    channel->BasicAck(env);
 }
 
-TEST(connecting_test, connect_badhost)
+TEST_F(connected_test, basic_ack_deliveryinfo)
 {
-  EXPECT_THROW(Channel::ptr_t channel = Channel::Create("HostDoesntExist"), std::runtime_error);
-}
+    const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+    std::string queue = channel->DeclareQueue("");
+    channel->BasicPublish("", queue, message);
 
-TEST(connecting_test, connect_badauth)
-{
-  EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "baduser", "badpass"), AmqpResponseLibraryException);
-}
+    std::string consumer = channel->BasicConsume(queue, "", true, false);
 
-TEST(connecting_test, connect_badframesize)
-{
-  // AMQP Spec says we have a minimum frame size of 4096
-  EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 400), AmqpResponseLibraryException);
-}
+    Envelope::DeliveryInfo info;
+    {
+        Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
+        info = env->GetDeliveryInfo();
+    }
 
-TEST(connecting_test, connect_badvhost)
-{
-  EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "guest", "guest", "nonexitant_vhost"), AmqpResponseLibraryException);
-}
+    channel->BasicAck(info);
 
-TEST(connecting_test, connect_using_uri)
-{
-    std::string host_uri = "amqp://" + connected_test::GetBrokerHost();
-    Channel::ptr_t channel = Channel::CreateFromUri(host_uri);
 }
