@@ -327,26 +327,31 @@ void Channel::PurgeQueue(const std::string& queue_name)
   amqp_queue_purge_t purge = {};
   purge.queue = amqp_cstring_bytes(queue_name.c_str());
   purge.nowait = false;
-  
+
   m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
   m_impl->MaybeReleaseBuffers();
 }
 
 void Channel::BasicAck(const Envelope::ptr_t& message)
 {
-  m_impl->CheckIsConnected();
-  // Delivery tag is local to the channel, so its important to use
-  // that channel, sadly this can cause the channel to throw an exception
-  // which will show up as an unrelated exception in a different method
-  // that actually waits for a response from the broker
-  amqp_channel_t channel = message->DeliveryChannel();
-  if (!m_impl->IsChannelOpen(channel))
-  {
-    throw std::runtime_error("The channel that the message was delivered on has been closed");
-  }
+    BasicAck(message->GetDeliveryInfo());
+}
 
-	m_impl->CheckForError(amqp_basic_ack(m_impl->m_connection, channel,
-    message->DeliveryTag(), false));
+void Channel::BasicAck(const Envelope::DeliveryInfo& info)
+{
+    m_impl->CheckIsConnected();
+    // Delivery tag is local to the channel, so its important to use
+    // that channel, sadly this can cause the channel to throw an exception
+    // which will show up as an unrelated exception in a different method
+    // that actually waits for a response from the broker
+    amqp_channel_t channel = info.delivery_channel;
+    if (!m_impl->IsChannelOpen(channel))
+    {
+        throw std::runtime_error("The channel that the message was delivered on has been closed");
+    }
+
+    m_impl->CheckForError(amqp_basic_ack(m_impl->m_connection, channel,
+                info.delivery_tag, false));
 }
 
 void Channel::BasicPublish(const std::string& exchange_name,
@@ -377,7 +382,7 @@ void Channel::BasicPublish(const std::string& exchange_name,
 
   if (AMQP_BASIC_RETURN_METHOD == response.payload.method.id)
   {
-    MessageReturnedException message_returned = 
+    MessageReturnedException message_returned =
       m_impl->CreateMessageReturnedException(*(reinterpret_cast<amqp_basic_return_t*>(response.payload.method.decoded)), channel);
 
     const boost::array<boost::uint32_t, 1> BASIC_ACK = { { AMQP_BASIC_ACK_METHOD } };
@@ -399,7 +404,7 @@ bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool
   amqp_basic_get_t get = {};
   get.queue = amqp_cstring_bytes(queue.c_str());
   get.no_ack = no_ack;
-  
+
   amqp_channel_t channel = m_impl->GetChannel();
   amqp_frame_t response = m_impl->DoRpcOnChannel(channel, AMQP_BASIC_GET_METHOD, &get, GET_RESPONSES);
 
@@ -431,7 +436,7 @@ void Channel::BasicRecover(const std::string& consumer)
 
   amqp_basic_recover_t recover = {};
   recover.requeue = true;
-  
+
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer);
 
   m_impl->DoRpcOnChannel(channel, AMQP_BASIC_RECOVER_METHOD, &recover, RECOVER_OK);
@@ -460,7 +465,7 @@ std::string Channel::BasicConsume(const std::string& queue,
 
   // Set this before starting the consume as it may have been set by a previous consumer
   const boost::array<boost::uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
-  
+
   amqp_basic_qos_t qos = {};
   qos.prefetch_size = 0;
   qos.prefetch_count = message_prefetch_count;
@@ -546,8 +551,8 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
 
   const boost::array<boost::uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
 
-  boost::chrono::microseconds real_timeout = (timeout >= 0 ? 
-                                         boost::chrono::milliseconds(timeout) : 
+  boost::chrono::microseconds real_timeout = (timeout >= 0 ?
+                                         boost::chrono::milliseconds(timeout) :
                                          boost::chrono::microseconds::max());
 
   amqp_frame_t deliver;
@@ -564,7 +569,7 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
   const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
   const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
   m_impl->MaybeReleaseBuffers();
-  
+
   BasicMessage::ptr_t content = m_impl->ReadContent(channel);
   m_impl->MaybeReleaseBuffers();
 

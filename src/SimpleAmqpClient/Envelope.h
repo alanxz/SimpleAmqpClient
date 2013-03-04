@@ -56,7 +56,7 @@ public:
 
   /**
     * Creates an new envelope object
-    * @param message the payload 
+    * @param message the payload
     * @param consumer_tag the consumer tag the message was delivered to
     * @param delivery_tag the delivery tag that the broker assigned to the message
     * @param exchange the name of the exchange that the message was published to
@@ -64,7 +64,7 @@ public:
     * @param routing_key the routing key that the message was published with
     * @returns a boost::shared_ptr to an envelope object
     */
-  static ptr_t Create(const BasicMessage::ptr_t message, const std::string& consumer_tag, 
+  static ptr_t Create(const BasicMessage::ptr_t message, const std::string& consumer_tag,
     const boost::uint64_t delivery_tag, const std::string& exchange, bool redelivered, const std::string& routing_key, const boost::uint16_t delivery_channel)
   {   return boost::make_shared<Envelope>(message, consumer_tag, delivery_tag, exchange, redelivered, routing_key, delivery_channel); }
 
@@ -80,7 +80,7 @@ public:
   /**
     * Get the payload of the envelope
     *
-    * @returns the message 
+    * @returns the message
     */
   inline BasicMessage::ptr_t Message() const { return m_message; }
 
@@ -128,6 +128,23 @@ public:
   inline std::string RoutingKey() const { return m_routingKey; }
 
   inline boost::uint16_t DeliveryChannel() const { return m_deliveryChannel; }
+
+
+  struct DeliveryInfo
+  {
+      boost::uint64_t delivery_tag;
+      boost::uint16_t delivery_channel;
+  };
+
+  inline DeliveryInfo GetDeliveryInfo() const
+  {
+      DeliveryInfo info;
+      info.delivery_tag = m_deliveryTag;
+      info.delivery_channel = m_deliveryChannel;
+
+      return info;
+  }
+
 private:
   const BasicMessage::ptr_t m_message;
   const std::string m_consumerTag;
