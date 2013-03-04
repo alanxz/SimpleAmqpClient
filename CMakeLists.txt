@@ -10,9 +10,9 @@ PROJECT(SimpleAmqpClient)
 # 3. If any interfaces have been added since the last public release, then increment age.
 # 4. If any interfaces have been removed since the last public release, then set age to 0.
 
-set(SAC_SOVERSION_CURRENT   3)
-set(SAC_SOVERSION_REVISION  1)
-set(SAC_SOVERSION_AGE       1)
+set(SAC_SOVERSION_CURRENT   4)
+set(SAC_SOVERSION_REVISION  0)
+set(SAC_SOVERSION_AGE       2)
 
 math(EXPR SAC_SOVERSION_MAJOR "${SAC_SOVERSION_CURRENT} - ${SAC_SOVERSION_AGE}")
 math(EXPR SAC_SOVERSION_MINOR "${SAC_SOVERSION_AGE}")
