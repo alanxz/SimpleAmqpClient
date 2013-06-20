@@ -29,6 +29,7 @@
 // Put these first to avoid warnings about INT#_C macro redefinition
 #include <amqp.h>
 #include <amqp_framing.h>
+#include <amqp_ssl_socket.h>
 
 #include "SimpleAmqpClient/Channel.h"
 
@@ -118,6 +119,73 @@ m_impl(new Detail::ChannelImpl)
 
     m_impl->SetIsConnected(true);
 }
+
+Channel::Channel(const std::string& host,
+                 int port,
+                 const std::string& username,
+                 const std::string& password,
+                 const std::string& vhost,
+                 int frame_max,
+                 const std::string& path_to_ca_cert,
+                 const std::string& path_to_client_key,
+                 const std::string& path_to_client_cert) :
+m_impl(new Detail::ChannelImpl)
+{
+    amqp_socket_t* socket = amqp_ssl_socket_new();
+    if (NULL == socket)
+    {
+      throw std::bad_alloc();
+    }
+
+    m_impl->m_connection = amqp_new_connection();
+    if (NULL == m_impl->m_connection)
+    {
+      amqp_socket_close(socket);
+      throw std::bad_alloc();
+    }
+    amqp_set_socket(m_impl->m_connection, socket);
+
+    try
+    {
+      int status = amqp_ssl_socket_set_cacert(socket, path_to_ca_cert.c_str());
+      if (status)
+      {
+        throw std::runtime_error("Error in setting CA certificate for socket");
+      }
+
+      if (path_to_client_key != ""
+          && path_to_client_cert != "")
+      {
+        status = amqp_ssl_socket_set_key(socket,
+                   path_to_client_cert.c_str(),
+                   path_to_client_key.c_str());
+        if (status)
+        {
+          throw std::runtime_error("Error in setting client certificate for socket");
+        }
+      }
+
+      status = amqp_socket_open(socket, host.c_str(), port);
+      if (status)
+      {
+        throw std::runtime_error("Error in opening SSL/TLS connection for socket");
+      }
+
+
+      m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
+            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
+            username.c_str(), password.c_str()));
+    }
+    catch (...)
+    {
+      amqp_destroy_connection(m_impl->m_connection);
+      throw;
+    }
+
+    m_impl->SetIsConnected(true);
+}
+
+
 
 Channel::~Channel()
 {
