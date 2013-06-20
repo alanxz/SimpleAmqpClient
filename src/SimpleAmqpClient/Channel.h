@@ -94,6 +94,47 @@ public:
 		return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
 	}
 
+          /**
+	  * Creates a new channel object
+	  * Creates a new connection to an AMQP broker using the supplied parameters and opens
+	  * a single channel for use
+          * @param path_to_ca_cert Path to ca certificate file
+	  * @param host The hostname or IP address of the AMQP broker
+          * @param path_to_client_key Path to client key file
+          * @param path_to_client_cert Path to client certificate file
+	  * @param port The port to connect to the AMQP broker on
+	  * @param username The username used to authenticate with the AMQP broker
+	  * @param password The password corresponding to the username used to authenticate with the AMQP broker
+	  * @param vhost The virtual host on the AMQP we should connect to
+	  * @param channel_max Request that the server limit the number of channels for
+	  * this connection to the specified parameter, a value of zero will use the broker-supplied value
+	  * @param frame_max Request that the server limit the maximum size of any frame to this value
+          *
+    	  * @return a new Channel object pointer
+	  */
+
+        static ptr_t CreateSecure(const std::string& path_to_ca_cert="",
+                                                const std::string& host = "127.0.0.1",
+                                                const std::string& path_to_client_key="",
+                                                const std::string& path_to_client_cert="",
+						int port = 5671,
+						const std::string& username = "guest",
+						const std::string& password = "guest",
+						const std::string& vhost = "/",
+						int frame_max = 131072)
+	{
+		return boost::make_shared<Channel>(host,
+                                                   port,
+                                                   username,
+                                                   password,
+                                                   vhost,
+                                                   frame_max,
+                                                   path_to_ca_cert,
+                                                   path_to_client_key,
+                                                   path_to_client_cert);
+	}
+
+
   /**
    * Create a new Channel object from an AMQP URI
    *
@@ -109,6 +150,18 @@ public:
 			   const std::string& password,
 			   const std::string& vhost,
 			   int frame_max);
+
+        explicit Channel(const std::string& host,
+			   int port,
+			   const std::string& username,
+			   const std::string& password,
+			   const std::string& vhost,
+			   int frame_max,
+                           const std::string& path_to_ca_cert,
+                           const std::string& path_to_client_key,
+                           const std::string& path_to_client_cert);
+
+
 public:
     virtual ~Channel();
 
