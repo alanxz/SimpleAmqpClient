@@ -1,4 +1,18 @@
-Changes since v2.0-beta
+Changes since v2.1 (v2.2):
+NOTE: this is the last version targeting rabbitmq-c v0.3, newer versions will
+      target rabbitmq-c v0.4
+- Disable building test suite by default (4f6af4e)
+- Default to building Release build when none is specified (c60d0e9)
+- Add -Wall -Wextra to default C++ flags (bf813e5)
+- Improve documentation (f967758, 23151d3)
+- BUG: throw std::bad_alloc when a 0-length table is received (6d17950, d694d4b)
+- Improve Channel::BasicGet documentation (ead3936)
+- Disable tests that exercise the immediate flag in basic.publish (48636b1)
+- Add Channel::BasicAck() overload allowing basic.ack without keeping the whole Envelope obj (0dea3b8, fcd094a)
+- Add method to create Channel from an AMQP URI (c8cae56, 8dd62b5)
+- Updated examples (fcc1176, a9d4eec, 03bb42d)
+
+Changes since v2.0-beta (v2.1)
  - Add wrapping of amqp_table_t for passing table arguments to various
    AMQP RPC methods (bae7b97)
  - Fix for bug in BasicConsumeMessage default timeout (6412fcf3)
