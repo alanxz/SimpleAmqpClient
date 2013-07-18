@@ -29,6 +29,7 @@
 // Put these first to avoid warnings about INT#_C macro redefinition
 #include <amqp.h>
 #include <amqp_framing.h>
+#include <amqp_tcp_socket.h>
 #include <amqp_ssl_socket.h>
 
 #include "SimpleAmqpClient/Channel.h"
@@ -102,10 +103,9 @@ m_impl(new Detail::ChannelImpl)
 
     try
     {
-      int sock = amqp_open_socket(host.c_str(), port);
+      amqp_socket_t *socket = amqp_tcp_socket_new(m_impl->m_connection);
+      int sock = amqp_socket_open(socket, host.c_str(), port);
       m_impl->CheckForError(sock);
-
-      amqp_set_sockfd(m_impl->m_connection, sock);
 
       m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
             frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
@@ -131,19 +131,17 @@ Channel::Channel(const std::string& host,
                  const std::string& path_to_client_cert) :
 m_impl(new Detail::ChannelImpl)
 {
-    amqp_socket_t* socket = amqp_ssl_socket_new();
-    if (NULL == socket)
+    m_impl->m_connection = amqp_new_connection();
+    if (NULL == m_impl->m_connection)
     {
       throw std::bad_alloc();
     }
 
-    m_impl->m_connection = amqp_new_connection();
-    if (NULL == m_impl->m_connection)
+    amqp_socket_t* socket = amqp_ssl_socket_new(m_impl->m_connection);
+    if (NULL == socket)
     {
-      amqp_socket_close(socket);
       throw std::bad_alloc();
     }
-    amqp_set_socket(m_impl->m_connection, socket);
 
     try
     {
