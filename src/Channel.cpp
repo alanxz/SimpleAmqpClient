@@ -131,19 +131,18 @@ Channel::Channel(const std::string& host,
                  const std::string& path_to_client_cert) :
 m_impl(new Detail::ChannelImpl)
 {
-    amqp_socket_t* socket = amqp_ssl_socket_new();
-    if (NULL == socket)
-    {
-      throw std::bad_alloc();
-    }
-
     m_impl->m_connection = amqp_new_connection();
     if (NULL == m_impl->m_connection)
     {
       amqp_socket_close(socket);
       throw std::bad_alloc();
     }
-    amqp_set_socket(m_impl->m_connection, socket);
+
+    amqp_socket_t* socket = amqp_ssl_socket_new(m_impl->m_connection);
+    if (NULL == socket)
+    {
+      throw std::bad_alloc();
+    }
 
     try
     {
