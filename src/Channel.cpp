@@ -134,7 +134,6 @@ m_impl(new Detail::ChannelImpl)
     m_impl->m_connection = amqp_new_connection();
     if (NULL == m_impl->m_connection)
     {
-      amqp_socket_close(socket);
       throw std::bad_alloc();
     }
 
