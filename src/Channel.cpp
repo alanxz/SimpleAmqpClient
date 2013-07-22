@@ -29,6 +29,7 @@
 // Put these first to avoid warnings about INT#_C macro redefinition
 #include <amqp.h>
 #include <amqp_framing.h>
+#include <amqp_tcp_socket.h>
 #include <amqp_ssl_socket.h>
 
 #include "SimpleAmqpClient/Channel.h"
@@ -102,10 +103,9 @@ m_impl(new Detail::ChannelImpl)
 
     try
     {
-      int sock = amqp_open_socket(host.c_str(), port);
+      amqp_socket_t *socket = amqp_tcp_socket_new(m_impl->m_connection);
+      int sock = amqp_socket_open(socket, host.c_str(), port);
       m_impl->CheckForError(sock);
-
-      amqp_set_sockfd(m_impl->m_connection, sock);
 
       m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
             frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
