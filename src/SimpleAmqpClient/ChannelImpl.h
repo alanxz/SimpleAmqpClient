@@ -180,7 +180,8 @@ public:
   void SetIsConnected(bool state) { m_is_connected = state; }
 
   amqp_connection_state_t m_connection;
-
+  int m_pipe[2];
+  
 private:
   std::map<std::string, amqp_channel_t> m_consumer_channel_map;
   channel_map_t m_open_channels;

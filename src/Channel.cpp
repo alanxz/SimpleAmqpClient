@@ -668,4 +668,14 @@ bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr
   return true;
 }
 
+void Channel::CancelConsume()
+{
+  // a single byte to send over pipe
+  char buf[1];
+  buf[0]=0;
+ 
+  // write to pipe to cancel basic message consume call
+  write(m_impl->m_pipe[1], buf, 1);
+}
+   
 } // namespace AmqpClient

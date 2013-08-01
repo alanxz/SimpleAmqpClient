@@ -65,6 +65,9 @@ ChannelImpl::ChannelImpl() :
 {
   // Channel 0 is always open
   m_open_channels.insert(std::make_pair(0, frame_queue_t()));
+  
+  // create a pipe for cancelling BasicConsumeMessage call
+  pipe(m_pipe);
 }
 
 ChannelImpl::~ChannelImpl()
@@ -319,14 +322,25 @@ start:
 
     fd_set fds;
     FD_ZERO(&fds);
+    FD_SET(static_cast<unsigned int>(m_pipe[0]), &fds);
     FD_SET(static_cast<unsigned int>(socketno), &fds);
-
-    int select_return = select(socketno + 1, &fds, NULL, &fds, &tv_timeout);
-
+ 
+    int max_fd = m_pipe[0] > socketno ? m_pipe[0] : socketno ; // get the bigger fd
+ 
+    int select_return = select(max_fd + 1, &fds, NULL, &fds, &tv_timeout);
+ 
     if (select_return == 0) // If it times out, return
     {
       return false;
     }
+    else if (select_return == 1 || FD_ISSET(m_pipe[0], &fds)) // If CancelConsume was called
+    {
+      // clear the pipe and timeout immediately
+      char buf[1];
+      read(m_pipe[0], buf, 1);
+      return false;
+    }
+    else
     else if (select_return == -1)
     {
       // If its an interupted system call just try again
