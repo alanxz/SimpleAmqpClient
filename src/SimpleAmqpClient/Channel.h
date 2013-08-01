@@ -529,6 +529,13 @@ public:
 	  */
 	bool BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& envelope, int timeout = -1);
 
+    /**
+      *  Cancel a running consume call
+      *  If you've called BasicConsumeMessage that is now blocking, this method
+      *  can be called from a different thread to wakeup the consume call.
+      */
+    void CancelConsume();
+
 protected:
     boost::scoped_ptr<Detail::ChannelImpl> m_impl;
 };
