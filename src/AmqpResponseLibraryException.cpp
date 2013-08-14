@@ -37,13 +37,9 @@ namespace AmqpClient {
 
 AmqpResponseLibraryException AmqpResponseLibraryException::CreateException(const amqp_rpc_reply_t_& reply, const std::string& context)
 {
-  char* error_string = amqp_error_string(reply.library_error);
-
   std::string message(context);
   message.append(": ");
-  message.append(error_string);
-
-  free(error_string);
+  message.append(amqp_error_string2(reply.library_error));
 
   return AmqpResponseLibraryException(message);
 }

@@ -182,9 +182,7 @@ void ChannelImpl::CheckForError(int ret)
 {
   if (ret < 0)
   {
-    char* errstr = amqp_error_string(-ret);
-    std::runtime_error error(errstr);
-    free(errstr);
+    std::runtime_error error(amqp_error_string2(ret));
     throw error;
   }
 }
