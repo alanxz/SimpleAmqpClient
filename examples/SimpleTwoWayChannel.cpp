@@ -31,61 +31,62 @@
 #include "SimpleAmqpClient/BasicMessage.h"
 
 
-namespace AmqpClient {
+namespace AmqpClient
+{
 
 const std::string SimpleTwoWayChannel::ROUTING_KEY = "";
 
-SimpleTwoWayChannel::SimpleTwoWayChannel(Channel::ptr_t channel, const std::string& incoming_name, 
-			const std::string& outgoing_name) :
-	m_channel(channel), m_incoming_tag(incoming_name), m_outgoing_tag(outgoing_name)
+SimpleTwoWayChannel::SimpleTwoWayChannel(Channel::ptr_t channel, const std::string &incoming_name,
+        const std::string &outgoing_name) :
+    m_channel(channel), m_incoming_tag(incoming_name), m_outgoing_tag(outgoing_name)
 {
-	// Receiver:
-	m_channel->DeclareExchange(m_incoming_tag, "fanout");
-	// Have the broker create a queue name for us
-	std::string queue_name = m_channel->DeclareQueue("");
-	m_channel->BindQueue(queue_name, m_incoming_tag);
-	m_channel->BasicConsume(queue_name, m_incoming_tag);
+    // Receiver:
+    m_channel->DeclareExchange(m_incoming_tag, "fanout");
+    // Have the broker create a queue name for us
+    std::string queue_name = m_channel->DeclareQueue("");
+    m_channel->BindQueue(queue_name, m_incoming_tag);
+    m_channel->BasicConsume(queue_name, m_incoming_tag);
 
-	// Sender
+    // Sender
 }
 
-SimpleTwoWayChannel::~SimpleTwoWayChannel() 
+SimpleTwoWayChannel::~SimpleTwoWayChannel()
 {
 }
 
-void SimpleTwoWayChannel::Send(const std::string& message)
+void SimpleTwoWayChannel::Send(const std::string &message)
 {
-	BasicMessage::ptr_t full_message = BasicMessage::Create();
-	full_message->Body(message);
-	Send(full_message);
+    BasicMessage::ptr_t full_message = BasicMessage::Create();
+    full_message->Body(message);
+    Send(full_message);
 }
 
 void SimpleTwoWayChannel::Send(BasicMessage::ptr_t message)
 {
-	m_channel->BasicPublish(m_outgoing_tag, ROUTING_KEY, message);
+    m_channel->BasicPublish(m_outgoing_tag, ROUTING_KEY, message);
 }
 
 std::string SimpleTwoWayChannel::Receive()
 {
-	BasicMessage::ptr_t message = ReceiveMessage();
-	return message->Body();
+    BasicMessage::ptr_t message = ReceiveMessage();
+    return message->Body();
 }
 
 BasicMessage::ptr_t SimpleTwoWayChannel::ReceiveMessage()
 {
-	return m_channel->BasicConsumeMessage();
+    return m_channel->BasicConsumeMessage();
 }
 
-std::string SimpleTwoWayChannel::SendAndReceive(const std::string& message)
+std::string SimpleTwoWayChannel::SendAndReceive(const std::string &message)
 {
-	Send(message);
-	return Receive();
+    Send(message);
+    return Receive();
 }
 
 BasicMessage::ptr_t SimpleTwoWayChannel::SendAndReceive(BasicMessage::ptr_t message)
 {
-	Send(message);
-	return ReceiveMessage();
+    Send(message);
+    return ReceiveMessage();
 }
 
 } // namespace AmqpClient

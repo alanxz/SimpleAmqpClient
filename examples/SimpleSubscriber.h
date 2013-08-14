@@ -49,27 +49,29 @@ namespace AmqpClient
 class SIMPLEAMQPCLIENT_EXPORT SimpleSubscriber
 {
 public:
-	typedef boost::shared_ptr<SimpleSubscriber> ptr_t;
+    typedef boost::shared_ptr<SimpleSubscriber> ptr_t;
 
-	friend ptr_t
-		boost::make_shared<SimpleSubscriber>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
+    friend ptr_t
+    boost::make_shared<SimpleSubscriber>(AmqpClient::Channel::ptr_t const &a1, std::string const &a2);
 
-	static ptr_t Create(AmqpClient::Channel::ptr_t channel, const std::string& publisher_channel)
-	{ return boost::make_shared<SimpleSubscriber>(channel, publisher_channel); }
+    static ptr_t Create(AmqpClient::Channel::ptr_t channel, const std::string &publisher_channel)
+    {
+        return boost::make_shared<SimpleSubscriber>(channel, publisher_channel);
+    }
 
 
 private:
-	SimpleSubscriber(Channel::ptr_t channel, const std::string &publisher_channel);
+    SimpleSubscriber(Channel::ptr_t channel, const std::string &publisher_channel);
 
 public:
-	virtual ~SimpleSubscriber();
+    virtual ~SimpleSubscriber();
 
-	std::string WaitForMessageString();
-	BasicMessage::ptr_t WaitForMessage();
+    std::string WaitForMessageString();
+    BasicMessage::ptr_t WaitForMessage();
 
 private:
-	Channel::ptr_t m_channel;
-	std::string m_consumerQueue;
+    Channel::ptr_t m_channel;
+    std::string m_consumerQueue;
 
 };
 

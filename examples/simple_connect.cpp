@@ -35,27 +35,27 @@
 using namespace AmqpClient;
 int main()
 {
-    char* szBroker = getenv("AMQP_BROKER");
+    char *szBroker = getenv("AMQP_BROKER");
     Channel::ptr_t channel;
     if (szBroker != NULL)
         channel = Channel::Create(szBroker);
     else
         channel = Channel::Create();
 
-	channel->DeclareQueue("alanqueue");
-	channel->BindQueue("alanqueue", "amq.direct", "alankey");
+    channel->DeclareQueue("alanqueue");
+    channel->BindQueue("alanqueue", "amq.direct", "alankey");
 
-	BasicMessage::ptr_t msg_in = BasicMessage::Create();
+    BasicMessage::ptr_t msg_in = BasicMessage::Create();
 
-	msg_in->Body("This is a small message.");
+    msg_in->Body("This is a small message.");
 
-	channel->BasicPublish("amq.direct", "alankey", msg_in);
+    channel->BasicPublish("amq.direct", "alankey", msg_in);
 
-	channel->BasicConsume("alanqueue", "consumertag");
+    channel->BasicConsume("alanqueue", "consumertag");
 
-	BasicMessage::ptr_t msg_out = channel->BasicConsumeMessage("consumertag")->Message();
+    BasicMessage::ptr_t msg_out = channel->BasicConsumeMessage("consumertag")->Message();
 
-	std::cout << "Message text: " << msg_out->Body() << std::endl;
+    std::cout << "Message text: " << msg_out->Body() << std::endl;
 
 }
 

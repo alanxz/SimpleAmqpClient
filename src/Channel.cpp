@@ -61,7 +61,8 @@
 
 #define BROKER_HEARTBEAT 0
 
-namespace AmqpClient {
+namespace AmqpClient
+{
 
 const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
@@ -69,116 +70,116 @@ const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
 Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max)
 {
-  amqp_connection_info info;
-  amqp_default_connection_info(&info);
+    amqp_connection_info info;
+    amqp_default_connection_info(&info);
 
-  boost::shared_ptr<char> uri_dup = boost::shared_ptr<char>(strdup(uri.c_str()), free);
+    boost::shared_ptr<char> uri_dup = boost::shared_ptr<char>(strdup(uri.c_str()), free);
 
-  if (0 != amqp_parse_url(uri_dup.get(), &info))
-  {
-    throw BadUriException();
-  }
+    if (0 != amqp_parse_url(uri_dup.get(), &info))
+    {
+        throw BadUriException();
+    }
 
-  return Create(std::string(info.host),
-                info.port,
-                std::string(info.user),
-                std::string(info.password),
-                std::string(info.vhost),
-                frame_max);
+    return Create(std::string(info.host),
+                  info.port,
+                  std::string(info.user),
+                  std::string(info.password),
+                  std::string(info.vhost),
+                  frame_max);
 }
 
-Channel::Channel(const std::string& host,
+Channel::Channel(const std::string &host,
                  int port,
-                 const std::string& username,
-                 const std::string& password,
-                 const std::string& vhost,
+                 const std::string &username,
+                 const std::string &password,
+                 const std::string &vhost,
                  int frame_max) :
-m_impl(new Detail::ChannelImpl)
+    m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
 
     if (NULL == m_impl->m_connection)
     {
-      throw std::bad_alloc();
+        throw std::bad_alloc();
     }
 
     try
     {
-      amqp_socket_t *socket = amqp_tcp_socket_new(m_impl->m_connection);
-      int sock = amqp_socket_open(socket, host.c_str(), port);
-      m_impl->CheckForError(sock);
+        amqp_socket_t *socket = amqp_tcp_socket_new(m_impl->m_connection);
+        int sock = amqp_socket_open(socket, host.c_str(), port);
+        m_impl->CheckForError(sock);
 
-      m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
-            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-            username.c_str(), password.c_str()));
+        m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
+                                            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
+                                            username.c_str(), password.c_str()));
     }
     catch (...)
     {
-      amqp_destroy_connection(m_impl->m_connection);
-      throw;
+        amqp_destroy_connection(m_impl->m_connection);
+        throw;
     }
 
     m_impl->SetIsConnected(true);
 }
 
-Channel::Channel(const std::string& host,
+Channel::Channel(const std::string &host,
                  int port,
-                 const std::string& username,
-                 const std::string& password,
-                 const std::string& vhost,
+                 const std::string &username,
+                 const std::string &password,
+                 const std::string &vhost,
                  int frame_max,
-                 const std::string& path_to_ca_cert,
-                 const std::string& path_to_client_key,
-                 const std::string& path_to_client_cert) :
-m_impl(new Detail::ChannelImpl)
+                 const std::string &path_to_ca_cert,
+                 const std::string &path_to_client_key,
+                 const std::string &path_to_client_cert) :
+    m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
     if (NULL == m_impl->m_connection)
     {
-      throw std::bad_alloc();
+        throw std::bad_alloc();
     }
 
-    amqp_socket_t* socket = amqp_ssl_socket_new(m_impl->m_connection);
+    amqp_socket_t *socket = amqp_ssl_socket_new(m_impl->m_connection);
     if (NULL == socket)
     {
-      throw std::bad_alloc();
+        throw std::bad_alloc();
     }
 
     try
     {
-      int status = amqp_ssl_socket_set_cacert(socket, path_to_ca_cert.c_str());
-      if (status)
-      {
-        throw std::runtime_error("Error in setting CA certificate for socket");
-      }
-
-      if (path_to_client_key != ""
-          && path_to_client_cert != "")
-      {
-        status = amqp_ssl_socket_set_key(socket,
-                   path_to_client_cert.c_str(),
-                   path_to_client_key.c_str());
+        int status = amqp_ssl_socket_set_cacert(socket, path_to_ca_cert.c_str());
         if (status)
         {
-          throw std::runtime_error("Error in setting client certificate for socket");
+            throw std::runtime_error("Error in setting CA certificate for socket");
         }
-      }
 
-      status = amqp_socket_open(socket, host.c_str(), port);
-      if (status)
-      {
-        throw std::runtime_error("Error in opening SSL/TLS connection for socket");
-      }
+        if (path_to_client_key != ""
+                && path_to_client_cert != "")
+        {
+            status = amqp_ssl_socket_set_key(socket,
+                                             path_to_client_cert.c_str(),
+                                             path_to_client_key.c_str());
+            if (status)
+            {
+                throw std::runtime_error("Error in setting client certificate for socket");
+            }
+        }
+
+        status = amqp_socket_open(socket, host.c_str(), port);
+        if (status)
+        {
+            throw std::runtime_error("Error in opening SSL/TLS connection for socket");
+        }
 
 
-      m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
-            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-            username.c_str(), password.c_str()));
+        m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
+                                            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
+                                            username.c_str(), password.c_str()));
     }
     catch (...)
     {
-      amqp_destroy_connection(m_impl->m_connection);
-      throw;
+        amqp_destroy_connection(m_impl->m_connection);
+        throw;
     }
 
     m_impl->SetIsConnected(true);
@@ -192,242 +193,242 @@ Channel::~Channel()
     amqp_destroy_connection(m_impl->m_connection);
 }
 
-void Channel::DeclareExchange(const std::string& exchange_name,
-                              const std::string& exchange_type,
+void Channel::DeclareExchange(const std::string &exchange_name,
+                              const std::string &exchange_type,
                               bool passive,
                               bool durable,
                               bool auto_delete)
 {
-  DeclareExchange(exchange_name, exchange_type, passive, durable, auto_delete, Table());
+    DeclareExchange(exchange_name, exchange_type, passive, durable, auto_delete, Table());
 }
 
-void Channel::DeclareExchange(const std::string& exchange_name,
-                              const std::string& exchange_type,
+void Channel::DeclareExchange(const std::string &exchange_name,
+                              const std::string &exchange_type,
                               bool passive,
                               bool durable,
                               bool auto_delete,
                               const Table &arguments)
 {
-  const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_EXCHANGE_DECLARE_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_EXCHANGE_DECLARE_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_exchange_declare_t declare = {};
-  declare.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  declare.type = amqp_cstring_bytes(exchange_type.c_str());
-  declare.passive = passive;
-  declare.durable = durable;
-  declare.auto_delete = auto_delete;
-  declare.internal = false;
-  declare.nowait = false;
+    amqp_exchange_declare_t declare = {};
+    declare.exchange = amqp_cstring_bytes(exchange_name.c_str());
+    declare.type = amqp_cstring_bytes(exchange_type.c_str());
+    declare.passive = passive;
+    declare.durable = durable;
+    declare.auto_delete = auto_delete;
+    declare.internal = false;
+    declare.nowait = false;
 
-  Detail::amqp_pool_ptr_t table_pool;
-  declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    Detail::amqp_pool_ptr_t table_pool;
+    declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-  m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-void Channel::DeleteExchange(const std::string& exchange_name,
+void Channel::DeleteExchange(const std::string &exchange_name,
                              bool if_unused)
 {
-  const boost::array<boost::uint32_t, 1> DELETE_OK = { { AMQP_EXCHANGE_DELETE_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> DELETE_OK = { { AMQP_EXCHANGE_DELETE_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_exchange_delete_t del = {};
-  del.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  del.if_unused = if_unused;
-  del.nowait = false;
+    amqp_exchange_delete_t del = {};
+    del.exchange = amqp_cstring_bytes(exchange_name.c_str());
+    del.if_unused = if_unused;
+    del.nowait = false;
 
-  m_impl->DoRpc(AMQP_EXCHANGE_DELETE_METHOD, &del, DELETE_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_EXCHANGE_DELETE_METHOD, &del, DELETE_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-void Channel::BindExchange(const std::string& destination,
-                           const std::string& source,
-                           const std::string& routing_key)
+void Channel::BindExchange(const std::string &destination,
+                           const std::string &source,
+                           const std::string &routing_key)
 {
-  BindExchange(destination, source, routing_key, Table());
+    BindExchange(destination, source, routing_key, Table());
 }
 
-void Channel::BindExchange(const std::string& destination,
-                           const std::string& source,
-                           const std::string& routing_key,
+void Channel::BindExchange(const std::string &destination,
+                           const std::string &source,
+                           const std::string &routing_key,
                            const Table &arguments)
 {
-  const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_EXCHANGE_BIND_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_EXCHANGE_BIND_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_exchange_bind_t bind = {};
-  bind.destination = amqp_cstring_bytes(destination.c_str());
-  bind.source = amqp_cstring_bytes(source.c_str());
-  bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
-  bind.nowait = false;
+    amqp_exchange_bind_t bind = {};
+    bind.destination = amqp_cstring_bytes(destination.c_str());
+    bind.source = amqp_cstring_bytes(source.c_str());
+    bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+    bind.nowait = false;
 
-  Detail::amqp_pool_ptr_t table_pool;
-  bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    Detail::amqp_pool_ptr_t table_pool;
+    bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-  m_impl->DoRpc(AMQP_EXCHANGE_BIND_METHOD, &bind, BIND_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_EXCHANGE_BIND_METHOD, &bind, BIND_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-void Channel::UnbindExchange(const std::string& destination,
-                             const std::string& source,
-                             const std::string& routing_key)
+void Channel::UnbindExchange(const std::string &destination,
+                             const std::string &source,
+                             const std::string &routing_key)
 {
-  UnbindExchange(destination, source, routing_key, Table());
+    UnbindExchange(destination, source, routing_key, Table());
 }
 
-void Channel::UnbindExchange(const std::string& destination,
-                             const std::string& source,
-                             const std::string& routing_key,
+void Channel::UnbindExchange(const std::string &destination,
+                             const std::string &source,
+                             const std::string &routing_key,
                              const Table &arguments)
 {
-  const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_EXCHANGE_UNBIND_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_EXCHANGE_UNBIND_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_exchange_unbind_t unbind = {};
-  unbind.destination = amqp_cstring_bytes(destination.c_str());
-  unbind.source = amqp_cstring_bytes(source.c_str());
-  unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
-  unbind.nowait = false;
+    amqp_exchange_unbind_t unbind = {};
+    unbind.destination = amqp_cstring_bytes(destination.c_str());
+    unbind.source = amqp_cstring_bytes(source.c_str());
+    unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+    unbind.nowait = false;
 
-  Detail::amqp_pool_ptr_t table_pool;
-  unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    Detail::amqp_pool_ptr_t table_pool;
+    unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-  m_impl->DoRpc(AMQP_EXCHANGE_UNBIND_METHOD, &unbind, UNBIND_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_EXCHANGE_UNBIND_METHOD, &unbind, UNBIND_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-std::string Channel::DeclareQueue(const std::string& queue_name,
+std::string Channel::DeclareQueue(const std::string &queue_name,
                                   bool passive,
                                   bool durable,
                                   bool exclusive,
                                   bool auto_delete)
 {
-  return DeclareQueue(queue_name, passive, durable, exclusive, auto_delete, Table());
+    return DeclareQueue(queue_name, passive, durable, exclusive, auto_delete, Table());
 }
 
-std::string Channel::DeclareQueue(const std::string& queue_name,
+std::string Channel::DeclareQueue(const std::string &queue_name,
                                   bool passive,
                                   bool durable,
                                   bool exclusive,
                                   bool auto_delete,
                                   const Table &arguments)
 {
-  const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_queue_declare_t declare = {};
-  declare.queue = amqp_cstring_bytes(queue_name.c_str());
-  declare.passive = passive;
-  declare.durable = durable;
-  declare.exclusive = exclusive;
-  declare.auto_delete = auto_delete;
-  declare.nowait = false;
+    amqp_queue_declare_t declare = {};
+    declare.queue = amqp_cstring_bytes(queue_name.c_str());
+    declare.passive = passive;
+    declare.durable = durable;
+    declare.exclusive = exclusive;
+    declare.auto_delete = auto_delete;
+    declare.nowait = false;
 
-  Detail::amqp_pool_ptr_t table_pool;
-  declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    Detail::amqp_pool_ptr_t table_pool;
+    declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-  amqp_frame_t response = m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
+    amqp_frame_t response = m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
 
-  amqp_queue_declare_ok_t* declare_ok = (amqp_queue_declare_ok_t*)response.payload.method.decoded;
+    amqp_queue_declare_ok_t *declare_ok = (amqp_queue_declare_ok_t *)response.payload.method.decoded;
 
-  std::string ret((char*)declare_ok->queue.bytes, declare_ok->queue.len);
-  m_impl->MaybeReleaseBuffers();
-  return ret;
+    std::string ret((char *)declare_ok->queue.bytes, declare_ok->queue.len);
+    m_impl->MaybeReleaseBuffers();
+    return ret;
 }
 
-void Channel::DeleteQueue(const std::string& queue_name,
+void Channel::DeleteQueue(const std::string &queue_name,
                           bool if_unused,
                           bool if_empty)
 {
-  const boost::array<boost::uint32_t, 1> DELETE_OK = { { AMQP_QUEUE_DELETE_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> DELETE_OK = { { AMQP_QUEUE_DELETE_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_queue_delete_t del = {};
-  del.queue = amqp_cstring_bytes(queue_name.c_str());
-  del.if_unused = if_unused;
-  del.if_empty = if_empty;
-  del.nowait = false;
+    amqp_queue_delete_t del = {};
+    del.queue = amqp_cstring_bytes(queue_name.c_str());
+    del.if_unused = if_unused;
+    del.if_empty = if_empty;
+    del.nowait = false;
 
-  m_impl->DoRpc(AMQP_QUEUE_DELETE_METHOD, &del, DELETE_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_QUEUE_DELETE_METHOD, &del, DELETE_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-void Channel::BindQueue(const std::string& queue_name,
-                        const std::string& exchange_name,
-                        const std::string& routing_key)
+void Channel::BindQueue(const std::string &queue_name,
+                        const std::string &exchange_name,
+                        const std::string &routing_key)
 {
-  BindQueue(queue_name, exchange_name, routing_key, Table());
+    BindQueue(queue_name, exchange_name, routing_key, Table());
 }
 
-void Channel::BindQueue(const std::string& queue_name,
-                        const std::string& exchange_name,
-                        const std::string& routing_key,
+void Channel::BindQueue(const std::string &queue_name,
+                        const std::string &exchange_name,
+                        const std::string &routing_key,
                         const Table &arguments)
 {
-  const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_QUEUE_BIND_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> BIND_OK = { { AMQP_QUEUE_BIND_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_queue_bind_t bind = {};
-  bind.queue = amqp_cstring_bytes(queue_name.c_str());
-  bind.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
-  bind.nowait = false;
+    amqp_queue_bind_t bind = {};
+    bind.queue = amqp_cstring_bytes(queue_name.c_str());
+    bind.exchange = amqp_cstring_bytes(exchange_name.c_str());
+    bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+    bind.nowait = false;
 
-  Detail::amqp_pool_ptr_t table_pool;
-  bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    Detail::amqp_pool_ptr_t table_pool;
+    bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-  m_impl->DoRpc(AMQP_QUEUE_BIND_METHOD, &bind, BIND_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_QUEUE_BIND_METHOD, &bind, BIND_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-void Channel::UnbindQueue(const std::string& queue_name,
-                          const std::string& exchange_name,
-                          const std::string& routing_key)
+void Channel::UnbindQueue(const std::string &queue_name,
+                          const std::string &exchange_name,
+                          const std::string &routing_key)
 {
-  UnbindQueue(queue_name, exchange_name, routing_key, Table());
+    UnbindQueue(queue_name, exchange_name, routing_key, Table());
 }
 
-void Channel::UnbindQueue(const std::string& queue_name,
-                          const std::string& exchange_name,
-                          const std::string& routing_key,
+void Channel::UnbindQueue(const std::string &queue_name,
+                          const std::string &exchange_name,
+                          const std::string &routing_key,
                           const Table &arguments)
 {
-  const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_QUEUE_UNBIND_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> UNBIND_OK = { { AMQP_QUEUE_UNBIND_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_queue_unbind_t unbind = {};
-  unbind.queue = amqp_cstring_bytes(queue_name.c_str());
-  unbind.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+    amqp_queue_unbind_t unbind = {};
+    unbind.queue = amqp_cstring_bytes(queue_name.c_str());
+    unbind.exchange = amqp_cstring_bytes(exchange_name.c_str());
+    unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
 
-  Detail::amqp_pool_ptr_t table_pool;
-  unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    Detail::amqp_pool_ptr_t table_pool;
+    unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-  m_impl->DoRpc(AMQP_QUEUE_UNBIND_METHOD, &unbind, UNBIND_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_QUEUE_UNBIND_METHOD, &unbind, UNBIND_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-void Channel::PurgeQueue(const std::string& queue_name)
+void Channel::PurgeQueue(const std::string &queue_name)
 {
-  const boost::array<boost::uint32_t, 1> PURGE_OK = { { AMQP_QUEUE_PURGE_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> PURGE_OK = { { AMQP_QUEUE_PURGE_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_queue_purge_t purge = {};
-  purge.queue = amqp_cstring_bytes(queue_name.c_str());
-  purge.nowait = false;
+    amqp_queue_purge_t purge = {};
+    purge.queue = amqp_cstring_bytes(queue_name.c_str());
+    purge.nowait = false;
 
-  m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-void Channel::BasicAck(const Envelope::ptr_t& message)
+void Channel::BasicAck(const Envelope::ptr_t &message)
 {
     BasicAck(message->GetDeliveryInfo());
 }
 
-void Channel::BasicAck(const Envelope::DeliveryInfo& info)
+void Channel::BasicAck(const Envelope::DeliveryInfo &info)
 {
     m_impl->CheckIsConnected();
     // Delivery tag is local to the channel, so its important to use
@@ -441,230 +442,230 @@ void Channel::BasicAck(const Envelope::DeliveryInfo& info)
     }
 
     m_impl->CheckForError(amqp_basic_ack(m_impl->m_connection, channel,
-                info.delivery_tag, false));
+                                         info.delivery_tag, false));
 }
 
-void Channel::BasicPublish(const std::string& exchange_name,
-                           const std::string& routing_key,
+void Channel::BasicPublish(const std::string &exchange_name,
+                           const std::string &routing_key,
                            const BasicMessage::ptr_t message,
                            bool mandatory,
                            bool immediate)
 {
-  m_impl->CheckIsConnected();
-  amqp_channel_t channel = m_impl->GetChannel();
+    m_impl->CheckIsConnected();
+    amqp_channel_t channel = m_impl->GetChannel();
 
-  m_impl->CheckForError(amqp_basic_publish(m_impl->m_connection, channel,
-                       amqp_cstring_bytes(exchange_name.c_str()),
-                       amqp_cstring_bytes(routing_key.c_str()),
-                       mandatory,
-                       immediate,
-                       message->getAmqpProperties(),
-                       message->getAmqpBody()));
+    m_impl->CheckForError(amqp_basic_publish(m_impl->m_connection, channel,
+                          amqp_cstring_bytes(exchange_name.c_str()),
+                          amqp_cstring_bytes(routing_key.c_str()),
+                          mandatory,
+                          immediate,
+                          message->getAmqpProperties(),
+                          message->getAmqpBody()));
 
-  // If we've done things correctly we can get one of 4 things back from the broker
-  // - basic.ack - our channel is in confirm mode, messsage was 'dealt with' by the broker
-  // - basic.return then basic.ack - the message wasn't delievered, but was dealt with
-  // - channel.close - probably tried to publish to a non-existant exchange, in any case error!
-  // - connection.clsoe - something really bad happened
-  const boost::array<boost::uint32_t, 2> PUBLISH_ACK = { { AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD } };
-  amqp_frame_t response;
-  m_impl->GetMethodOnChannel(channel, response, PUBLISH_ACK);
+    // If we've done things correctly we can get one of 4 things back from the broker
+    // - basic.ack - our channel is in confirm mode, messsage was 'dealt with' by the broker
+    // - basic.return then basic.ack - the message wasn't delievered, but was dealt with
+    // - channel.close - probably tried to publish to a non-existant exchange, in any case error!
+    // - connection.clsoe - something really bad happened
+    const boost::array<boost::uint32_t, 2> PUBLISH_ACK = { { AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD } };
+    amqp_frame_t response;
+    m_impl->GetMethodOnChannel(channel, response, PUBLISH_ACK);
 
-  if (AMQP_BASIC_RETURN_METHOD == response.payload.method.id)
-  {
-    MessageReturnedException message_returned =
-      m_impl->CreateMessageReturnedException(*(reinterpret_cast<amqp_basic_return_t*>(response.payload.method.decoded)), channel);
+    if (AMQP_BASIC_RETURN_METHOD == response.payload.method.id)
+    {
+        MessageReturnedException message_returned =
+            m_impl->CreateMessageReturnedException(*(reinterpret_cast<amqp_basic_return_t *>(response.payload.method.decoded)), channel);
 
-    const boost::array<boost::uint32_t, 1> BASIC_ACK = { { AMQP_BASIC_ACK_METHOD } };
-    m_impl->GetMethodOnChannel(channel, response, BASIC_ACK);
+        const boost::array<boost::uint32_t, 1> BASIC_ACK = { { AMQP_BASIC_ACK_METHOD } };
+        m_impl->GetMethodOnChannel(channel, response, BASIC_ACK);
+        m_impl->ReturnChannel(channel);
+        m_impl->MaybeReleaseBuffers();
+        throw message_returned;
+    }
+
     m_impl->ReturnChannel(channel);
     m_impl->MaybeReleaseBuffers();
-    throw message_returned;
-  }
-
-  m_impl->ReturnChannel(channel);
-  m_impl->MaybeReleaseBuffers();
 }
 
-bool Channel::BasicGet(Envelope::ptr_t& envelope, const std::string& queue, bool no_ack)
+bool Channel::BasicGet(Envelope::ptr_t &envelope, const std::string &queue, bool no_ack)
 {
-  const boost::array<boost::uint32_t, 2> GET_RESPONSES = { { AMQP_BASIC_GET_OK_METHOD, AMQP_BASIC_GET_EMPTY_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 2> GET_RESPONSES = { { AMQP_BASIC_GET_OK_METHOD, AMQP_BASIC_GET_EMPTY_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_basic_get_t get = {};
-  get.queue = amqp_cstring_bytes(queue.c_str());
-  get.no_ack = no_ack;
+    amqp_basic_get_t get = {};
+    get.queue = amqp_cstring_bytes(queue.c_str());
+    get.no_ack = no_ack;
 
-  amqp_channel_t channel = m_impl->GetChannel();
-  amqp_frame_t response = m_impl->DoRpcOnChannel(channel, AMQP_BASIC_GET_METHOD, &get, GET_RESPONSES);
+    amqp_channel_t channel = m_impl->GetChannel();
+    amqp_frame_t response = m_impl->DoRpcOnChannel(channel, AMQP_BASIC_GET_METHOD, &get, GET_RESPONSES);
 
-  if (AMQP_BASIC_GET_EMPTY_METHOD == response.payload.method.id)
-  {
+    if (AMQP_BASIC_GET_EMPTY_METHOD == response.payload.method.id)
+    {
+        m_impl->ReturnChannel(channel);
+        m_impl->MaybeReleaseBuffers();
+        return false;
+    }
+
+    amqp_basic_get_ok_t *get_ok = (amqp_basic_get_ok_t *)response.payload.method.decoded;
+    boost::uint64_t delivery_tag = get_ok->delivery_tag;
+    bool redelivered = (get_ok->redelivered == 0 ? false : true);
+    std::string exchange((char *)get_ok->exchange.bytes, get_ok->exchange.len);
+    std::string routing_key((char *)get_ok->routing_key.bytes, get_ok->routing_key.len);
+
+    BasicMessage::ptr_t message = m_impl->ReadContent(channel);
+    envelope = Envelope::Create(message, "", delivery_tag, exchange, redelivered, routing_key, channel);
+
     m_impl->ReturnChannel(channel);
     m_impl->MaybeReleaseBuffers();
-    return false;
-  }
-
-  amqp_basic_get_ok_t* get_ok = (amqp_basic_get_ok_t*)response.payload.method.decoded;
-  boost::uint64_t delivery_tag = get_ok->delivery_tag;
-  bool redelivered = (get_ok->redelivered == 0 ? false : true);
-  std::string exchange((char*)get_ok->exchange.bytes, get_ok->exchange.len);
-  std::string routing_key((char*)get_ok->routing_key.bytes, get_ok->routing_key.len);
-
-  BasicMessage::ptr_t message = m_impl->ReadContent(channel);
-  envelope = Envelope::Create(message, "", delivery_tag, exchange, redelivered, routing_key, channel);
-
-  m_impl->ReturnChannel(channel);
-  m_impl->MaybeReleaseBuffers();
-  return true;
+    return true;
 }
 
-void Channel::BasicRecover(const std::string& consumer)
+void Channel::BasicRecover(const std::string &consumer)
 {
-  const boost::array<boost::uint32_t, 1> RECOVER_OK = { { AMQP_BASIC_RECOVER_OK_METHOD } };
-  m_impl->CheckIsConnected();
+    const boost::array<boost::uint32_t, 1> RECOVER_OK = { { AMQP_BASIC_RECOVER_OK_METHOD } };
+    m_impl->CheckIsConnected();
 
-  amqp_basic_recover_t recover = {};
-  recover.requeue = true;
+    amqp_basic_recover_t recover = {};
+    recover.requeue = true;
 
-  amqp_channel_t channel = m_impl->GetConsumerChannel(consumer);
+    amqp_channel_t channel = m_impl->GetConsumerChannel(consumer);
 
-  m_impl->DoRpcOnChannel(channel, AMQP_BASIC_RECOVER_METHOD, &recover, RECOVER_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpcOnChannel(channel, AMQP_BASIC_RECOVER_METHOD, &recover, RECOVER_OK);
+    m_impl->MaybeReleaseBuffers();
 }
 
-std::string Channel::BasicConsume(const std::string& queue,
-						   const std::string& consumer_tag,
-						   bool no_local,
-						   bool no_ack,
-						   bool exclusive,
-               boost::uint16_t message_prefetch_count)
+std::string Channel::BasicConsume(const std::string &queue,
+                                  const std::string &consumer_tag,
+                                  bool no_local,
+                                  bool no_ack,
+                                  bool exclusive,
+                                  boost::uint16_t message_prefetch_count)
 {
-  return BasicConsume(queue, consumer_tag, no_local, no_ack, exclusive, message_prefetch_count, Table());
+    return BasicConsume(queue, consumer_tag, no_local, no_ack, exclusive, message_prefetch_count, Table());
 }
-std::string Channel::BasicConsume(const std::string& queue,
-						   const std::string& consumer_tag,
-						   bool no_local,
-						   bool no_ack,
-						   bool exclusive,
-               boost::uint16_t message_prefetch_count,
-               const Table &arguments)
+std::string Channel::BasicConsume(const std::string &queue,
+                                  const std::string &consumer_tag,
+                                  bool no_local,
+                                  bool no_ack,
+                                  bool exclusive,
+                                  boost::uint16_t message_prefetch_count,
+                                  const Table &arguments)
 {
-  m_impl->CheckIsConnected();
-  amqp_channel_t channel = m_impl->GetChannel();
+    m_impl->CheckIsConnected();
+    amqp_channel_t channel = m_impl->GetChannel();
 
-  // Set this before starting the consume as it may have been set by a previous consumer
-  const boost::array<boost::uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
+    // Set this before starting the consume as it may have been set by a previous consumer
+    const boost::array<boost::uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
 
-  amqp_basic_qos_t qos = {};
-  qos.prefetch_size = 0;
-  qos.prefetch_count = message_prefetch_count;
-  qos.global = false;
+    amqp_basic_qos_t qos = {};
+    qos.prefetch_size = 0;
+    qos.prefetch_count = message_prefetch_count;
+    qos.global = false;
 
-  m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
-  m_impl->MaybeReleaseBuffers();
+    m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
+    m_impl->MaybeReleaseBuffers();
 
-  const boost::array<boost::uint32_t, 1> CONSUME_OK = { { AMQP_BASIC_CONSUME_OK_METHOD } };
+    const boost::array<boost::uint32_t, 1> CONSUME_OK = { { AMQP_BASIC_CONSUME_OK_METHOD } };
 
-  amqp_basic_consume_t consume = {};
-  consume.queue = amqp_cstring_bytes(queue.c_str());
-  consume.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
-  consume.no_local = no_local;
-  consume.no_ack = no_ack;
-  consume.exclusive = exclusive;
-  consume.nowait = false;
+    amqp_basic_consume_t consume = {};
+    consume.queue = amqp_cstring_bytes(queue.c_str());
+    consume.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
+    consume.no_local = no_local;
+    consume.no_ack = no_ack;
+    consume.exclusive = exclusive;
+    consume.nowait = false;
 
-  Detail::amqp_pool_ptr_t table_pool;
-  consume.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    Detail::amqp_pool_ptr_t table_pool;
+    consume.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-  amqp_frame_t response = m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CONSUME_METHOD, &consume, CONSUME_OK);
+    amqp_frame_t response = m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CONSUME_METHOD, &consume, CONSUME_OK);
 
-  amqp_basic_consume_ok_t* consume_ok = (amqp_basic_consume_ok_t*)response.payload.method.decoded;
-  std::string tag((char*)consume_ok->consumer_tag.bytes, consume_ok->consumer_tag.len);
-  m_impl->MaybeReleaseBuffers();
+    amqp_basic_consume_ok_t *consume_ok = (amqp_basic_consume_ok_t *)response.payload.method.decoded;
+    std::string tag((char *)consume_ok->consumer_tag.bytes, consume_ok->consumer_tag.len);
+    m_impl->MaybeReleaseBuffers();
 
-  m_impl->AddConsumer(tag, channel);
+    m_impl->AddConsumer(tag, channel);
 
-  return tag;
-}
-
-void Channel::BasicQos(const std::string& consumer_tag, boost::uint16_t message_prefetch_count)
-{
-  m_impl->CheckIsConnected();
-  amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
-
-  const boost::array<boost::uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
-
-  amqp_basic_qos_t qos = {};
-  qos.prefetch_size = 0;
-  qos.prefetch_count = message_prefetch_count;
-  qos.global = false;
-
-  m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
-  m_impl->MaybeReleaseBuffers();
+    return tag;
 }
 
-void Channel::BasicCancel(const std::string& consumer_tag)
+void Channel::BasicQos(const std::string &consumer_tag, boost::uint16_t message_prefetch_count)
 {
-  m_impl->CheckIsConnected();
-  amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
+    m_impl->CheckIsConnected();
+    amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-  const boost::array<boost::uint32_t, 1> CANCEL_OK = { { AMQP_BASIC_CANCEL_OK_METHOD } };
+    const boost::array<boost::uint32_t, 1> QOS_OK = { { AMQP_BASIC_QOS_OK_METHOD } };
 
-  amqp_basic_cancel_t cancel = {};
-  cancel.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
-  cancel.nowait = false;
+    amqp_basic_qos_t qos = {};
+    qos.prefetch_size = 0;
+    qos.prefetch_count = message_prefetch_count;
+    qos.global = false;
 
-  m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CANCEL_METHOD, &cancel, CANCEL_OK);
+    m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
+    m_impl->MaybeReleaseBuffers();
+}
 
-  m_impl->RemoveConsumer(consumer_tag);
+void Channel::BasicCancel(const std::string &consumer_tag)
+{
+    m_impl->CheckIsConnected();
+    amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-  // Lets go hunting to make sure we don't have any queued frames lying around
-  // Otherwise these frames will potentially hang around when we don't want them to
-  // TODO: Implement queue purge
-  m_impl->ReturnChannel(channel);
-  m_impl->MaybeReleaseBuffers();
+    const boost::array<boost::uint32_t, 1> CANCEL_OK = { { AMQP_BASIC_CANCEL_OK_METHOD } };
+
+    amqp_basic_cancel_t cancel = {};
+    cancel.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
+    cancel.nowait = false;
+
+    m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CANCEL_METHOD, &cancel, CANCEL_OK);
+
+    m_impl->RemoveConsumer(consumer_tag);
+
+    // Lets go hunting to make sure we don't have any queued frames lying around
+    // Otherwise these frames will potentially hang around when we don't want them to
+    // TODO: Implement queue purge
+    m_impl->ReturnChannel(channel);
+    m_impl->MaybeReleaseBuffers();
 }
 
 
-Envelope::ptr_t Channel::BasicConsumeMessage(const std::string& consumer_tag)
+Envelope::ptr_t Channel::BasicConsumeMessage(const std::string &consumer_tag)
 {
-	Envelope::ptr_t returnval;
-	BasicConsumeMessage(consumer_tag, returnval);
-	return returnval;
+    Envelope::ptr_t returnval;
+    BasicConsumeMessage(consumer_tag, returnval);
+    return returnval;
 }
 
-bool Channel::BasicConsumeMessage(const std::string& consumer_tag, Envelope::ptr_t& message, int timeout)
+bool Channel::BasicConsumeMessage(const std::string &consumer_tag, Envelope::ptr_t &message, int timeout)
 {
-  m_impl->CheckIsConnected();
-  amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
+    m_impl->CheckIsConnected();
+    amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-  const boost::array<boost::uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
+    const boost::array<boost::uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
 
-  boost::chrono::microseconds real_timeout = (timeout >= 0 ?
-                                         boost::chrono::milliseconds(timeout) :
-                                         boost::chrono::microseconds::max());
+    boost::chrono::microseconds real_timeout = (timeout >= 0 ?
+            boost::chrono::milliseconds(timeout) :
+            boost::chrono::microseconds::max());
 
-  amqp_frame_t deliver;
-  if (!m_impl->GetMethodOnChannel(channel, deliver, DELIVER, real_timeout))
-  {
-    return false;
-  }
+    amqp_frame_t deliver;
+    if (!m_impl->GetMethodOnChannel(channel, deliver, DELIVER, real_timeout))
+    {
+        return false;
+    }
 
-  amqp_basic_deliver_t* deliver_method = reinterpret_cast<amqp_basic_deliver_t*>(deliver.payload.method.decoded);
+    amqp_basic_deliver_t *deliver_method = reinterpret_cast<amqp_basic_deliver_t *>(deliver.payload.method.decoded);
 
-  const std::string exchange((char*)deliver_method->exchange.bytes, deliver_method->exchange.len);
-  const std::string routing_key((char*)deliver_method->routing_key.bytes, deliver_method->routing_key.len);
-  const std::string in_consumer_tag((char*)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
-  const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
-  const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
-  m_impl->MaybeReleaseBuffers();
+    const std::string exchange((char *)deliver_method->exchange.bytes, deliver_method->exchange.len);
+    const std::string routing_key((char *)deliver_method->routing_key.bytes, deliver_method->routing_key.len);
+    const std::string in_consumer_tag((char *)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
+    const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
+    const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
+    m_impl->MaybeReleaseBuffers();
 
-  BasicMessage::ptr_t content = m_impl->ReadContent(channel);
-  m_impl->MaybeReleaseBuffers();
+    BasicMessage::ptr_t content = m_impl->ReadContent(channel);
+    m_impl->MaybeReleaseBuffers();
 
-  message = Envelope::Create(content, in_consumer_tag, delivery_tag, exchange, redelivered, routing_key, channel);
-  return true;
+    message = Envelope::Create(content, in_consumer_tag, delivery_tag, exchange, redelivered, routing_key, channel);
+    return true;
 }
 
 } // namespace AmqpClient

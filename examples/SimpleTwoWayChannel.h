@@ -42,43 +42,52 @@
 # pragma warning ( disable: 4275 4251 )
 #endif
 
-namespace AmqpClient {
+namespace AmqpClient
+{
 
 
 class SIMPLEAMQPCLIENT_EXPORT SimpleTwoWayChannel : boost::noncopyable
 {
 public:
-	typedef boost::shared_ptr<SimpleTwoWayChannel> ptr_t;
-	friend ptr_t boost::make_shared<SimpleTwoWayChannel>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2, std::string const & a3);
+    typedef boost::shared_ptr<SimpleTwoWayChannel> ptr_t;
+    friend ptr_t boost::make_shared<SimpleTwoWayChannel>(AmqpClient::Channel::ptr_t const &a1, std::string const &a2, std::string const &a3);
 
-	static ptr_t Create(Channel::ptr_t channel, const std::string& incoming_name, const std::string& outgoing_name)
-	{ return boost::make_shared<SimpleTwoWayChannel>(channel, incoming_name, outgoing_name); }
+    static ptr_t Create(Channel::ptr_t channel, const std::string &incoming_name, const std::string &outgoing_name)
+    {
+        return boost::make_shared<SimpleTwoWayChannel>(channel, incoming_name, outgoing_name);
+    }
 
 private:
-	static const std::string ROUTING_KEY;
+    static const std::string ROUTING_KEY;
 
-	explicit SimpleTwoWayChannel(Channel::ptr_t channel, const std::string& incoming_name, 
-			const std::string& outgoing_name);
+    explicit SimpleTwoWayChannel(Channel::ptr_t channel, const std::string &incoming_name,
+                                 const std::string &outgoing_name);
 
 public:
-	virtual ~SimpleTwoWayChannel();
+    virtual ~SimpleTwoWayChannel();
 
-	std::string getIncomingName() const { return m_incoming_tag; }
-	std::string getOutgoingName() const { return m_outgoing_tag; }
+    std::string getIncomingName() const
+    {
+        return m_incoming_tag;
+    }
+    std::string getOutgoingName() const
+    {
+        return m_outgoing_tag;
+    }
 
-	void Send(const std::string& message);
-	void Send(BasicMessage::ptr_t message);
+    void Send(const std::string &message);
+    void Send(BasicMessage::ptr_t message);
 
-	std::string Receive();
-	BasicMessage::ptr_t ReceiveMessage();
+    std::string Receive();
+    BasicMessage::ptr_t ReceiveMessage();
 
-	std::string SendAndReceive(const std::string& message);
-	BasicMessage::ptr_t SendAndReceive(BasicMessage::ptr_t message);
+    std::string SendAndReceive(const std::string &message);
+    BasicMessage::ptr_t SendAndReceive(BasicMessage::ptr_t message);
 
 private:
-	Channel::ptr_t m_channel;
-	const std::string m_incoming_tag;
-	const std::string m_outgoing_tag;
+    Channel::ptr_t m_channel;
+    const std::string m_incoming_tag;
+    const std::string m_outgoing_tag;
 };
 
 
@@ -86,7 +95,7 @@ private:
 
 #ifdef _MSC_VER
 # pragma warning ( pop )
-#endif 
+#endif
 
 #endif //SIMPLERPCCLIENT_H
 

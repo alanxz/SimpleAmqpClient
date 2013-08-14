@@ -37,8 +37,8 @@ namespace AmqpClient
 class BadUriException : public std::runtime_error
 {
 public:
-  explicit BadUriException() :
-    std::runtime_error("URI is malformed") {} 
+    explicit BadUriException() :
+        std::runtime_error("URI is malformed") {}
 };
 } // namespace AmqpClient
 #endif // BAD_URI_EXCEPTION_H

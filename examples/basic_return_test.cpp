@@ -34,35 +34,36 @@ using namespace AmqpClient;
 
 int main()
 {
-  char* szBroker = getenv("AMQP_BROKER");
-  Channel::ptr_t channel;
-  if (szBroker != NULL)
-    channel = Channel::Create(szBroker);
-  else
-    channel = Channel::Create();
+    char *szBroker = getenv("AMQP_BROKER");
+    Channel::ptr_t channel;
+    if (szBroker != NULL)
+        channel = Channel::Create(szBroker);
+    else
+        channel = Channel::Create();
 
-  BasicMessage::ptr_t the_message = BasicMessage::Create("Body Content");
-  try {  
-  channel->DeclareQueue("BasicReturnTestQueue");
-  channel->BasicConsume("BasicReturnTestQueue", "consumer_tag1");
-
-  channel->BasicPublish("", "BasicReturnTestQueue", the_message, true, false);
-  channel->BasicPublish("", "ThisDoesntExist", the_message, true, false);
-  
-
-    for (int i = 0; i < 2; ++i)
+    BasicMessage::ptr_t the_message = BasicMessage::Create("Body Content");
+    try
     {
-      Envelope::ptr_t env;
-      if (channel->BasicConsumeMessage("consumer_tag1", env, 0))
-      {
-        std::cout << "Received message with body: " << env->Message()->Body() << std::endl;
-      }
+        channel->DeclareQueue("BasicReturnTestQueue");
+        channel->BasicConsume("BasicReturnTestQueue", "consumer_tag1");
+
+        channel->BasicPublish("", "BasicReturnTestQueue", the_message, true, false);
+        channel->BasicPublish("", "ThisDoesntExist", the_message, true, false);
+
+
+        for (int i = 0; i < 2; ++i)
+        {
+            Envelope::ptr_t env;
+            if (channel->BasicConsumeMessage("consumer_tag1", env, 0))
+            {
+                std::cout << "Received message with body: " << env->Message()->Body() << std::endl;
+            }
+        }
     }
-  }
-  catch (MessageReturnedException& e)
-  {
-    std::cout << "Message got returned: " << e.what();
-    std::cout << "\nMessage body: " << e.message()->Body();
-  }
+    catch (MessageReturnedException &e)
+    {
+        std::cout << "Message got returned: " << e.what();
+        std::cout << "\nMessage body: " << e.message()->Body();
+    }
 
 }

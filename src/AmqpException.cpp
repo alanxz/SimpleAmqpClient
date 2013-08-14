@@ -58,117 +58,117 @@ const boost::uint16_t NotAllowedException::REPLY_CODE = AMQP_NOT_ALLOWED;
 const boost::uint16_t NotImplementedException::REPLY_CODE = AMQP_NOT_IMPLEMENTED;
 const boost::uint16_t InternalErrorException::REPLY_CODE = AMQP_INTERNAL_ERROR;
 
-void AmqpException::Throw(const amqp_rpc_reply_t& reply)
+void AmqpException::Throw(const amqp_rpc_reply_t &reply)
 {
-  assert(reply.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION);
+    assert(reply.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION);
 
-  switch (reply.reply.id)
-  {
-  case AMQP_CONNECTION_CLOSE_METHOD:
-    Throw(*(reinterpret_cast<amqp_connection_close_t*>(reply.reply.decoded)));
-    break;
-  case AMQP_CHANNEL_CLOSE_METHOD:
-    Throw(*(reinterpret_cast<amqp_channel_close_t*>(reply.reply.decoded)));
-    break;
-  default:
-    throw std::logic_error(std::string("Programming error: unknown server exception class/method").append(boost::lexical_cast<std::string>(reply.reply.id)));
-  }
+    switch (reply.reply.id)
+    {
+    case AMQP_CONNECTION_CLOSE_METHOD:
+        Throw(*(reinterpret_cast<amqp_connection_close_t *>(reply.reply.decoded)));
+        break;
+    case AMQP_CHANNEL_CLOSE_METHOD:
+        Throw(*(reinterpret_cast<amqp_channel_close_t *>(reply.reply.decoded)));
+        break;
+    default:
+        throw std::logic_error(std::string("Programming error: unknown server exception class/method").append(boost::lexical_cast<std::string>(reply.reply.id)));
+    }
 }
 
-void AmqpException::Throw(const amqp_channel_close_t& reply)
+void AmqpException::Throw(const amqp_channel_close_t &reply)
 {
-  std::ostringstream what;
+    std::ostringstream what;
 
-  std::string reply_text;
-  if (reply.reply_text.bytes != NULL)
-  {
-    reply_text = std::string((char*)reply.reply_text.bytes, reply.reply_text.len);
-  }
+    std::string reply_text;
+    if (reply.reply_text.bytes != NULL)
+    {
+        reply_text = std::string((char *)reply.reply_text.bytes, reply.reply_text.len);
+    }
 
-  const char* method_name = amqp_method_name(((reply.class_id << 16) | reply.method_id));
-  if (method_name != NULL)
-  {
-    what << "channel error: " << reply.reply_code << ": " << method_name << " caused: " << reply_text;
-  }
-  else
-  {
-    what << "channel error: " << reply.reply_code << ": " << reply_text;
-  }
+    const char *method_name = amqp_method_name(((reply.class_id << 16) | reply.method_id));
+    if (method_name != NULL)
+    {
+        what << "channel error: " << reply.reply_code << ": " << method_name << " caused: " << reply_text;
+    }
+    else
+    {
+        what << "channel error: " << reply.reply_code << ": " << reply_text;
+    }
 
-  switch (reply.reply_code)
-  {
-  case ContentTooLargeException::REPLY_CODE:
-    throw ContentTooLargeException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case NoRouteException::REPLY_CODE:
-    throw NoRouteException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case NoConsumersException::REPLY_CODE:
-    throw NoConsumersException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case AccessRefusedException::REPLY_CODE:
-    throw AccessRefusedException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case NotFoundException::REPLY_CODE:
-    throw NotFoundException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case ResourceLockedException::REPLY_CODE:
-    throw ResourceLockedException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case PreconditionFailedException::REPLY_CODE:
-    throw PreconditionFailedException(what.str(), reply_text, reply.class_id, reply.method_id);
-  default:
-    throw std::logic_error(std::string("Programming error: unknown channel reply code: ").append(boost::lexical_cast<std::string>(reply.reply_code)));
-  }
+    switch (reply.reply_code)
+    {
+    case ContentTooLargeException::REPLY_CODE:
+        throw ContentTooLargeException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case NoRouteException::REPLY_CODE:
+        throw NoRouteException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case NoConsumersException::REPLY_CODE:
+        throw NoConsumersException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case AccessRefusedException::REPLY_CODE:
+        throw AccessRefusedException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case NotFoundException::REPLY_CODE:
+        throw NotFoundException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case ResourceLockedException::REPLY_CODE:
+        throw ResourceLockedException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case PreconditionFailedException::REPLY_CODE:
+        throw PreconditionFailedException(what.str(), reply_text, reply.class_id, reply.method_id);
+    default:
+        throw std::logic_error(std::string("Programming error: unknown channel reply code: ").append(boost::lexical_cast<std::string>(reply.reply_code)));
+    }
 }
 
-void AmqpException::Throw(const amqp_connection_close_t& reply)
+void AmqpException::Throw(const amqp_connection_close_t &reply)
 {
-  std::ostringstream what;
-  const char* method_name = amqp_method_name(((reply.class_id << 16) | reply.method_id));
+    std::ostringstream what;
+    const char *method_name = amqp_method_name(((reply.class_id << 16) | reply.method_id));
 
-  std::string reply_text;
-  if (reply.reply_text.bytes != NULL)
-  {
-    reply_text = std::string((char*)reply.reply_text.bytes, reply.reply_text.len);
-  }
+    std::string reply_text;
+    if (reply.reply_text.bytes != NULL)
+    {
+        reply_text = std::string((char *)reply.reply_text.bytes, reply.reply_text.len);
+    }
 
-  if (method_name != NULL)
-  {
-    what << "connection error: " << reply.reply_code << ": " << method_name << " caused: " << reply_text;
-  }
-  else
-  {
-    what << "connection error: " << reply.reply_code << ": " << reply_text;
-  }
+    if (method_name != NULL)
+    {
+        what << "connection error: " << reply.reply_code << ": " << method_name << " caused: " << reply_text;
+    }
+    else
+    {
+        what << "connection error: " << reply.reply_code << ": " << reply_text;
+    }
 
-  switch (reply.reply_code)
-  {
-  case ConnectionForcedException::REPLY_CODE:
-    throw ConnectionForcedException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case InvalidPathException::REPLY_CODE:
-    throw InvalidPathException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case FrameErrorException::REPLY_CODE:
-    throw FrameErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case SyntaxErrorException::REPLY_CODE:
-    throw SyntaxErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case CommandInvalidException::REPLY_CODE:
-    throw CommandInvalidException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case ChannelErrorException::REPLY_CODE:
-    throw ChannelErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case UnexpectedFrameException::REPLY_CODE:
-    throw UnexpectedFrameException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case ResourceErrorException::REPLY_CODE:
-    throw ResourceErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case NotAllowedException::REPLY_CODE:
-    throw NotAllowedException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case NotImplementedException::REPLY_CODE:
-    throw NotImplementedException(what.str(), reply_text, reply.class_id, reply.method_id);
-  case InternalErrorException::REPLY_CODE:
-    throw InternalErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
-  default:
-    throw std::logic_error(std::string("Programming error: unknown connection reply code: ").append(boost::lexical_cast<std::string>(reply.reply_code)));
-  }
+    switch (reply.reply_code)
+    {
+    case ConnectionForcedException::REPLY_CODE:
+        throw ConnectionForcedException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case InvalidPathException::REPLY_CODE:
+        throw InvalidPathException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case FrameErrorException::REPLY_CODE:
+        throw FrameErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case SyntaxErrorException::REPLY_CODE:
+        throw SyntaxErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case CommandInvalidException::REPLY_CODE:
+        throw CommandInvalidException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case ChannelErrorException::REPLY_CODE:
+        throw ChannelErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case UnexpectedFrameException::REPLY_CODE:
+        throw UnexpectedFrameException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case ResourceErrorException::REPLY_CODE:
+        throw ResourceErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case NotAllowedException::REPLY_CODE:
+        throw NotAllowedException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case NotImplementedException::REPLY_CODE:
+        throw NotImplementedException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case InternalErrorException::REPLY_CODE:
+        throw InternalErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
+    default:
+        throw std::logic_error(std::string("Programming error: unknown connection reply code: ").append(boost::lexical_cast<std::string>(reply.reply_code)));
+    }
 }
 
-AmqpException::AmqpException(const std::string& what, const std::string& reply_text, boost::uint16_t class_id, boost::uint16_t method_id) throw() :
-      std::runtime_error(what),
-      m_reply_text(reply_text),
-      m_class_id(class_id),
-      m_method_id(method_id)
-      {}
+AmqpException::AmqpException(const std::string &what, const std::string &reply_text, boost::uint16_t class_id, boost::uint16_t method_id) throw() :
+    std::runtime_error(what),
+    m_reply_text(reply_text),
+    m_class_id(class_id),
+    m_method_id(method_id)
+{}
 }

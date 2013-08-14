@@ -49,27 +49,32 @@ namespace AmqpClient
 class SIMPLEAMQPCLIENT_EXPORT SimplePublisher : boost::noncopyable
 {
 public:
-	typedef boost::shared_ptr<SimplePublisher> ptr_t;
+    typedef boost::shared_ptr<SimplePublisher> ptr_t;
 
-	friend ptr_t boost::make_shared<SimplePublisher>(AmqpClient::Channel::ptr_t const & a1, std::string const & a2);
+    friend ptr_t boost::make_shared<SimplePublisher>(AmqpClient::Channel::ptr_t const &a1, std::string const &a2);
 
-	static ptr_t Create(Channel::ptr_t channel, const std::string& publisher_name = "")
-	{ return boost::make_shared<SimplePublisher>(channel, publisher_name); }
+    static ptr_t Create(Channel::ptr_t channel, const std::string &publisher_name = "")
+    {
+        return boost::make_shared<SimplePublisher>(channel, publisher_name);
+    }
 
 private:
-	explicit SimplePublisher(Channel::ptr_t channel, const std::string& publisher_name);
+    explicit SimplePublisher(Channel::ptr_t channel, const std::string &publisher_name);
 
 public:
-	virtual ~SimplePublisher();
+    virtual ~SimplePublisher();
 
-	std::string getPublisherName() const { return m_publisherExchange; }
+    std::string getPublisherName() const
+    {
+        return m_publisherExchange;
+    }
 
-	void Publish(const std::string& message);
-	void Publish(BasicMessage::ptr_t message);
+    void Publish(const std::string &message);
+    void Publish(BasicMessage::ptr_t message);
 
 private:
-	Channel::ptr_t m_channel;
-	std::string m_publisherExchange;
+    Channel::ptr_t m_channel;
+    std::string m_publisherExchange;
 
 
 

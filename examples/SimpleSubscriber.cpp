@@ -37,18 +37,18 @@
 namespace AmqpClient
 {
 
-SimpleSubscriber::SimpleSubscriber(Channel::ptr_t channel, const std::string& publisher_name) :
-	m_channel(channel)
+SimpleSubscriber::SimpleSubscriber(Channel::ptr_t channel, const std::string &publisher_name) :
+    m_channel(channel)
 {
-	m_consumerQueue = "SimpleSubscriber_";
-	boost::uuids::random_generator uuid_gen;
-	boost::uuids::uuid guid(uuid_gen());
-	m_consumerQueue += boost::lexical_cast<std::string>(guid);
+    m_consumerQueue = "SimpleSubscriber_";
+    boost::uuids::random_generator uuid_gen;
+    boost::uuids::uuid guid(uuid_gen());
+    m_consumerQueue += boost::lexical_cast<std::string>(guid);
 
-	m_channel->DeclareQueue(m_consumerQueue);
-	m_channel->BindQueue(m_consumerQueue, publisher_name);
+    m_channel->DeclareQueue(m_consumerQueue);
+    m_channel->BindQueue(m_consumerQueue, publisher_name);
 
-	m_channel->BasicConsume(m_consumerQueue, m_consumerQueue);
+    m_channel->BasicConsume(m_consumerQueue, m_consumerQueue);
 }
 
 SimpleSubscriber::~SimpleSubscriber()
@@ -57,13 +57,13 @@ SimpleSubscriber::~SimpleSubscriber()
 
 std::string SimpleSubscriber::WaitForMessageString()
 {
-	BasicMessage::ptr_t incoming = WaitForMessage();
-	return incoming->Body();
+    BasicMessage::ptr_t incoming = WaitForMessage();
+    return incoming->Body();
 }
 
 BasicMessage::ptr_t SimpleSubscriber::WaitForMessage()
 {
-	return m_channel->BasicConsumeMessage();
+    return m_channel->BasicConsumeMessage();
 }
 
 } //namespace AmqpClient

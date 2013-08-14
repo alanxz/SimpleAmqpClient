@@ -42,14 +42,15 @@
 
 struct amqp_rpc_reply_t_;
 
-namespace AmqpClient {
+namespace AmqpClient
+{
 
 class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException : public std::runtime_error
 {
 public:
-    static AmqpResponseLibraryException CreateException(const amqp_rpc_reply_t_& reply, const std::string& context);
+    static AmqpResponseLibraryException CreateException(const amqp_rpc_reply_t_& reply, const std::string &context);
 protected:
-    explicit AmqpResponseLibraryException(const std::string& message) throw();
+    explicit AmqpResponseLibraryException(const std::string &message) throw();
 };
 
 } // namespace AmqpClient
