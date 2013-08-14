@@ -13,3 +13,4 @@ Debug/
 ipch/
 install_manifest.txt
 .ycm_extra_conf.py*
+*.orig
