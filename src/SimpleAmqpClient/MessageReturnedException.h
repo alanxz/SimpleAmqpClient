@@ -1,3 +1,4 @@
+/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 #ifndef MESSAGE_RETURNED_EXCEPTION_H
 #define MESSAGE_RETURNED_EXCEPTION_H
 /*
