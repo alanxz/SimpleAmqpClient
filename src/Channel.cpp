@@ -224,8 +224,8 @@ void Channel::DeclareExchange(const std::string &exchange_name,
     Detail::amqp_pool_ptr_t table_pool;
     declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-    m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 void Channel::DeleteExchange(const std::string &exchange_name,
@@ -239,8 +239,8 @@ void Channel::DeleteExchange(const std::string &exchange_name,
     del.if_unused = if_unused;
     del.nowait = false;
 
-    m_impl->DoRpc(AMQP_EXCHANGE_DELETE_METHOD, &del, DELETE_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_EXCHANGE_DELETE_METHOD, &del, DELETE_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 void Channel::BindExchange(const std::string &destination,
@@ -267,8 +267,8 @@ void Channel::BindExchange(const std::string &destination,
     Detail::amqp_pool_ptr_t table_pool;
     bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-    m_impl->DoRpc(AMQP_EXCHANGE_BIND_METHOD, &bind, BIND_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_EXCHANGE_BIND_METHOD, &bind, BIND_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 void Channel::UnbindExchange(const std::string &destination,
@@ -295,8 +295,8 @@ void Channel::UnbindExchange(const std::string &destination,
     Detail::amqp_pool_ptr_t table_pool;
     unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-    m_impl->DoRpc(AMQP_EXCHANGE_UNBIND_METHOD, &unbind, UNBIND_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_EXCHANGE_UNBIND_METHOD, &unbind, UNBIND_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 std::string Channel::DeclareQueue(const std::string &queue_name,
@@ -334,7 +334,7 @@ std::string Channel::DeclareQueue(const std::string &queue_name,
     amqp_queue_declare_ok_t *declare_ok = (amqp_queue_declare_ok_t *)response.payload.method.decoded;
 
     std::string ret((char *)declare_ok->queue.bytes, declare_ok->queue.len);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(response.channel);
     return ret;
 }
 
@@ -351,8 +351,8 @@ void Channel::DeleteQueue(const std::string &queue_name,
     del.if_empty = if_empty;
     del.nowait = false;
 
-    m_impl->DoRpc(AMQP_QUEUE_DELETE_METHOD, &del, DELETE_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_QUEUE_DELETE_METHOD, &del, DELETE_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 void Channel::BindQueue(const std::string &queue_name,
@@ -379,8 +379,8 @@ void Channel::BindQueue(const std::string &queue_name,
     Detail::amqp_pool_ptr_t table_pool;
     bind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-    m_impl->DoRpc(AMQP_QUEUE_BIND_METHOD, &bind, BIND_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_QUEUE_BIND_METHOD, &bind, BIND_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 void Channel::UnbindQueue(const std::string &queue_name,
@@ -406,8 +406,8 @@ void Channel::UnbindQueue(const std::string &queue_name,
     Detail::amqp_pool_ptr_t table_pool;
     unbind.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
 
-    m_impl->DoRpc(AMQP_QUEUE_UNBIND_METHOD, &unbind, UNBIND_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_QUEUE_UNBIND_METHOD, &unbind, UNBIND_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 void Channel::PurgeQueue(const std::string &queue_name)
@@ -419,8 +419,8 @@ void Channel::PurgeQueue(const std::string &queue_name)
     purge.queue = amqp_cstring_bytes(queue_name.c_str());
     purge.nowait = false;
 
-    m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
-    m_impl->MaybeReleaseBuffers();
+    amqp_frame_t frame = m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
 void Channel::BasicAck(const Envelope::ptr_t &message)
@@ -479,12 +479,12 @@ void Channel::BasicPublish(const std::string &exchange_name,
         const boost::array<boost::uint32_t, 1> BASIC_ACK = { { AMQP_BASIC_ACK_METHOD } };
         m_impl->GetMethodOnChannel(channel, response, BASIC_ACK);
         m_impl->ReturnChannel(channel);
-        m_impl->MaybeReleaseBuffers();
+        m_impl->MaybeReleaseBuffersOnChannel(channel);
         throw message_returned;
     }
 
     m_impl->ReturnChannel(channel);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
 bool Channel::BasicGet(Envelope::ptr_t &envelope, const std::string &queue, bool no_ack)
@@ -502,7 +502,7 @@ bool Channel::BasicGet(Envelope::ptr_t &envelope, const std::string &queue, bool
     if (AMQP_BASIC_GET_EMPTY_METHOD == response.payload.method.id)
     {
         m_impl->ReturnChannel(channel);
-        m_impl->MaybeReleaseBuffers();
+        m_impl->MaybeReleaseBuffersOnChannel(channel);
         return false;
     }
 
@@ -516,7 +516,7 @@ bool Channel::BasicGet(Envelope::ptr_t &envelope, const std::string &queue, bool
     envelope = Envelope::Create(message, "", delivery_tag, exchange, redelivered, routing_key, channel);
 
     m_impl->ReturnChannel(channel);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
     return true;
 }
 
@@ -531,7 +531,7 @@ void Channel::BasicRecover(const std::string &consumer)
     amqp_channel_t channel = m_impl->GetConsumerChannel(consumer);
 
     m_impl->DoRpcOnChannel(channel, AMQP_BASIC_RECOVER_METHOD, &recover, RECOVER_OK);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
 std::string Channel::BasicConsume(const std::string &queue,
@@ -563,7 +563,7 @@ std::string Channel::BasicConsume(const std::string &queue,
     qos.global = false;
 
     m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 
     const boost::array<boost::uint32_t, 1> CONSUME_OK = { { AMQP_BASIC_CONSUME_OK_METHOD } };
 
@@ -582,7 +582,7 @@ std::string Channel::BasicConsume(const std::string &queue,
 
     amqp_basic_consume_ok_t *consume_ok = (amqp_basic_consume_ok_t *)response.payload.method.decoded;
     std::string tag((char *)consume_ok->consumer_tag.bytes, consume_ok->consumer_tag.len);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 
     m_impl->AddConsumer(tag, channel);
 
@@ -602,7 +602,7 @@ void Channel::BasicQos(const std::string &consumer_tag, boost::uint16_t message_
     qos.global = false;
 
     m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
 void Channel::BasicCancel(const std::string &consumer_tag)
@@ -624,7 +624,7 @@ void Channel::BasicCancel(const std::string &consumer_tag)
     // Otherwise these frames will potentially hang around when we don't want them to
     // TODO: Implement queue purge
     m_impl->ReturnChannel(channel);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
 
@@ -659,10 +659,10 @@ bool Channel::BasicConsumeMessage(const std::string &consumer_tag, Envelope::ptr
     const std::string in_consumer_tag((char *)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
     const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
     const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 
     BasicMessage::ptr_t content = m_impl->ReadContent(channel);
-    m_impl->MaybeReleaseBuffers();
+    m_impl->MaybeReleaseBuffersOnChannel(channel);
 
     message = Envelope::Create(content, in_consumer_tag, delivery_tag, exchange, redelivered, routing_key, channel);
     return true;

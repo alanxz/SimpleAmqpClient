@@ -121,7 +121,7 @@ public:
                 }
                 catch (AmqpException &)
                 {
-                    MaybeReleaseBuffers();
+                    MaybeReleaseBuffersOnChannel(channel);
                     throw;
                 }
             }
@@ -176,7 +176,7 @@ public:
     amqp_channel_t RemoveConsumer(const std::string &consumer_tag);
     amqp_channel_t GetConsumerChannel(const std::string &consumer_tag);
 
-    void MaybeReleaseBuffers();
+    void MaybeReleaseBuffersOnChannel(amqp_channel_t channel);
     void CheckIsConnected();
     void SetIsConnected(bool state)
     {

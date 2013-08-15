@@ -397,22 +397,12 @@ bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel, amqp_frame_t &fr
     return GetNextFrameFromBrokerOnChannel(channel, frame, timeout);
 }
 
-void ChannelImpl::MaybeReleaseBuffers()
+void ChannelImpl::MaybeReleaseBuffersOnChannel(amqp_channel_t channel)
 {
-    // Check to see if we have any amqp_frame_t's lying around, if not we can tell the library to recycle its buffers
-    bool buffers_empty = true;
-    for (channel_map_iterator_t it = m_open_channels.begin(); it != m_open_channels.end(); ++it)
+    channel_map_iterator_t it = m_open_channels.find(channel);
+    if (m_open_channels.end() != it && !it->second.empty())
     {
-        if (!it->second.empty())
-        {
-            buffers_empty = false;
-            break;
-        }
-    }
-
-    if (buffers_empty)
-    {
-        amqp_maybe_release_buffers(m_connection);
+        amqp_maybe_release_buffers_on_channel(m_connection, channel);
     }
 }
 
