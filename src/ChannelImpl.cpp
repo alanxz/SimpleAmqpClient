@@ -37,24 +37,6 @@
 
 #include <boost/array.hpp>
 
-// This will get us the posix version of strerror_r() on linux
-#ifndef _XOPEN_SOURCE
-# define _XOPEN_SOURCE 600
-#endif
-#include <string.h>
-#include <sys/types.h>
-#include <errno.h>
-
-#ifdef HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-# include <sys/select.h>
-#endif
-
-#ifdef HAVE_WINSOCK2_H
-# define NOMINMAX
-# include <WinSock2.h>
-#endif
-
 namespace AmqpClient
 {
 namespace Detail
