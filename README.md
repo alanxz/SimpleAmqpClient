@@ -17,7 +17,7 @@ Known to work in the following environments:
 
 ### Pre-requisites
 +  [boost-1.47.0](http://www.boost.org/) or newer (uses chrono, system internally in addition to other header based libraries such as sharedptr and noncopyable)
-+  [rabbitmq-c](http://github.com/alanxz/rabbitmq-c) you'll need version 0.2 or better.
++  [rabbitmq-c](http://github.com/alanxz/rabbitmq-c) you'll need version 0.4.0 or better.
 +  [cmake 2.8+](http://www.cmake.org/) what is needed for the build system
 +  [Doxygen](http://www.stack.nl/~dimitri/doxygen/) OPTIONAL only necessary to generate API documentation
 

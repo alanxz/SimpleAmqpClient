@@ -6,13 +6,14 @@ PROJECT(SimpleAmqpClient)
 # NOTE: THIS IS UNRELATED to the actual project version
 #
 # 1. If the library source code has changed at all since the last update, then increment revision
-# 2. If any interfaces have been added, removed, or changed since the last update, increment current and set revision to 0.
+# 2. If any interfaces have been added, removed, or changed since the last update, increment
+#    current and set revision to 0.
 # 3. If any interfaces have been added since the last public release, then increment age.
 # 4. If any interfaces have been removed since the last public release, then set age to 0.
 
-set(SAC_SOVERSION_CURRENT   4)
+set(SAC_SOVERSION_CURRENT   5)
 set(SAC_SOVERSION_REVISION  0)
-set(SAC_SOVERSION_AGE       2)
+set(SAC_SOVERSION_AGE       3)
 
 math(EXPR SAC_SOVERSION_MAJOR "${SAC_SOVERSION_CURRENT} - ${SAC_SOVERSION_AGE}")
 math(EXPR SAC_SOVERSION_MINOR "${SAC_SOVERSION_AGE}")

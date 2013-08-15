@@ -1,3 +1,13 @@
+Changes since v2.2 (v2.3):
+NOTE: this release uses new rabbitmq-c interfaces introduced in v0.4.0, thus
+requires rabbitmq-c v0.4.0 or later.
+- Add support for SSL (Ashok Anand 44b8b4e)
+- Use new rabbitmq-c socket interface (Nikita Vasiliev 9f6cdac)
+- Use new rabbitmq-c error-string interface (a26da26)
+- Code formatting and license header updates (752ae75, 5a2f64c, c3dec10, 2b82942)
+- Use new rabbitmq-c timeout interface when reading frames (d4a9f31)
+- Use new rabbitmq-c interface to release memory on a per-channel basis (49b8ba8)
+
 Changes since v2.1 (v2.2):
 NOTE: this is the last version targeting rabbitmq-c v0.3, newer versions will
       target rabbitmq-c v0.4
