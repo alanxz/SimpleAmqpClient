@@ -220,7 +220,7 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel)
 
     if (frame.frame_type != AMQP_FRAME_HEADER)
         // TODO: We should connection.close here
-        throw std::runtime_error("Channel::BasicConsumeMessage: receieved unexpected frame type (was expected AMQP_FRAME_HEADER)");
+        throw std::runtime_error("Channel::BasicConsumeMessage: received unexpected frame type (was expected AMQP_FRAME_HEADER)");
 
     // The memory for this is allocated in a pool associated with the connection
     // The BasicMessage constructor does a deep copy of the properties structure
@@ -241,7 +241,7 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel)
 
         if (frame.frame_type != AMQP_FRAME_BODY)
             // TODO: we should connection.close here
-            throw std::runtime_error("Channel::BasicConsumeMessge: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
+            throw std::runtime_error("Channel::BasicConsumeMessage: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
 
         void *body_ptr = reinterpret_cast<char *>(body.bytes) + received_size;
         memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
