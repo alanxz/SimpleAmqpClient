@@ -59,7 +59,6 @@
 
 #include <string.h>
 
-#define BROKER_HEARTBEAT 0
 
 namespace AmqpClient
 {
@@ -109,9 +108,7 @@ Channel::Channel(const std::string &host,
         int sock = amqp_socket_open(socket, host.c_str(), port);
         m_impl->CheckForError(sock);
 
-        m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
-                                            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                                            username.c_str(), password.c_str()));
+        m_impl->DoLogin(username, password, vhost, frame_max);
     }
     catch (...)
     {
@@ -171,10 +168,7 @@ Channel::Channel(const std::string &host,
             throw std::runtime_error("Error in opening SSL/TLS connection for socket");
         }
 
-
-        m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
-                                            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                                            username.c_str(), password.c_str()));
+        m_impl->DoLogin(username, password, vhost, frame_max);
     }
     catch (...)
     {

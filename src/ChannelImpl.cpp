@@ -37,6 +37,10 @@
 
 #include <boost/array.hpp>
 
+#include <string.h>
+
+#define BROKER_HEARTBEAT 0
+
 namespace AmqpClient
 {
 namespace Detail
@@ -52,6 +56,14 @@ ChannelImpl::ChannelImpl() :
 
 ChannelImpl::~ChannelImpl()
 {
+}
+
+void ChannelImpl::DoLogin(const std::string &username,
+        const std::string &password, const std::string &vhost, int frame_max)
+{
+    CheckRpcReply(0, amqp_login(m_connection, vhost.c_str(), 0,
+                frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
+                username.c_str(), password.c_str()));
 }
 
 amqp_channel_t ChannelImpl::GetNextChannelId()

@@ -61,6 +61,8 @@ public:
     typedef std::map<amqp_channel_t, frame_queue_t> channel_map_t;
     typedef channel_map_t::iterator channel_map_iterator_t;
 
+    void DoLogin(const std::string &username, const std::string &password,
+            const std::string &vhost, int frame_max);
     amqp_channel_t GetChannel();
     void ReturnChannel(amqp_channel_t channel);
     bool IsChannelOpen(amqp_channel_t channel);
