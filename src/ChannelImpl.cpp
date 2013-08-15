@@ -300,64 +300,32 @@ ChannelImpl::channel_map_iterator_t ChannelImpl::GetChannelQueueOrThrow(amqp_cha
 
 bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame, boost::chrono::microseconds timeout)
 {
-    int socketno = amqp_get_sockfd(m_connection);
+    struct timeval *tvp = NULL;
+    struct timeval tv_timeout;
+    memset(&tv_timeout, 0, sizeof(tv_timeout));
 
-start:
-    // Possibly set a timeout on receiving
-    if (timeout != boost::chrono::microseconds::max() && !amqp_frames_enqueued(m_connection) && !amqp_data_in_buffer(m_connection))
+    if (timeout != boost::chrono::microseconds::max())
     {
-        struct timeval tv_timeout;
-        memset(&tv_timeout, 0, sizeof(tv_timeout));
-
         // boost::chrono::seconds.count() returns boost::int_atleast64_t,
         // long can be 32 or 64 bit depending on the platform/arch
         // unless the timeout is something absurd cast to long will be ok, but
         // lets guard against the case where someone does something silly
         assert(boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count() <
-               static_cast<boost::chrono::seconds::rep>(std::numeric_limits<long>::max()));
+                static_cast<boost::chrono::seconds::rep>(std::numeric_limits<long>::max()));
 
         tv_timeout.tv_sec = static_cast<long>(boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count());
         tv_timeout.tv_usec = static_cast<long>((timeout - boost::chrono::seconds(tv_timeout.tv_sec)).count());
 
-        fd_set fds;
-        FD_ZERO(&fds);
-        FD_SET(static_cast<unsigned int>(socketno), &fds);
-
-        int select_return = select(socketno + 1, &fds, NULL, &fds, &tv_timeout);
-
-        if (select_return == 0) // If it times out, return
-        {
-            return false;
-        }
-        else if (select_return == -1)
-        {
-            // If its an interupted system call just try again
-            if (errno == EINTR)
-            {
-                goto start;
-            }
-            else
-            {
-                std::string error_string("error calling select on socket: ");
-#ifdef HAVE_STRERROR_S
-                const int BUFFER_LENGTH = 256;
-                char error_string_buffer[BUFFER_LENGTH] = {0};
-                strerror_s(error_string_buffer, errno);
-                error_string += error_string_buffer;
-#elif defined(HAVE_STRERROR_R)
-                const int BUFFER_LENGTH = 256;
-                char error_string_buffer[BUFFER_LENGTH] = {0};
-                strerror_r(errno, error_string_buffer, BUFFER_LENGTH);
-                error_string += error_string_buffer;
-#else
-                error_string += strerror(errno);
-#endif
-                throw std::runtime_error(error_string.c_str());
-            }
-        }
+        tvp = &tv_timeout;
     }
 
-    CheckForError(amqp_simple_wait_frame(m_connection, &frame));
+    int ret = amqp_simple_wait_frame_noblock(m_connection, &frame, tvp);
+
+    if (AMQP_STATUS_TIMEOUT == ret)
+    {
+        return false;
+    }
+    CheckForError(ret);
     return true;
 }
 
