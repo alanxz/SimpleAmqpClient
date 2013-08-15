@@ -61,9 +61,26 @@ ChannelImpl::~ChannelImpl()
 void ChannelImpl::DoLogin(const std::string &username,
         const std::string &password, const std::string &vhost, int frame_max)
 {
-    CheckRpcReply(0, amqp_login(m_connection, vhost.c_str(), 0,
-                frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                username.c_str(), password.c_str()));
+    amqp_table_entry_t capabilties[1];
+    amqp_table_entry_t capability_entry;
+    amqp_table_t client_properties;
+
+    capabilties[0].key = amqp_cstring_bytes("consumer_cancel_notify");
+    capabilties[0].value.kind = AMQP_FIELD_KIND_BOOLEAN;
+    capabilties[0].value.value.boolean = 1;
+
+    capability_entry.key = amqp_cstring_bytes("capabilities");
+    capability_entry.value.kind = AMQP_FIELD_KIND_TABLE;
+    capability_entry.value.value.table.num_entries =
+        sizeof(capabilties) / sizeof(amqp_table_entry_t);
+    capability_entry.value.value.table.entries = capabilties;
+
+    client_properties.num_entries = 1;
+    client_properties.entries = &capability_entry;
+
+    CheckRpcReply(0, amqp_login_with_properties(m_connection, vhost.c_str(), 0,
+                frame_max, BROKER_HEARTBEAT, &client_properties,
+                AMQP_SASL_METHOD_PLAIN, username.c_str(), password.c_str()));
 }
 
 amqp_channel_t ChannelImpl::GetNextChannelId()

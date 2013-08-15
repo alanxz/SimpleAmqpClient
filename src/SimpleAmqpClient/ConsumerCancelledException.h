@@ -1,11 +1,11 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef SIMPLEAMQPCLIENT_H
-#define SIMPLEAMQPCLIENT_H
+#ifndef SIMPLEAMQPCLIENT_CONSUMERCANCELLEDEXCEPTION_H_
+#define SIMPLEAMQPCLIENT_CONSUMERCANCELLEDEXCEPTION_H_
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
  *
- * Copyright (c) 2010-2013 Alan Antonuk
+ * Copyright (c) 2013 Alan Antonuk
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,14 +29,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/Channel.h"
-#include "SimpleAmqpClient/Envelope.h"
-#include "SimpleAmqpClient/BasicMessage.h"
-#include "SimpleAmqpClient/AmqpException.h"
-#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
-#include "SimpleAmqpClient/ConnectionClosedException.h"
-#include "SimpleAmqpClient/ConsumerCancelledException.h"
-#include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
-#include "SimpleAmqpClient/MessageReturnedException.h"
+#include <stdexcept>
+#include <string>
 
-#endif // SIMPLEAMQPCLIENT_H
+namespace AmqpClient
+{
+
+class ConsumerCancelledException : public std::runtime_error
+{
+public:
+    explicit ConsumerCancelledException(const std::string &consumer_tag) throw() :
+        std::runtime_error(std::string("Consumer was cancelled: ").append(consumer_tag))
+      , m_consumer_tag(consumer_tag)
+    {}
+
+    virtual ~ConsumerCancelledException() throw() {}
+
+    std::string GetConsumerTag() const { return m_consumer_tag; }
+
+private:
+    std::string m_consumer_tag;
+};
+} // namespace AmqpClient
+#endif /* SIMPLEAMQPCLIENT_CONSUMERCANCELLEDEXCEPTION_H_ */
