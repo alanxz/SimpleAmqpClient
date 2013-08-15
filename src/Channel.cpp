@@ -38,6 +38,7 @@
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 #include "SimpleAmqpClient/BadUriException.h"
+#include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Util.h"
 #include "SimpleAmqpClient/ChannelImpl.h"
@@ -59,7 +60,6 @@
 
 #include <string.h>
 
-#define BROKER_HEARTBEAT 0
 
 namespace AmqpClient
 {
@@ -109,9 +109,7 @@ Channel::Channel(const std::string &host,
         int sock = amqp_socket_open(socket, host.c_str(), port);
         m_impl->CheckForError(sock);
 
-        m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
-                                            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                                            username.c_str(), password.c_str()));
+        m_impl->DoLogin(username, password, vhost, frame_max);
     }
     catch (...)
     {
@@ -171,10 +169,7 @@ Channel::Channel(const std::string &host,
             throw std::runtime_error("Error in opening SSL/TLS connection for socket");
         }
 
-
-        m_impl->CheckRpcReply(0, amqp_login(m_impl->m_connection, vhost.c_str(), 0,
-                                            frame_max, BROKER_HEARTBEAT, AMQP_SASL_METHOD_PLAIN,
-                                            username.c_str(), password.c_str()));
+        m_impl->DoLogin(username, password, vhost, frame_max);
     }
     catch (...)
     {
@@ -640,16 +635,26 @@ bool Channel::BasicConsumeMessage(const std::string &consumer_tag, Envelope::ptr
     m_impl->CheckIsConnected();
     amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-    const boost::array<boost::uint32_t, 1> DELIVER = { { AMQP_BASIC_DELIVER_METHOD } };
+    const boost::array<boost::uint32_t, 2> DELIVER_OR_CANCEL = { { AMQP_BASIC_DELIVER_METHOD,
+                                                                AMQP_BASIC_CANCEL_METHOD } };
 
     boost::chrono::microseconds real_timeout = (timeout >= 0 ?
             boost::chrono::milliseconds(timeout) :
             boost::chrono::microseconds::max());
 
     amqp_frame_t deliver;
-    if (!m_impl->GetMethodOnChannel(channel, deliver, DELIVER, real_timeout))
+    if (!m_impl->GetMethodOnChannel(channel, deliver, DELIVER_OR_CANCEL, real_timeout))
     {
         return false;
+    }
+
+    if (AMQP_BASIC_CANCEL_METHOD == deliver.payload.method.id)
+    {
+        m_impl->RemoveConsumer(consumer_tag);
+        m_impl->ReturnChannel(channel);
+        m_impl->MaybeReleaseBuffersOnChannel(channel);
+
+        throw ConsumerCancelledException(consumer_tag);
     }
 
     amqp_basic_deliver_t *deliver_method = reinterpret_cast<amqp_basic_deliver_t *>(deliver.payload.method.decoded);

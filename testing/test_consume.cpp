@@ -201,3 +201,25 @@ TEST_F(connected_test, basic_qos_badconsumer)
 {
     EXPECT_THROW(channel->BasicQos("consumer_notexist", 1), ConsumerTagNotFoundException);
 }
+
+TEST_F(connected_test, consumer_cancelled)
+{
+    std::string queue = channel->DeclareQueue("");
+    std::string consumer = channel->BasicConsume(queue, "", true, false);
+    channel->DeleteQueue(queue);
+
+    EXPECT_THROW(channel->BasicConsumeMessage(consumer), ConsumerCancelledException);
+}
+
+TEST_F(connected_test, consumer_cancelled_one_message)
+{
+    std::string queue = channel->DeclareQueue("");
+    std::string consumer = channel->BasicConsume(queue, "", true, false);
+
+    channel->BasicPublish("", queue, BasicMessage::Create("Message"));
+    channel->BasicConsumeMessage(consumer);
+
+    channel->DeleteQueue(queue);
+
+    EXPECT_THROW(channel->BasicConsumeMessage(consumer), ConsumerCancelledException);
+}

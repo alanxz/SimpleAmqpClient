@@ -37,23 +37,9 @@
 
 #include <boost/array.hpp>
 
-// This will get us the posix version of strerror_r() on linux
-#ifndef _XOPEN_SOURCE
-# define _XOPEN_SOURCE 600
-#endif
 #include <string.h>
-#include <sys/types.h>
-#include <errno.h>
 
-#ifdef HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-# include <sys/select.h>
-#endif
-
-#ifdef HAVE_WINSOCK2_H
-# define NOMINMAX
-# include <WinSock2.h>
-#endif
+#define BROKER_HEARTBEAT 0
 
 namespace AmqpClient
 {
@@ -70,6 +56,31 @@ ChannelImpl::ChannelImpl() :
 
 ChannelImpl::~ChannelImpl()
 {
+}
+
+void ChannelImpl::DoLogin(const std::string &username,
+        const std::string &password, const std::string &vhost, int frame_max)
+{
+    amqp_table_entry_t capabilties[1];
+    amqp_table_entry_t capability_entry;
+    amqp_table_t client_properties;
+
+    capabilties[0].key = amqp_cstring_bytes("consumer_cancel_notify");
+    capabilties[0].value.kind = AMQP_FIELD_KIND_BOOLEAN;
+    capabilties[0].value.value.boolean = 1;
+
+    capability_entry.key = amqp_cstring_bytes("capabilities");
+    capability_entry.value.kind = AMQP_FIELD_KIND_TABLE;
+    capability_entry.value.value.table.num_entries =
+        sizeof(capabilties) / sizeof(amqp_table_entry_t);
+    capability_entry.value.value.table.entries = capabilties;
+
+    client_properties.num_entries = 1;
+    client_properties.entries = &capability_entry;
+
+    CheckRpcReply(0, amqp_login_with_properties(m_connection, vhost.c_str(), 0,
+                frame_max, BROKER_HEARTBEAT, &client_properties,
+                AMQP_SASL_METHOD_PLAIN, username.c_str(), password.c_str()));
 }
 
 amqp_channel_t ChannelImpl::GetNextChannelId()
@@ -209,7 +220,7 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel)
 
     if (frame.frame_type != AMQP_FRAME_HEADER)
         // TODO: We should connection.close here
-        throw std::runtime_error("Channel::BasicConsumeMessage: receieved unexpected frame type (was expected AMQP_FRAME_HEADER)");
+        throw std::runtime_error("Channel::BasicConsumeMessage: received unexpected frame type (was expected AMQP_FRAME_HEADER)");
 
     // The memory for this is allocated in a pool associated with the connection
     // The BasicMessage constructor does a deep copy of the properties structure
@@ -230,7 +241,7 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel)
 
         if (frame.frame_type != AMQP_FRAME_BODY)
             // TODO: we should connection.close here
-            throw std::runtime_error("Channel::BasicConsumeMessge: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
+            throw std::runtime_error("Channel::BasicConsumeMessage: received unexpected frame type (was expecting AMQP_FRAME_BODY)");
 
         void *body_ptr = reinterpret_cast<char *>(body.bytes) + received_size;
         memcpy(body_ptr, frame.payload.body_fragment.bytes, frame.payload.body_fragment.len);
