@@ -16,7 +16,7 @@ install:
   - pushd _prereqs
   - git clone https://github.com/alanxz/rabbitmq-c
   - cd rabbitmq-c
-  - git submodule init && git submodule update
+  - git checkout v0.4.0
   - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../_install -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF .
   - make install
   - popd
