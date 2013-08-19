@@ -43,7 +43,6 @@
 #include <boost/noncopyable.hpp>
 
 #include <map>
-#include <queue>
 #include <vector>
 
 namespace AmqpClient
@@ -192,14 +191,21 @@ public:
     amqp_connection_state_t m_connection;
 
 private:
-    std::map<std::string, amqp_channel_t> m_consumer_channel_map;
-    channel_map_t m_open_channels;
-    std::queue<amqp_channel_t> m_free_channels;
-
     frame_queue_t m_frame_queue;
+    std::map<std::string, amqp_channel_t> m_consumer_channel_map;
+
+    enum channel_state_t {
+        CS_Closed = 0,
+        CS_Open,
+        CS_Used
+    };
+    typedef std::vector<channel_state_t> channel_state_list_t;
+
+    channel_state_list_t m_channels;
+    // A channel that is likely to be an CS_Open state
+    amqp_channel_t m_last_used_channel;
 
     bool m_is_connected;
-    boost::uint16_t m_next_channel_id;
 };
 
 } // namespace Detail

@@ -47,11 +47,10 @@ namespace Detail
 {
 
 ChannelImpl::ChannelImpl() :
-    m_is_connected(false)
-    , m_next_channel_id(1)
+      m_last_used_channel(0)
+    , m_is_connected(false)
 {
-    // Channel 0 is always open
-    m_open_channels.insert(std::make_pair(0, frame_queue_t()));
+    m_channels.push_back(CS_Used);
 }
 
 ChannelImpl::~ChannelImpl()
@@ -85,27 +84,25 @@ void ChannelImpl::DoLogin(const std::string &username,
 
 amqp_channel_t ChannelImpl::GetNextChannelId()
 {
-    int max_channels = amqp_get_channel_max(m_connection);
-    int channel_count = static_cast<int>(m_open_channels.size());
-    if (0 == max_channels)
+    channel_state_list_t::iterator unused_channel = std::find(m_channels.begin(), m_channels.end(), CS_Closed);
+
+    if (m_channels.end() == unused_channel)
     {
-        if (std::numeric_limits<boost::uint16_t>::max() <= channel_count)
+        int max_channels = amqp_get_channel_max(m_connection);
+        if (0 == max_channels)
+        {
+            max_channels = std::numeric_limits<uint16_t>::max();
+        }
+        if (static_cast<size_t>(max_channels) < m_channels.size())
         {
             throw std::runtime_error("Too many channels open");
         }
-    }
-    else if (max_channels <= channel_count)
-    {
-        throw std::runtime_error("Too many channels open");
+
+        m_channels.push_back(CS_Closed);
+        unused_channel = m_channels.end() - 1;
     }
 
-    while (m_open_channels.end() != m_open_channels.find(++m_next_channel_id))
-    {
-        /* Empty */
-    }
-
-    m_open_channels.insert(std::make_pair(m_next_channel_id, frame_queue_t()));
-    return m_next_channel_id;
+    return unused_channel - m_channels.begin();
 }
 
 amqp_channel_t ChannelImpl::CreateNewChannel()
@@ -120,39 +117,48 @@ amqp_channel_t ChannelImpl::CreateNewChannel()
     amqp_confirm_select_t confirm_select = {};
     DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(new_channel, AMQP_CONFIRM_SELECT_METHOD, &confirm_select, CONFIRM_OK);
 
+    m_channels.at(new_channel) = CS_Open;
+
     return new_channel;
 }
 
 amqp_channel_t ChannelImpl::GetChannel()
 {
-    if (m_free_channels.empty())
+    if (CS_Open == m_channels.at(m_last_used_channel))
+    {
+        m_channels[m_last_used_channel] = CS_Used;
+        return m_last_used_channel;
+    }
+
+    channel_state_list_t::iterator it = std::find(m_channels.begin(), m_channels.end(), CS_Open);
+
+    if (m_channels.end() == it)
     {
         return CreateNewChannel();
     }
-    else
-    {
-        amqp_channel_t ret = m_free_channels.front();
-        m_free_channels.pop();
-        return ret;
-    }
+
+    *it = CS_Used;
+    return it - m_channels.begin();
 }
 
 void ChannelImpl::ReturnChannel(amqp_channel_t channel)
 {
-    m_free_channels.push(channel);
+    m_channels.at(channel) = CS_Open;
+    m_last_used_channel = channel;
 }
 
 
 bool ChannelImpl::IsChannelOpen(amqp_channel_t channel)
 {
-    return m_open_channels.find(channel) != m_open_channels.end();
+    return CS_Closed != m_channels.at(channel);
 }
 
 
 void ChannelImpl::FinishCloseChannel(amqp_channel_t channel)
 {
+    m_channels.at(channel) = CS_Closed;
+
     amqp_channel_close_ok_t close_ok;
-    m_open_channels.erase(channel);
     CheckForError(amqp_send_method(m_connection, channel, AMQP_CHANNEL_CLOSE_OK_METHOD, &close_ok));
 }
 
