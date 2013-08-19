@@ -66,16 +66,22 @@ public:
     amqp_channel_t GetChannel();
     void ReturnChannel(amqp_channel_t channel);
     bool IsChannelOpen(amqp_channel_t channel);
-    channel_map_iterator_t GetChannelQueueOrThrow(amqp_channel_t channel);
 
     bool GetNextFrameFromBroker(amqp_frame_t &frame, boost::chrono::microseconds timeout);
     bool GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_frame_t &frame, boost::chrono::microseconds timeout = boost::chrono::microseconds::max());
     bool GetNextFrameOnChannel(amqp_channel_t channel, amqp_frame_t &frame, boost::chrono::microseconds timeout = boost::chrono::microseconds::max());
 
-    template <class ResponseListType>
-    static bool is_expected_method(const amqp_frame_t &frame, const ResponseListType &expected_responses)
+    static bool is_on_channel(const amqp_frame_t &frame, amqp_channel_t channel)
     {
-        return AMQP_FRAME_METHOD == frame.frame_type &&
+        return channel == frame.channel;
+    }
+
+    template <class ResponseListType>
+    static bool is_expected_method(const amqp_frame_t &frame, amqp_channel_t channel,
+                                   const ResponseListType &expected_responses)
+    {
+        return channel == frame.channel &&
+            AMQP_FRAME_METHOD == frame.frame_type &&
                expected_responses.end() != std::find(expected_responses.begin(), expected_responses.end(), frame.payload.method.id);
     }
 
@@ -84,17 +90,15 @@ public:
                             const ResponseListType &expected_responses,
                             boost::chrono::microseconds timeout = boost::chrono::microseconds::max())
     {
-        // Check to see a desired frame is in the frame queue for the channel
-        frame_queue_t &channel_queue = GetChannelQueueOrThrow(channel)->second;
-
         frame_queue_t::iterator desired_frame =
-            std::find_if(channel_queue.begin(), channel_queue.end(),
-                         boost::bind(&ChannelImpl::is_expected_method<ResponseListType>, _1, expected_responses));
+            std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
+                         boost::bind(&ChannelImpl::is_expected_method<ResponseListType>, _1,
+                                     channel, expected_responses));
 
-        if (channel_queue.end() != desired_frame)
+        if (m_frame_queue.end() != desired_frame)
         {
             frame = *desired_frame;
-            channel_queue.erase(desired_frame);
+            m_frame_queue.erase(desired_frame);
             return true;
         }
 
@@ -108,7 +112,7 @@ public:
         amqp_frame_t incoming_frame;
         while (GetNextFrameFromBrokerOnChannel(channel, incoming_frame, timeout_left))
         {
-            if (is_expected_method(incoming_frame, expected_responses))
+            if (is_expected_method(incoming_frame, channel, expected_responses))
             {
                 frame = incoming_frame;
                 return true;
@@ -127,7 +131,7 @@ public:
                     throw;
                 }
             }
-            GetChannelQueueOrThrow(channel)->second.push_back(incoming_frame);
+            m_frame_queue.push_back(incoming_frame);
 
             if (timeout != boost::chrono::microseconds::max())
             {
@@ -191,6 +195,9 @@ private:
     std::map<std::string, amqp_channel_t> m_consumer_channel_map;
     channel_map_t m_open_channels;
     std::queue<amqp_channel_t> m_free_channels;
+
+    frame_queue_t m_frame_queue;
+
     bool m_is_connected;
     boost::uint16_t m_next_channel_id;
 };

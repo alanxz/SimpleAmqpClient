@@ -41,6 +41,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <string>
+#include <vector>
 
 #ifdef _MSC_VER
 # pragma warning ( push )
