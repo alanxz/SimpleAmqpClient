@@ -464,7 +464,8 @@ void Channel::BasicPublish(const std::string &exchange_name,
     // - connection.clsoe - something really bad happened
     const boost::array<boost::uint32_t, 2> PUBLISH_ACK = { { AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD } };
     amqp_frame_t response;
-    m_impl->GetMethodOnChannel(channel, response, PUBLISH_ACK);
+    boost::array<amqp_channel_t, 1> channels = {{ channel }};
+    m_impl->GetMethodOnChannel(channels, response, PUBLISH_ACK);
 
     if (AMQP_BASIC_RETURN_METHOD == response.payload.method.id)
     {
@@ -472,7 +473,7 @@ void Channel::BasicPublish(const std::string &exchange_name,
             m_impl->CreateMessageReturnedException(*(reinterpret_cast<amqp_basic_return_t *>(response.payload.method.decoded)), channel);
 
         const boost::array<boost::uint32_t, 1> BASIC_ACK = { { AMQP_BASIC_ACK_METHOD } };
-        m_impl->GetMethodOnChannel(channel, response, BASIC_ACK);
+        m_impl->GetMethodOnChannel(channels, response, BASIC_ACK);
         m_impl->ReturnChannel(channel);
         m_impl->MaybeReleaseBuffersOnChannel(channel);
         throw message_returned;
@@ -630,47 +631,60 @@ Envelope::ptr_t Channel::BasicConsumeMessage(const std::string &consumer_tag)
     return returnval;
 }
 
+Envelope::ptr_t Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags)
+{
+    Envelope::ptr_t returnval;
+    BasicConsumeMessage(consumer_tags, returnval);
+    return returnval;
+}
+
+Envelope::ptr_t Channel::BasicConsumeMessage()
+{
+    Envelope::ptr_t returnval;
+    BasicConsumeMessage(returnval);
+    return returnval;
+}
+
 bool Channel::BasicConsumeMessage(const std::string &consumer_tag, Envelope::ptr_t &message, int timeout)
 {
     m_impl->CheckIsConnected();
     amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
-    const boost::array<boost::uint32_t, 2> DELIVER_OR_CANCEL = { { AMQP_BASIC_DELIVER_METHOD,
-                                                                AMQP_BASIC_CANCEL_METHOD } };
+    boost::array<amqp_channel_t, 1> channels = {{ channel }};
 
-    boost::chrono::microseconds real_timeout = (timeout >= 0 ?
-            boost::chrono::milliseconds(timeout) :
-            boost::chrono::microseconds::max());
+    return m_impl->ConsumeMessageOnChannel(channels, message, timeout);
+}
 
-    amqp_frame_t deliver;
-    if (!m_impl->GetMethodOnChannel(channel, deliver, DELIVER_OR_CANCEL, real_timeout))
+
+bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
+                                  Envelope::ptr_t &message, int timeout)
+{
+    m_impl->CheckIsConnected();
+
+    std::vector<amqp_channel_t> channels;
+    channels.reserve(consumer_tags.size());
+
+    for (std::vector<std::string>::const_iterator it = consumer_tags.begin();
+         it != consumer_tags.end(); ++it)
     {
-        return false;
+        channels.push_back(m_impl->GetConsumerChannel(*it));
     }
 
-    if (AMQP_BASIC_CANCEL_METHOD == deliver.payload.method.id)
-    {
-        m_impl->RemoveConsumer(consumer_tag);
-        m_impl->ReturnChannel(channel);
-        m_impl->MaybeReleaseBuffersOnChannel(channel);
+    return m_impl->ConsumeMessageOnChannel(channels, message, timeout);
+}
 
-        throw ConsumerCancelledException(consumer_tag);
+bool Channel::BasicConsumeMessage(Envelope::ptr_t &message, int timeout)
+{
+    m_impl->CheckIsConnected();
+
+    std::vector<amqp_channel_t> channels = m_impl->GetAllConsumerChannels();
+
+    if (0 == channels.size())
+    {
+        throw ConsumerTagNotFoundException();
     }
 
-    amqp_basic_deliver_t *deliver_method = reinterpret_cast<amqp_basic_deliver_t *>(deliver.payload.method.decoded);
-
-    const std::string exchange((char *)deliver_method->exchange.bytes, deliver_method->exchange.len);
-    const std::string routing_key((char *)deliver_method->routing_key.bytes, deliver_method->routing_key.len);
-    const std::string in_consumer_tag((char *)deliver_method->consumer_tag.bytes, deliver_method->consumer_tag.len);
-    const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
-    const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
-    m_impl->MaybeReleaseBuffersOnChannel(channel);
-
-    BasicMessage::ptr_t content = m_impl->ReadContent(channel);
-    m_impl->MaybeReleaseBuffersOnChannel(channel);
-
-    message = Envelope::Create(content, in_consumer_tag, delivery_tag, exchange, redelivered, routing_key, channel);
-    return true;
+    return m_impl->ConsumeMessageOnChannel(channels, message, timeout);
 }
 
 } // namespace AmqpClient

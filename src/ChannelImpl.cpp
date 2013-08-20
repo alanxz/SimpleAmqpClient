@@ -305,6 +305,18 @@ amqp_channel_t ChannelImpl::GetConsumerChannel(const std::string &consumer_tag)
     return it->second;
 }
 
+std::vector<amqp_channel_t> ChannelImpl::GetAllConsumerChannels() const
+{
+    std::vector<amqp_channel_t> ret;
+    for (consumer_map_t::const_iterator it = m_consumer_channel_map.begin();
+         it != m_consumer_channel_map.end(); ++it)
+    {
+        ret.push_back(it->second);
+    }
+
+    return ret;
+}
+
 bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame, boost::chrono::microseconds timeout)
 {
     struct timeval *tvp = NULL;
@@ -336,52 +348,6 @@ bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame, boost::chrono::mic
     return true;
 }
 
-bool ChannelImpl::GetNextFrameFromBrokerOnChannel(amqp_channel_t channel, amqp_frame_t &frame_out, boost::chrono::microseconds timeout)
-{
-    boost::chrono::steady_clock::time_point end_point;
-    boost::chrono::microseconds timeout_left = timeout;
-    if (timeout != boost::chrono::microseconds::max())
-    {
-        end_point = boost::chrono::steady_clock::now() + timeout;
-    }
-
-    amqp_frame_t frame;
-    while (GetNextFrameFromBroker(frame, timeout_left))
-    {
-        if (frame.channel == channel)
-        {
-            frame_out = frame;
-            return true;
-        }
-
-        if (frame.channel == 0)
-        {
-            // Only thing we care to handle on the channel0 is the connection.close method
-            if (AMQP_FRAME_METHOD == frame.frame_type &&
-                    AMQP_CONNECTION_CLOSE_METHOD == frame.payload.method.id)
-            {
-                FinishCloseConnection();
-                AmqpException::Throw(*reinterpret_cast<amqp_connection_close_t *>(frame.payload.method.decoded));
-            }
-        }
-        else
-        {
-            m_frame_queue.push_back(frame);
-        }
-
-        if (timeout != boost::chrono::microseconds::max())
-        {
-            boost::chrono::steady_clock::time_point now = boost::chrono::steady_clock::now();
-            if (now >= end_point)
-            {
-                return false;
-            }
-            timeout_left = boost::chrono::duration_cast<boost::chrono::microseconds>(end_point - now);
-        }
-    }
-    return false;
-}
-
 bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel, amqp_frame_t &frame, boost::chrono::microseconds timeout)
 {
     frame_queue_t::iterator it = std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
@@ -401,7 +367,8 @@ bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel, amqp_frame_t &fr
         return true;
     }
 
-    return GetNextFrameFromBrokerOnChannel(channel, frame, timeout);
+    boost::array<amqp_channel_t, 1> channels = {{ channel }};
+    return GetNextFrameFromBrokerOnChannel(channels, frame, timeout);
 }
 
 void ChannelImpl::MaybeReleaseBuffersOnChannel(amqp_channel_t channel)

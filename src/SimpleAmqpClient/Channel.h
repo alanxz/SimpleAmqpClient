@@ -520,6 +520,24 @@ public:
     Envelope::ptr_t BasicConsumeMessage(const std::string &consumer_tag);
 
     /**
+     * Consumes a single message from a list of consumers
+     * Waits for a single message to be delivered from a list of consumers. This function only works
+     * after BasicConsume has been called.
+     *
+     * @returns the next message delivered from the broker
+     */
+    Envelope::ptr_t BasicConsumeMessage(const std::vector<std::string> &consumer_tags);
+
+    /**
+     * Consumes a single message from any open consumers
+     * Waits for a message from any consumer open on this Channel object. This function only works
+     * after BasicConsume has been called.
+     *
+     * @returns the next message delivered from the broker
+     */
+    Envelope::ptr_t BasicConsumeMessage();
+
+    /**
       * Consumes a single message with a timeout (this gets an envelope object)
       * Waits for a single Basic message to be Delivered or the timeout to expire.
       * This function only works after BasicConsume as been successfully called.
@@ -531,6 +549,36 @@ public:
       * @returns true if a message was delivered before the timeout, false otherwise
       */
     bool BasicConsumeMessage(const std::string &consumer_tag, Envelope::ptr_t &envelope, int timeout = -1);
+
+    /**
+     * Consumes a single message with a timeout from a list of consumers
+     *
+     * Waits for a single message to be delivered to one of the listed consumer tags to be
+     * delivered or for the timeout to expire. This function only works after BasicConsume has
+     * been successfully called.
+     *
+     * @param consumer_tags [in] a list of the consumer tags to wait for a message from
+     * @param envelope [out] the message object that is delivered.
+     * @param timeout [in] the timeout in milliseconds for the message to be delivered. 0 works
+     *  like a non-blocking read, -1 is an infinite timeout.
+     * @returns true if a message was delivered before the timeout, false otherwise.
+     */
+    bool BasicConsumeMessage(const std::vector<std::string> &consumer_tags, Envelope::ptr_t &envelope,
+                            int timeout = -1);
+
+    /**
+     * Consumes a single message from any consumers opened for this Channel object
+     *
+     * Waits for a single message to be delivered to one of the consumers opened on this Channel
+     * object to be delivered, or for the timeout to occur. This function only works after BasicConsume
+     * has been successfully called.
+     *
+     * @param envelope [out] the message object that is delivered.
+     * @param timeout [in] the timeout in milliseconds for the message to be delivered. 0 works
+     * like a non-blocking read, -1 is an infinite timeout.
+     * @returns true if a message delivered before the timeout, false otherwise
+     */
+    bool BasicConsumeMessage(Envelope::ptr_t &envelope, int timeout = -1);
 
 protected:
     boost::scoped_ptr<Detail::ChannelImpl> m_impl;
