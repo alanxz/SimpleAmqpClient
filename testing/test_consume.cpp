@@ -223,3 +223,20 @@ TEST_F(connected_test, consumer_cancelled_one_message)
 
     EXPECT_THROW(channel->BasicConsumeMessage(consumer), ConsumerCancelledException);
 }
+
+TEST_F(connected_test, consume_multiple)
+{
+    std::string queue1 = channel->DeclareQueue("");
+    std::string queue2 = channel->DeclareQueue("");
+
+    std::string Body = "Message 1";
+    channel->BasicPublish("", queue1, BasicMessage::Create(Body));
+
+
+    channel->BasicConsume(queue1);
+    channel->BasicConsume(queue2);
+
+    Envelope::ptr_t env = channel->BasicConsumeMessage();
+
+    EXPECT_EQ(Body, env->Message()->Body());
+}
