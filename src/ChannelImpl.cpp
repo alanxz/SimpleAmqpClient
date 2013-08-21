@@ -33,8 +33,6 @@
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 
-#include "config.h"
-
 #include <boost/array.hpp>
 
 #include <string.h>

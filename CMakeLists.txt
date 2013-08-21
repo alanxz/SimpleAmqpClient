@@ -47,26 +47,6 @@ endif ()
 INCLUDE_DIRECTORIES(BEFORE src
     ${CMAKE_CURRENT_BINARY_DIR})
 
-INCLUDE (CheckIncludeFile)
-
-# We need winsock32 if we're compiling on windows
-# This needs to match what rabbitmq-c does
-if (WIN32)
-    set(SOCKET_LIBRARY ws2_32)
-    CHECK_INCLUDE_FILE(winsock2.h HAVE_WINSOCK2_H)
-else ()
-    CHECK_INCLUDE_FILE(sys/socket.h HAVE_SYS_SOCKET_H)
-endif ()
-
-INCLUDE (CheckFunctionExists)
-
-CHECK_FUNCTION_EXISTS(strerror_s HAVE_STRERROR_S)
-SET(CMAKE_REQUIRED_DEFINITIONS "-D_XOPEN_SOURCE=600")
-CHECK_FUNCTION_EXISTS(strerror_r HAVE_STRERROR_R)
-UNSET(CMAKE_REQUIRED_DEFINITIONS)
-
-CONFIGURE_FILE(config.h.in config.h)
-
 option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
 
 if (WIN32 AND NOT BUILD_SHARED_LIBS)
