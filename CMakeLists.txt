@@ -45,17 +45,17 @@ if (CMAKE_CXX_FLAGS STREQUAL ""
 endif ()
 
 INCLUDE_DIRECTORIES(BEFORE src
-	${CMAKE_CURRENT_BINARY_DIR})
+    ${CMAKE_CURRENT_BINARY_DIR})
 
 INCLUDE (CheckIncludeFile)
 
 # We need winsock32 if we're compiling on windows
 # This needs to match what rabbitmq-c does
 if (WIN32)
-	set(SOCKET_LIBRARY ws2_32)
-  CHECK_INCLUDE_FILE(winsock2.h HAVE_WINSOCK2_H)
+    set(SOCKET_LIBRARY ws2_32)
+    CHECK_INCLUDE_FILE(winsock2.h HAVE_WINSOCK2_H)
 else ()
-  CHECK_INCLUDE_FILE(sys/socket.h HAVE_SYS_SOCKET_H)
+    CHECK_INCLUDE_FILE(sys/socket.h HAVE_SYS_SOCKET_H)
 endif ()
 
 INCLUDE (CheckFunctionExists)
@@ -74,41 +74,41 @@ if (WIN32 AND NOT BUILD_SHARED_LIBS)
 endif()
 
 SET(SAC_LIB_SRCS
-	src/SimpleAmqpClient/SimpleAmqpClient.h
+    src/SimpleAmqpClient/SimpleAmqpClient.h
 
-	src/SimpleAmqpClient/AmqpException.h
-	src/AmqpException.cpp
+    src/SimpleAmqpClient/AmqpException.h
+    src/AmqpException.cpp
 
-	src/SimpleAmqpClient/Channel.h
-	src/Channel.cpp
+    src/SimpleAmqpClient/Channel.h
+    src/Channel.cpp
 
-	src/SimpleAmqpClient/ChannelImpl.h
-	src/ChannelImpl.cpp
+    src/SimpleAmqpClient/ChannelImpl.h
+    src/ChannelImpl.cpp
 
-	src/SimpleAmqpClient/BasicMessage.h
-	src/BasicMessage.cpp
+    src/SimpleAmqpClient/BasicMessage.h
+    src/BasicMessage.cpp
 
-	src/SimpleAmqpClient/Util.h
+    src/SimpleAmqpClient/Util.h
 
-	src/SimpleAmqpClient/AmqpResponseLibraryException.h
-	src/AmqpResponseLibraryException.cpp
+    src/SimpleAmqpClient/AmqpResponseLibraryException.h
+    src/AmqpResponseLibraryException.cpp
 
-  src/SimpleAmqpClient/BadUriException.h
-	src/SimpleAmqpClient/ConnectionClosedException.h
-	src/SimpleAmqpClient/ConsumerTagNotFoundException.h
+    src/SimpleAmqpClient/BadUriException.h
+    src/SimpleAmqpClient/ConnectionClosedException.h
+    src/SimpleAmqpClient/ConsumerTagNotFoundException.h
 
-	src/SimpleAmqpClient/Envelope.h
-	src/Envelope.cpp
+    src/SimpleAmqpClient/Envelope.h
+    src/Envelope.cpp
 
-	src/SimpleAmqpClient/MessageReturnedException.h
-	src/MessageReturnedException.cpp
- 
-  src/SimpleAmqpClient/Table.h
-  src/Table.cpp
- 
-  src/SimpleAmqpClient/TableImpl.h
-  src/TableImpl.cpp
-	)
+    src/SimpleAmqpClient/MessageReturnedException.h
+    src/MessageReturnedException.cpp
+
+    src/SimpleAmqpClient/Table.h
+    src/Table.cpp
+
+    src/SimpleAmqpClient/TableImpl.h
+    src/TableImpl.cpp
+    )
 
 
 ADD_LIBRARY(SimpleAmqpClient ${SAC_LIB_SRCS})
@@ -146,9 +146,9 @@ endif ()
 option(ENABLE_TESTING "Enable smoke tests" OFF)
 
 if (ENABLE_TESTING)
-  enable_testing()
-  add_subdirectory(third-party/gtest-1.6.0)
-	add_subdirectory(testing)
+    enable_testing()
+    add_subdirectory(third-party/gtest-1.6.0)
+    add_subdirectory(testing)
 endif (ENABLE_TESTING)
 
 
@@ -158,22 +158,22 @@ SET(PROJECT_VERSION ${SAC_VERSION})
 INCLUDE(UseDoxygen)
 
 INSTALL(TARGETS SimpleAmqpClient
-	RUNTIME DESTINATION bin
-	ARCHIVE DESTINATION lib
-	LIBRARY DESTINATION lib
-	)
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    )
 
 INSTALL(FILES
-	src/SimpleAmqpClient/SimpleAmqpClient.h
-	src/SimpleAmqpClient/AmqpException.h
-	src/SimpleAmqpClient/Channel.h
-	src/SimpleAmqpClient/BasicMessage.h
-	src/SimpleAmqpClient/Util.h
-	src/SimpleAmqpClient/AmqpResponseLibraryException.h
-	src/SimpleAmqpClient/ConnectionClosedException.h
-	src/SimpleAmqpClient/ConsumerTagNotFoundException.h
-	src/SimpleAmqpClient/Envelope.h
-	src/SimpleAmqpClient/MessageReturnedException.h
-  src/SimpleAmqpClient/Table.h
-	DESTINATION include/SimpleAmqpClient
-	)
+    src/SimpleAmqpClient/SimpleAmqpClient.h
+    src/SimpleAmqpClient/AmqpException.h
+    src/SimpleAmqpClient/Channel.h
+    src/SimpleAmqpClient/BasicMessage.h
+    src/SimpleAmqpClient/Util.h
+    src/SimpleAmqpClient/AmqpResponseLibraryException.h
+    src/SimpleAmqpClient/ConnectionClosedException.h
+    src/SimpleAmqpClient/ConsumerTagNotFoundException.h
+    src/SimpleAmqpClient/Envelope.h
+    src/SimpleAmqpClient/MessageReturnedException.h
+    src/SimpleAmqpClient/Table.h
+    DESTINATION include/SimpleAmqpClient
+    )
