@@ -164,16 +164,19 @@ INSTALL(TARGETS SimpleAmqpClient
     )
 
 INSTALL(FILES
-    src/SimpleAmqpClient/SimpleAmqpClient.h
     src/SimpleAmqpClient/AmqpException.h
-    src/SimpleAmqpClient/Channel.h
-    src/SimpleAmqpClient/BasicMessage.h
-    src/SimpleAmqpClient/Util.h
     src/SimpleAmqpClient/AmqpResponseLibraryException.h
+    src/SimpleAmqpClient/BadUriException.h
+    src/SimpleAmqpClient/BasicMessage.h
+    src/SimpleAmqpClient/Channel.h
     src/SimpleAmqpClient/ConnectionClosedException.h
+    src/SimpleAmqpClient/ConsumerCancelledException.h
     src/SimpleAmqpClient/ConsumerTagNotFoundException.h
     src/SimpleAmqpClient/Envelope.h
     src/SimpleAmqpClient/MessageReturnedException.h
+    src/SimpleAmqpClient/SimpleAmqpClient.h
     src/SimpleAmqpClient/Table.h
+    src/SimpleAmqpClient/Util.h
+    src/SimpleAmqpClient/Version.h
     DESTINATION include/SimpleAmqpClient
     )
