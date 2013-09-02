@@ -310,13 +310,14 @@ std::string Channel::DeclareQueue(const std::string &queue_name,
                                   bool auto_delete,
                                   const Table &arguments)
 {
-	unsigned message_count, consumer_count;
+	boost::uint32_t message_count;
+	boost::uint32_t consumer_count;
 	return DeclareQueueWithCounts(queue_name, message_count, consumer_count, passive, durable, exclusive, auto_delete, arguments);
 }
 
 std::string Channel::DeclareQueueWithCounts(const std::string &queue_name,
-	unsigned &message_count,
-	unsigned &consumer_count,
+	boost::uint32_t &message_count,
+	boost::uint32_t &consumer_count,
 	bool passive,
 	bool durable,
 	bool exclusive,
@@ -326,8 +327,8 @@ std::string Channel::DeclareQueueWithCounts(const std::string &queue_name,
 }
 
 std::string Channel::DeclareQueueWithCounts(const std::string &queue_name,
-	unsigned &message_count,
-	unsigned &consumer_count,
+	boost::uint32_t &message_count,
+	boost::uint32_t &consumer_count,
 	bool passive,
 	bool durable,
 	bool exclusive,

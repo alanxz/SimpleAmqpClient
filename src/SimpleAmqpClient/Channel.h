@@ -270,9 +270,9 @@ public:
       * Declares a queue
       * Creates a queue on the AMQP broker if it does not already exist
       * @param queue_name the desired name of the queue. If this is a zero-length string the broker
-      *  will generate a queue name and it will be returned as a result from this method
+      *  will generate a queue name and it will be returned as a result from this metho
       * @param passive Indicated how the broker should react if the queue does not exist.
-      *  If passive is true and the queue does not exist the broker will respond with an error and
+      *  If passive is true and the queue does not exist the borker will respond with an error and
       *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
       *  does not already exist)
       * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
@@ -294,9 +294,9 @@ public:
       * Declares a queue
       * Creates a queue on the AMQP broker if it does not already exist
       * @param queue_name the desired name of the queue. If this is a zero-length string the broker
-      *  will generate a queue name and it will be returned as a result from this method
+      *  will generate a queue name and it will be returned as a result from this metho
       * @param passive Indicated how the broker should react if the queue does not exist.
-      *  If passive is true and the queue does not exist the broker will respond with an error and
+      *  If passive is true and the queue does not exist the borker will respond with an error and
       *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
       *  does not already exist)
       * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
@@ -339,8 +339,8 @@ public:
       *  create a unique queue by not providing a queue name
       */
 	std::string DeclareQueueWithCounts(const std::string &queue_name,
-                             unsigned &message_count,
-                             unsigned &consumer_count,
+                             boost::uint32_t &message_count,
+                             boost::uint32_t &consumer_count,
                              bool passive = false,
                              bool durable = false,
                              bool exclusive = true,
@@ -370,8 +370,8 @@ public:
       *  create a unique queue by not providing a queue name
       */
     std::string DeclareQueueWithCounts(const std::string &queue_name,
-                             unsigned &message_count,
-                             unsigned &consumer_count,
+                             boost::uint32_t &message_count,
+                             boost::uint32_t &consumer_count,
                              bool passive,
                              bool durable,
                              bool exclusive,
