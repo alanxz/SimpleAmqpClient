@@ -71,6 +71,9 @@ public:
 
     bool GetNextFrameFromBroker(amqp_frame_t &frame, boost::chrono::microseconds timeout);
 
+    bool CheckForQueuedMessageOnChannel(amqp_channel_t message_on_channel) const;
+    void AddToFrameQueue(const amqp_frame_t &frame);
+
     template <class ChannelListType>
     bool GetNextFrameFromBrokerOnChannel(const ChannelListType channels, amqp_frame_t &frame_out,
             boost::chrono::microseconds timeout = boost::chrono::microseconds::max())
@@ -103,7 +106,7 @@ public:
             }
             else
             {
-                m_frame_queue.push_back(frame);
+                AddToFrameQueue(frame);
             }
 
             if (timeout != boost::chrono::microseconds::max())
@@ -122,14 +125,27 @@ public:
     bool GetNextFrameOnChannel(amqp_channel_t channel, amqp_frame_t &frame,
             boost::chrono::microseconds timeout = boost::chrono::microseconds::max());
 
-    static bool is_on_channel(const amqp_frame_t &frame, amqp_channel_t channel)
+    static bool is_on_channel(const amqp_frame_t frame, amqp_channel_t channel)
     {
         return channel == frame.channel;
     }
 
+    static bool is_frame_type_on_channel(const amqp_frame_t frame, uint8_t frame_type, amqp_channel_t channel)
+    {
+        return frame.frame_type == frame_type &&
+            frame.channel == channel;
+    }
+
+    static bool is_method_on_channel(const amqp_frame_t frame, amqp_method_number_t method, amqp_channel_t channel)
+    {
+        return frame.channel == channel &&
+                frame.frame_type == AMQP_FRAME_METHOD &&
+                frame.payload.method.id == method;
+    }
+
     template <class ChannelListType, class ResponseListType>
-    static bool is_expected_method(const amqp_frame_t &frame, const ChannelListType channels,
-                                   const ResponseListType &expected_responses)
+    static bool is_expected_method_on_channel(const amqp_frame_t &frame, const ChannelListType channels,
+                                              const ResponseListType &expected_responses)
     {
         return channels.end() != std::find(channels.begin(), channels.end(), frame.channel) &&
             AMQP_FRAME_METHOD == frame.frame_type &&
@@ -143,7 +159,7 @@ public:
     {
         frame_queue_t::iterator desired_frame =
             std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
-                         boost::bind(&ChannelImpl::is_expected_method<ChannelListType, ResponseListType>, _1,
+                         boost::bind(&ChannelImpl::is_expected_method_on_channel<ChannelListType, ResponseListType>, _1,
                                      channels, expected_responses));
 
         if (m_frame_queue.end() != desired_frame)
@@ -163,7 +179,7 @@ public:
         amqp_frame_t incoming_frame;
         while (GetNextFrameFromBrokerOnChannel(channels, incoming_frame, timeout_left))
         {
-            if (is_expected_method(incoming_frame, channels, expected_responses))
+            if (is_expected_method_on_channel(incoming_frame, channels, expected_responses))
             {
                 frame = incoming_frame;
                 return true;
@@ -219,7 +235,31 @@ public:
     }
 
     template <class ChannelListType>
+    static bool envelope_on_channel(const Envelope::ptr_t &envelope, const ChannelListType channels)
+    {
+        return channels.end() != std::find(channels.begin(), channels.end(), envelope->DeliveryChannel());
+    }
+
+    template <class ChannelListType>
     bool ConsumeMessageOnChannel(const ChannelListType channels, Envelope::ptr_t &message, int timeout)
+    {
+        envelope_list_t::iterator it = std::find_if(m_delivered_messages.begin(),
+                                                    m_delivered_messages.end(),
+                                                    boost::bind(ChannelImpl::envelope_on_channel<ChannelListType>,
+                                                                _1, channels));
+
+        if (it != m_delivered_messages.end())
+        {
+            message = *it;
+            m_delivered_messages.erase(it);
+            return true;
+        }
+
+        return ConsumeMessageOnChannelInner(channels, message, timeout);
+    }
+
+    template <class ChannelListType>
+    bool ConsumeMessageOnChannelInner(const ChannelListType channels, Envelope::ptr_t &message, int timeout)
     {
         const boost::array<boost::uint32_t, 2> DELIVER_OR_CANCEL = { { AMQP_BASIC_DELIVER_METHOD,
             AMQP_BASIC_CANCEL_METHOD } };
@@ -292,6 +332,9 @@ public:
 
 private:
     frame_queue_t m_frame_queue;
+
+    typedef std::vector<Envelope::ptr_t> envelope_list_t;
+    envelope_list_t m_delivered_messages;
 
     typedef std::map<std::string, amqp_channel_t> consumer_map_t;
     consumer_map_t m_consumer_channel_map;

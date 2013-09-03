@@ -315,6 +315,69 @@ std::vector<amqp_channel_t> ChannelImpl::GetAllConsumerChannels() const
     return ret;
 }
 
+bool ChannelImpl::CheckForQueuedMessageOnChannel(amqp_channel_t channel) const
+{
+    frame_queue_t::const_iterator it = std::find_if(m_frame_queue.begin(),
+                                                    m_frame_queue.end(),
+                                                    boost::bind(&ChannelImpl::is_method_on_channel,
+                                                                _1, AMQP_BASIC_DELIVER_METHOD, channel));
+
+    if (it == m_frame_queue.end())
+    {
+        return false;
+    }
+
+    it = std::find_if(it+1, m_frame_queue.end(), boost::bind(&ChannelImpl::is_on_channel,
+                                                              _1, channel));
+
+    if (it == m_frame_queue.end())
+    {
+        return false;
+    }
+    if (it->frame_type != AMQP_FRAME_HEADER)
+    {
+        throw std::runtime_error("Protocol error");
+    }
+
+    uint64_t body_length = it->payload.properties.body_size;
+    uint64_t body_received = 0;
+
+    while (body_received < body_length)
+    {
+        it = std::find_if(it+1, m_frame_queue.end(),
+                          boost::bind(&ChannelImpl::is_on_channel, _1, channel));
+
+        if (it == m_frame_queue.end())
+        {
+            return false;
+        }
+        if (it->frame_type != AMQP_FRAME_BODY)
+        {
+            throw std::runtime_error("Protocol error");
+        }
+        body_received += it->payload.body_fragment.len;
+    }
+
+    return true;
+}
+
+void ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame)
+{
+    m_frame_queue.push_back(frame);
+
+    if (CheckForQueuedMessageOnChannel(frame.channel))
+    {
+        boost::array<amqp_channel_t, 1> channel = {{frame.channel}};
+        Envelope::ptr_t envelope;
+        if (!ConsumeMessageOnChannelInner(channel, envelope, -1))
+        {
+            throw std::logic_error("ConsumeMessageOnChannelInner returned false unexpectedly");
+        }
+
+        m_delivered_messages.push_back(envelope);
+    }
+}
+
 bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame, boost::chrono::microseconds timeout)
 {
     struct timeval *tvp = NULL;
