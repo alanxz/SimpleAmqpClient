@@ -310,56 +310,56 @@ std::string Channel::DeclareQueue(const std::string &queue_name,
                                   bool auto_delete,
                                   const Table &arguments)
 {
-	boost::uint32_t message_count;
-	boost::uint32_t consumer_count;
-	return DeclareQueueWithCounts(queue_name, message_count, consumer_count, passive, durable, exclusive, auto_delete, arguments);
+    boost::uint32_t message_count;
+    boost::uint32_t consumer_count;
+    return DeclareQueueWithCounts(queue_name, message_count, consumer_count, passive, durable, exclusive, auto_delete, arguments);
 }
 
 std::string Channel::DeclareQueueWithCounts(const std::string &queue_name,
-	boost::uint32_t &message_count,
-	boost::uint32_t &consumer_count,
-	bool passive,
-	bool durable,
-	bool exclusive,
-	bool auto_delete)
+                                            boost::uint32_t &message_count,
+                                            boost::uint32_t &consumer_count,
+                                            bool passive,
+                                            bool durable,
+                                            bool exclusive,
+                                            bool auto_delete)
 {
-	return DeclareQueueWithCounts(queue_name, message_count, consumer_count, passive, durable, exclusive, auto_delete, Table());
+    return DeclareQueueWithCounts(queue_name, message_count, consumer_count, passive, durable, exclusive, auto_delete, Table());
 }
 
 std::string Channel::DeclareQueueWithCounts(const std::string &queue_name,
-	boost::uint32_t &message_count,
-	boost::uint32_t &consumer_count,
-	bool passive,
-	bool durable,
-	bool exclusive,
-	bool auto_delete,
-	const Table &arguments)
+                                            boost::uint32_t &message_count,
+                                            boost::uint32_t &consumer_count,
+                                            bool passive,
+                                            bool durable,
+                                            bool exclusive,
+                                            bool auto_delete,
+                                            const Table &arguments)
 {
-	const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
-	m_impl->CheckIsConnected();
-
-	amqp_queue_declare_t declare = {};
-	declare.queue = amqp_cstring_bytes(queue_name.c_str());
-	declare.passive = passive;
-	declare.durable = durable;
-	declare.exclusive = exclusive;
-	declare.auto_delete = auto_delete;
-	declare.nowait = false;
-
-	Detail::amqp_pool_ptr_t table_pool;
-	declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
-
-	amqp_frame_t response = m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
-
-	amqp_queue_declare_ok_t *declare_ok = (amqp_queue_declare_ok_t *)response.payload.method.decoded;
-
-	std::string ret((char *)declare_ok->queue.bytes, declare_ok->queue.len);
-
-	message_count = declare_ok->message_count;
-	consumer_count = declare_ok->consumer_count;
-
-	m_impl->MaybeReleaseBuffersOnChannel(response.channel);
-	return ret;
+    const boost::array<boost::uint32_t, 1> DECLARE_OK = { { AMQP_QUEUE_DECLARE_OK_METHOD } };
+    m_impl->CheckIsConnected();
+    
+    amqp_queue_declare_t declare = {};
+    declare.queue = amqp_cstring_bytes(queue_name.c_str());
+    declare.passive = passive;
+    declare.durable = durable;
+    declare.exclusive = exclusive;
+    declare.auto_delete = auto_delete;
+    declare.nowait = false;
+    
+    Detail::amqp_pool_ptr_t table_pool;
+    declare.arguments = Detail::TableValueImpl::CreateAmqpTable(arguments, table_pool);
+    
+    amqp_frame_t response = m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
+    
+    amqp_queue_declare_ok_t *declare_ok = (amqp_queue_declare_ok_t *)response.payload.method.decoded;
+    
+    std::string ret((char *)declare_ok->queue.bytes, declare_ok->queue.len);
+    
+    message_count = declare_ok->message_count;
+    consumer_count = declare_ok->consumer_count;
+    
+    m_impl->MaybeReleaseBuffersOnChannel(response.channel);
+    return ret;
 }
 
 

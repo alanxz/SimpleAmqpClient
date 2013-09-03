@@ -79,58 +79,58 @@ TEST_F(connected_test, queue_declare_notautodelete)
 
 TEST_F(connected_test, queue_declare_counts)
 {
-	boost::uint32_t message_count = 123;
-	boost::uint32_t consumer_count = 123;
-
-	std::string queue = channel->DeclareQueueWithCounts("queue_declare_counts", message_count, consumer_count);
-
-	EXPECT_NE("", queue);
-	EXPECT_EQ(0, message_count);
-	EXPECT_EQ(0, consumer_count);
-
-	const std::string body("Test Message");
-	BasicMessage::ptr_t out_message = BasicMessage::Create(body);
-	channel->BasicPublish("", queue, out_message);
-	channel->BasicPublish("", queue, out_message);
-	channel->BasicPublish("", queue, out_message);
-
-	std::string queue2 = channel->DeclareQueueWithCounts("queue_declare_counts", message_count, consumer_count);
-
-	EXPECT_NE("", queue2);
-	EXPECT_EQ(3, message_count);
-	EXPECT_EQ(0, consumer_count);
-
-	channel->DeleteQueue(queue);
+    boost::uint32_t message_count = 123;
+    boost::uint32_t consumer_count = 123;
+    
+    std::string queue = channel->DeclareQueueWithCounts("queue_declare_counts", message_count, consumer_count);
+    
+    EXPECT_NE("", queue);
+    EXPECT_EQ(0, message_count);
+    EXPECT_EQ(0, consumer_count);
+    
+    const std::string body("Test Message");
+    BasicMessage::ptr_t out_message = BasicMessage::Create(body);
+    channel->BasicPublish("", queue, out_message);
+    channel->BasicPublish("", queue, out_message);
+    channel->BasicPublish("", queue, out_message);
+    
+    std::string queue2 = channel->DeclareQueueWithCounts("queue_declare_counts", message_count, consumer_count);
+    
+    EXPECT_NE("", queue2);
+    EXPECT_EQ(3, message_count);
+    EXPECT_EQ(0, consumer_count);
+    
+    channel->DeleteQueue(queue);
 }
 
 TEST_F(connected_test, queue_declare_counts_table)
 {
-	boost::uint32_t message_count = 123;
-	boost::uint32_t consumer_count = 123;
-
-	Table qTable;
-
-	qTable.insert(TableEntry(TableKey("IsATest"), TableValue(true)));
-
-	std::string queue = channel->DeclareQueueWithCounts("queue_declare_counts_table", message_count, consumer_count, false, false, true, true, qTable);
-
-	EXPECT_NE("", queue);
-	EXPECT_EQ(0, message_count);
-	EXPECT_EQ(0, consumer_count);
-
-	const std::string body("Test Message");
-	BasicMessage::ptr_t out_message = BasicMessage::Create(body);
-	channel->BasicPublish("", queue, out_message);
-	channel->BasicPublish("", queue, out_message);
-	channel->BasicPublish("", queue, out_message);
-
-	std::string queue2 = channel->DeclareQueueWithCounts("queue_declare_counts_table", message_count, consumer_count, false, false, true, true, qTable);
-
-	EXPECT_NE("", queue2);
-	EXPECT_EQ(3, message_count);
-	EXPECT_EQ(0, consumer_count);
-
-	channel->DeleteQueue(queue);
+    boost::uint32_t message_count = 123;
+    boost::uint32_t consumer_count = 123;
+    
+    Table qTable;
+    
+    qTable.insert(TableEntry(TableKey("IsATest"), TableValue(true)));
+    
+    std::string queue = channel->DeclareQueueWithCounts("queue_declare_counts_table", message_count, consumer_count, false, false, true, true, qTable);
+    
+    EXPECT_NE("", queue);
+    EXPECT_EQ(0, message_count);
+    EXPECT_EQ(0, consumer_count);
+    
+    const std::string body("Test Message");
+    BasicMessage::ptr_t out_message = BasicMessage::Create(body);
+    channel->BasicPublish("", queue, out_message);
+    channel->BasicPublish("", queue, out_message);
+    channel->BasicPublish("", queue, out_message);
+    
+    std::string queue2 = channel->DeclareQueueWithCounts("queue_declare_counts_table", message_count, consumer_count, false, false, true, true, qTable);
+    
+    EXPECT_NE("", queue2);
+    EXPECT_EQ(3, message_count);
+    EXPECT_EQ(0, consumer_count);
+    
+    channel->DeleteQueue(queue);
 }
 
 TEST_F(connected_test, queue_delete)
