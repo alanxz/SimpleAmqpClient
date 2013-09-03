@@ -317,6 +317,68 @@ public:
                              const Table &arguments);
 
     /**
+      * Declares a queue and returns current message- and consumer counts
+      * Creates a queue on the AMQP broker if it does not already exist
+      * @param queue_name the desired name of the queue. If this is a zero-length string the broker
+      *  will generate a queue name and it will be returned as a result from this method
+      * @param message_count Reference to an unsigned int which will receive the current
+      *  number of messages in the declared queue, if any.
+      * @param consumer_count Reference to an unsigned int which will receive the current
+      *  number of consumers of the declared queue, if any.
+      * @param passive Indicated how the broker should react if the queue does not exist.
+      *  If passive is true and the queue does not exist the broker will respond with an error and
+      *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
+      *  does not already exist)
+      * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
+      *  Defaults to false
+      * @param exclusive Indicates that only client can use the queue. Defaults to true. An
+      *  exclusive queue is deleted when the connection is closed
+      * @param auto_delete the queue will be deleted after at least one exchange has been bound to it,
+      *  then has been unbound
+      * @returns the name of the queue created on the broker. Used mostly when the broker is asked to
+      *  create a unique queue by not providing a queue name
+      */
+    std::string DeclareQueueWithCounts(const std::string &queue_name,
+                                       boost::uint32_t &message_count,
+                                       boost::uint32_t &consumer_count,
+                                       bool passive = false,
+                                       bool durable = false,
+                                       bool exclusive = true,
+                                       bool auto_delete = true);
+
+    /**
+      * Declares a queue and returns current message- and consumer counts
+      * Creates a queue on the AMQP broker if it does not already exist
+      * @param queue_name the desired name of the queue. If this is a zero-length string the broker
+      *  will generate a queue name and it will be returned as a result from this method
+      * @param message_count Reference to an unsigned int which will receive the current
+      *  number of messages in the declared queue, if any.
+      * @param consumer_count Reference to an unsigned int which will receive the current
+      *  number of consumers of the declared queue, if any.
+      * @param passive Indicated how the broker should react if the queue does not exist.
+      *  If passive is true and the queue does not exist the broker will respond with an error and
+      *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
+      *  does not already exist)
+      * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
+      *  Defaults to false
+      * @param exclusive Indicates that only client can use the queue. Defaults to true. An
+      *  exclusive queue is deleted when the connection is closed
+      * @param auto_delete the queue will be deleted after at least one exchange has been bound to it,
+      *  then has been unbound
+      * @param arguments A table of additional arguments used when declaring a queue
+      * @returns the name of the queue created on the broker. Used mostly when the broker is asked to
+      *  create a unique queue by not providing a queue name
+      */
+    std::string DeclareQueueWithCounts(const std::string &queue_name,
+                                       boost::uint32_t &message_count,
+                                       boost::uint32_t &consumer_count,
+                                       bool passive,
+                                       bool durable,
+                                       bool exclusive,
+                                       bool auto_delete,
+                                       const Table &arguments);
+
+    /**
       * Deletes a queue
       * Removes a queue from the broker. There is no indication of whether the queue was actually deleted
       * on the broker.
