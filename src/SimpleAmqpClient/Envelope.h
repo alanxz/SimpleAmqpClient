@@ -52,8 +52,6 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable
 public:
     typedef boost::shared_ptr<Envelope> ptr_t;
 
-    friend ptr_t boost::make_shared<Envelope>(AmqpClient::BasicMessage::ptr_t const &a1, std::string const &a2, boost::uint64_t const &a3,
-            std::string const &a4, bool const &a5, std::string const &a6, boost::uint16_t const &a7);
 
     /**
       * Creates an new envelope object

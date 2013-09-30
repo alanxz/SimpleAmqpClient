@@ -67,9 +67,6 @@ public:
         dm_persistent = 2
     };
 
-    friend ptr_t boost::make_shared<BasicMessage>();
-    friend ptr_t boost::make_shared<BasicMessage>(std::string const &a1);
-    friend ptr_t boost::make_shared<BasicMessage>(amqp_bytes_t_ const &a1, amqp_basic_properties_t_* const &a2);
 
     /**
       * Create a new empty BasicMessage object
