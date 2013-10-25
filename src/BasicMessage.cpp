@@ -334,7 +334,7 @@ void BasicMessage::MessageIdClear()
 
 boost::uint64_t BasicMessage::Timestamp() const
 {
-    if (ReplyToIsSet())
+    if (TimestampIsSet())
         return m_impl->m_properties.timestamp;
     else
         return 0;
