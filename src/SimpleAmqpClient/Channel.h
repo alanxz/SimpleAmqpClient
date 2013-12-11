@@ -462,6 +462,23 @@ public:
     void BasicAck(const Envelope::DeliveryInfo &info);
 
     /**
+      * Reject a Basic message
+      * Rejects a message delievered using BasicGet or BasicConsume
+      * @param message the message that is being nack'ed
+      * @param requeue tells the broker to requeue the message or not
+      */
+    void BasicReject(const Envelope::ptr_t &message, bool requeue);
+
+    /**
+     * Reject a Basic message
+     * Rejects a message delivered using BasicGet or BasicConsume, this overload
+     * doesn't require the Envelope object to Reject
+     * @param delivery_info
+     * @param requeue tells the broker to requeue the message or not
+     */
+    void BasicReject(const Envelope::DeliveryInfo &info, bool requeue);
+
+    /**
       * Publishes a Basic message
       * Publishes a Basic message to an exchange
       * @param exchange_name The name of the exchange to publish the message to

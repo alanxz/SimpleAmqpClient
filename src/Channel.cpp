@@ -470,6 +470,28 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info)
                                          info.delivery_tag, false));
 }
 
+void Channel::BasicReject(const Envelope::ptr_t &message, bool requeue)
+{
+    BasicReject(message->GetDeliveryInfo(), requeue);
+}
+
+void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue)
+{
+    m_impl->CheckIsConnected();
+    // Delivery tag is local to the channel, so its important to use
+    // that channel, sadly this can cause the channel to throw an exception
+    // which will show up as an unrelated exception in a different method
+    // that actually waits for a response from the broker
+    amqp_channel_t channel = info.delivery_channel;
+    if (!m_impl->IsChannelOpen(channel))
+    {
+        throw std::runtime_error("The channel that the message was delivered on has been closed");
+    }
+
+    m_impl->CheckForError(amqp_basic_reject(m_impl->m_connection, channel,
+                                         info.delivery_tag, requeue));
+}
+
 void Channel::BasicPublish(const std::string &exchange_name,
                            const std::string &routing_key,
                            const BasicMessage::ptr_t message,
