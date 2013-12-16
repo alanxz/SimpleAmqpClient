@@ -470,12 +470,12 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info)
                                          info.delivery_tag, false));
 }
 
-void Channel::BasicReject(const Envelope::ptr_t &message, bool requeue)
+void Channel::BasicReject(const Envelope::ptr_t &message, bool requeue, bool multiple)
 {
-    BasicReject(message->GetDeliveryInfo(), requeue);
+    BasicReject(message->GetDeliveryInfo(), requeue, multiple);
 }
 
-void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue)
+void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue, bool multiple)
 {
     m_impl->CheckIsConnected();
     // Delivery tag is local to the channel, so its important to use
@@ -488,8 +488,8 @@ void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue)
         throw std::runtime_error("The channel that the message was delivered on has been closed");
     }
 
-    m_impl->CheckForError(amqp_basic_reject(m_impl->m_connection, channel,
-                                         info.delivery_tag, requeue));
+    m_impl->CheckForError(amqp_basic_nack(m_impl->m_connection, channel,
+                                         info.delivery_tag, multiple, requeue));
 }
 
 void Channel::BasicPublish(const std::string &exchange_name,

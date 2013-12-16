@@ -467,7 +467,7 @@ public:
       * @param message the message that is being nack'ed
       * @param requeue tells the broker to requeue the message or not
       */
-    void BasicReject(const Envelope::ptr_t &message, bool requeue);
+    void BasicReject(const Envelope::ptr_t &message, bool requeue, bool multiple = false);
 
     /**
      * Reject a Basic message
@@ -476,7 +476,7 @@ public:
      * @param delivery_info
      * @param requeue tells the broker to requeue the message or not
      */
-    void BasicReject(const Envelope::DeliveryInfo &info, bool requeue);
+    void BasicReject(const Envelope::DeliveryInfo &info, bool requeue, bool multiple = false);
 
     /**
       * Publishes a Basic message
