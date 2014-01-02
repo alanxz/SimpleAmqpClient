@@ -178,7 +178,7 @@ public:
       * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
       *  Defaults to false
       * @param auto_delete Indicates whether the exchange will automatically be removed when no queues are
-      *  bound to it. Defaults to true
+      *  bound to it. Defaults to false
       */
     void DeclareExchange(const std::string &exchange_name,
                          const std::string &exchange_type = Channel::EXCHANGE_TYPE_DIRECT,
@@ -193,13 +193,11 @@ public:
       * @param exchange_type the type of exchange to be declared. Defaults to direct
       *  other types that could be used: fanout and topic
       * @param passive Indicates how the broker should react if the exchange does not exist.
-      *  If passive is true and the exhange does not exist the broker will respond with an error and
-      *  not create the exchange, exchange is created otherwise. Defaults to false (exchange is created
-      *  if it does not already exist)
+      *  If passive is true and the exchange does not exist the broker will respond with an error and
+      *  not create the exchange, exchange is created otherwise.
       * @param durable Indicates whether the exchange is durable - e.g., will it survive a broker restart
-      *  Defaults to false
       * @param auto_delete Indicates whether the exchange will automatically be removed when no queues are
-      *  bound to it. Defaults to true
+      *  bound to it.
     * @param arguments A table of additional arguments used when creating the exchange
       */
     void DeclareExchange(const std::string &exchange_name,
