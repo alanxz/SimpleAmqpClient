@@ -13,6 +13,7 @@ add_executable(test_api
     test_message.cpp
     test_table.cpp
     test_ack.cpp
+    test_nack.cpp
     )
 target_link_libraries(test_api SimpleAmqpClient ${GTEST_BOTH_LIBRARIES})
 add_test(test_api test_api)
