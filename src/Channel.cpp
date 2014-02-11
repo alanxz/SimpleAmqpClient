@@ -31,7 +31,9 @@
 #include <amqp.h>
 #include <amqp_framing.h>
 #include <amqp_tcp_socket.h>
-#include <amqp_ssl_socket.h>
+#ifdef SAC_SSL_SUPPORT_ENABLED
+# include <amqp_ssl_socket.h>
+#endif
 
 #include "SimpleAmqpClient/Channel.h"
 
@@ -120,6 +122,7 @@ Channel::Channel(const std::string &host,
     m_impl->SetIsConnected(true);
 }
 
+#ifdef SAC_SSL_SUPPORT_ENABLED
 Channel::Channel(const std::string &host,
                  int port,
                  const std::string &username,
@@ -128,8 +131,8 @@ Channel::Channel(const std::string &host,
                  int frame_max,
                  const std::string &path_to_ca_cert,
                  const std::string &path_to_client_key,
-                 const std::string &path_to_client_cert) :
-    m_impl(new Detail::ChannelImpl)
+                 const std::string &path_to_client_cert)
+    : m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
     if (NULL == m_impl->m_connection)
@@ -179,6 +182,20 @@ Channel::Channel(const std::string &host,
 
     m_impl->SetIsConnected(true);
 }
+#else
+Channel::Channel(const std::string &,
+                 int ,
+                 const std::string &,
+                 const std::string &,
+                 const std::string &,
+                 int ,
+                 const std::string &,
+                 const std::string &,
+                 const std::string &)
+{
+    throw std::logic_error("SSL support has not been compiled into SimpleAmqpClient");
+}
+#endif
 
 
 
