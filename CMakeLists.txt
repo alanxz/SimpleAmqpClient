@@ -143,7 +143,7 @@ option(ENABLE_TESTING "Enable smoke tests" OFF)
 
 if (ENABLE_TESTING)
     enable_testing()
-    add_subdirectory(third-party/gtest-1.6.0)
+    add_subdirectory(third-party/gtest-1.7.0)
     add_subdirectory(testing)
 endif (ENABLE_TESTING)
 
