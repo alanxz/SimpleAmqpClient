@@ -265,7 +265,7 @@ public:
       * Declares a queue
       * Creates a queue on the AMQP broker if it does not already exist
       * @param queue_name the desired name of the queue. If this is a zero-length string the broker
-      *  will generate a queue name and it will be returned as a result from this metho
+      *  will generate a queue name and it will be returned as a result from this method
       * @param passive Indicated how the broker should react if the queue does not exist.
       *  If passive is true and the queue does not exist the borker will respond with an error and
       *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
@@ -289,7 +289,7 @@ public:
       * Declares a queue
       * Creates a queue on the AMQP broker if it does not already exist
       * @param queue_name the desired name of the queue. If this is a zero-length string the broker
-      *  will generate a queue name and it will be returned as a result from this metho
+      *  will generate a queue name and it will be returned as a result from this method
       * @param passive Indicated how the broker should react if the queue does not exist.
       *  If passive is true and the queue does not exist the borker will respond with an error and
       *  not create the queue, the queue is created otherwise. Defaults to false (queue is created if it
