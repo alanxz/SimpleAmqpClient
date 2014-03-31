@@ -129,9 +129,7 @@ Channel::Channel(const std::string &host,
                  const std::string &password,
                  const std::string &vhost,
                  int frame_max,
-                 const std::string &path_to_ca_cert,
-                 const std::string &path_to_client_key,
-                 const std::string &path_to_client_cert)
+                 const SSLConnectionParams &ssl_params)
     : m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
@@ -145,21 +143,22 @@ Channel::Channel(const std::string &host,
     {
         throw std::bad_alloc();
     }
+    amqp_ssl_socket_set_verify(socket, ssl_params.verify_hostname);
 
     try
     {
-        int status = amqp_ssl_socket_set_cacert(socket, path_to_ca_cert.c_str());
+        int status = amqp_ssl_socket_set_cacert(socket, ssl_params.path_to_ca_cert.c_str());
         if (status)
         {
             throw std::runtime_error("Error in setting CA certificate for socket");
         }
 
-        if (path_to_client_key != ""
-                && path_to_client_cert != "")
+        if (ssl_params.path_to_client_key != ""
+                && ssl_params.path_to_client_cert != "")
         {
             status = amqp_ssl_socket_set_key(socket,
-                                             path_to_client_cert.c_str(),
-                                             path_to_client_key.c_str());
+                                             ssl_params.path_to_client_cert.c_str(),
+                                             ssl_params.path_to_client_key.c_str());
             if (status)
             {
                 throw std::runtime_error("Error in setting client certificate for socket");
