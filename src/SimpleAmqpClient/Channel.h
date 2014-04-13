@@ -94,6 +94,15 @@ public:
         return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
     }
 
+protected:
+    struct SSLConnectionParams {
+        std::string path_to_ca_cert;
+        std::string path_to_client_key;
+        std::string path_to_client_cert;
+        bool verify_hostname;
+    };
+
+public:
     /**
     * Creates a new channel object
     * Creates a new connection to an AMQP broker using the supplied parameters and opens
@@ -109,6 +118,8 @@ public:
     * @param channel_max Request that the server limit the number of channels for
     * this connection to the specified parameter, a value of zero will use the broker-supplied value
     * @param frame_max Request that the server limit the maximum size of any frame to this value
+    * @param verify_host Verify the hostname against the certificate when
+    * opening the SSL connection.
     *
     * @return a new Channel object pointer
     */
@@ -121,17 +132,22 @@ public:
                               const std::string &username = "guest",
                               const std::string &password = "guest",
                               const std::string &vhost = "/",
-                              int frame_max = 131072)
+                              int frame_max = 131072,
+                              bool verify_hostname = true)
     {
+        SSLConnectionParams ssl_params;
+        ssl_params.path_to_ca_cert = path_to_ca_cert;
+        ssl_params.path_to_client_key = path_to_client_key;
+        ssl_params.path_to_client_cert = path_to_client_cert;
+        ssl_params.verify_hostname = verify_hostname;
+
         return boost::make_shared<Channel>(host,
                                            port,
                                            username,
                                            password,
                                            vhost,
                                            frame_max,
-                                           path_to_ca_cert,
-                                           path_to_client_key,
-                                           path_to_client_cert);
+                                           ssl_params);
     }
 
 
@@ -157,9 +173,7 @@ public:
                      const std::string &password,
                      const std::string &vhost,
                      int frame_max,
-                     const std::string &path_to_ca_cert,
-                     const std::string &path_to_client_key,
-                     const std::string &path_to_client_cert);
+                     const SSLConnectionParams &ssl_params);
 
 
 public:
