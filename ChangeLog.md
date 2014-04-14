@@ -1,3 +1,15 @@
+Changes since v2.3 (v2.4):
+- Add support for consumer cancellation notification (5d35698)
+- Improvements in extra-frame bookkeeping reducing memory useage under certain
+  conditions (e9de652, f4980bc)
+- API support for waiting for multiple consumers at a time (e7e701a)
+- Add version header (0fc6cab)
+- Add pkg-config on install (a13c99a)
+- Add DeclareQueueWithCounts API (Kai Blaschke 7fbcd96)
+- Support for C++11 (Alexandre Jacquin 57a8d85)
+- Add BasicReject API (Luca Marturana 0c9478e)
+- Upgrade gtest to v1.7.0 (8fe82fd)
+
 Changes since v2.2 (v2.3):
 NOTE: this release uses new rabbitmq-c interfaces introduced in v0.4.0, thus
 requires rabbitmq-c v0.4.0 or later.
