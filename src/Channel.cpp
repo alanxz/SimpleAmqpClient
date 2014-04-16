@@ -37,6 +37,7 @@
 
 #include "SimpleAmqpClient/Channel.h"
 
+#include "SimpleAmqpClient/AmqpLibraryException.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 #include "SimpleAmqpClient/BadUriException.h"
@@ -150,7 +151,7 @@ Channel::Channel(const std::string &host,
         int status = amqp_ssl_socket_set_cacert(socket, ssl_params.path_to_ca_cert.c_str());
         if (status)
         {
-            throw std::runtime_error("Error in setting CA certificate for socket");
+            throw AmqpLibraryException::CreateException(status, "Error setting CA certificate for socket");
         }
 
         if (ssl_params.path_to_client_key != ""
@@ -161,14 +162,16 @@ Channel::Channel(const std::string &host,
                                              ssl_params.path_to_client_key.c_str());
             if (status)
             {
-                throw std::runtime_error("Error in setting client certificate for socket");
+                throw AmqpLibraryException::CreateException(
+                    status, "Error setting client certificate for socket");
             }
         }
 
         status = amqp_socket_open(socket, host.c_str(), port);
         if (status)
         {
-            throw std::runtime_error("Error in opening SSL/TLS connection for socket");
+            throw AmqpLibraryException::CreateException(
+                status, "Error setting client certificate for socket");
         }
 
         m_impl->DoLogin(username, password, vhost, frame_max);

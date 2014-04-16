@@ -39,6 +39,7 @@
 #endif
 
 #include "SimpleAmqpClient/ChannelImpl.h"
+#include "SimpleAmqpClient/AmqpLibraryException.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
@@ -212,8 +213,7 @@ void ChannelImpl::CheckForError(int ret)
 {
     if (ret < 0)
     {
-        std::runtime_error error(amqp_error_string2(ret));
-        throw error;
+        throw AmqpLibraryException::CreateException(ret);
     }
 }
 

@@ -86,6 +86,9 @@ SET(SAC_LIB_SRCS
 
     src/SimpleAmqpClient/Util.h
 
+    src/SimpleAmqpClient/AmqpLibraryException.h
+    src/AmqpLibraryException.cpp
+
     src/SimpleAmqpClient/AmqpResponseLibraryException.h
     src/AmqpResponseLibraryException.cpp
 
@@ -161,6 +164,7 @@ INSTALL(TARGETS SimpleAmqpClient
 
 INSTALL(FILES
     src/SimpleAmqpClient/AmqpException.h
+    src/SimpleAmqpClient/AmqpLibraryException.h
     src/SimpleAmqpClient/AmqpResponseLibraryException.h
     src/SimpleAmqpClient/BadUriException.h
     src/SimpleAmqpClient/BasicMessage.h
