@@ -25,9 +25,10 @@ Known to work in the following environments:
 This is a typical cmake project, it should work like most typical cmake projects:
 
 In a sibiling directory to where you extracted the source code:
+
     mkdir simpleamqpclient-build
     cd simpleamqpclient-build
-    cmake ../SimpleAmqpClient
+    cmake ..
 
 Then use your the appropriate build utility to build the library (make, msbuild)
 
