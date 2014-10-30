@@ -55,7 +55,7 @@ if (CMAKE_CXX_FLAGS STREQUAL ""
     AND NOT DEFINED SAC_CXX_FLAGS_SET)
   if (CMAKE_COMPILER_IS_GNUCXX
       OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    SET(CMAKE_CXX_FLAGS "-Wall -Wextra" CACHE STRING "Flags used by the compiler during all build types." FORCE)
+    SET(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra" CACHE STRING "Flags used by the compiler during all build types." FORCE)
   endif ()
   set(SAC_CXX_FLAGS_SET TRUE CACHE INTERNAL "Have the SAC default compiler flags been set?")
 endif ()
