@@ -97,6 +97,17 @@ Channel::Channel(const std::string &host,
                  const std::string &password,
                  const std::string &vhost,
                  int frame_max) :
+    Channel(host, port, username, password, vhost, frame_max, 0)
+{
+}
+
+Channel::Channel(const std::string &host,
+                 int port,
+                 const std::string &username,
+                 const std::string &password,
+                 const std::string &vhost,
+                 int frame_max,
+                 int heartbeat) :
     m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
@@ -112,7 +123,7 @@ Channel::Channel(const std::string &host,
         int sock = amqp_socket_open(socket, host.c_str(), port);
         m_impl->CheckForError(sock);
 
-        m_impl->DoLogin(username, password, vhost, frame_max);
+        m_impl->DoLogin(username, password, vhost, frame_max, heartbeat);
     }
     catch (...)
     {
@@ -123,6 +134,17 @@ Channel::Channel(const std::string &host,
     m_impl->SetIsConnected(true);
 }
 
+Channel::Channel(const std::string &host,
+                 int port,
+                 const std::string &username,
+                 const std::string &password,
+                 const std::string &vhost,
+                 int frame_max,
+                 const SSLConnectionParams &ssl_params)
+    : Channel(host, port, username, password, vhost, frame_max, 0, ssl_params)
+{
+}
+
 #ifdef SAC_SSL_SUPPORT_ENABLED
 Channel::Channel(const std::string &host,
                  int port,
@@ -130,6 +152,7 @@ Channel::Channel(const std::string &host,
                  const std::string &password,
                  const std::string &vhost,
                  int frame_max,
+                 int heartbeat,
                  const SSLConnectionParams &ssl_params)
     : m_impl(new Detail::ChannelImpl)
 {
@@ -174,7 +197,7 @@ Channel::Channel(const std::string &host,
                 status, "Error setting client certificate for socket");
         }
 
-        m_impl->DoLogin(username, password, vhost, frame_max);
+        m_impl->DoLogin(username, password, vhost, frame_max, heartbeat);
     }
     catch (...)
     {
@@ -190,6 +213,7 @@ Channel::Channel(const std::string &,
                  const std::string &,
                  const std::string &,
                  const std::string &,
+                 int ,
                  int ,
                  const SSLConnectionParams &)
 {

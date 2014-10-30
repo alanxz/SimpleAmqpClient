@@ -70,7 +70,7 @@ public:
     static const std::string EXCHANGE_TYPE_FANOUT;
     static const std::string EXCHANGE_TYPE_TOPIC;
 
-    /**
+     /**
       * Creates a new channel object
       * Creates a new connection to an AMQP broker using the supplied parameters and opens
       * a single channel for use
@@ -82,6 +82,7 @@ public:
       * @param channel_max Request that the server limit the number of channels for
       * this connection to the specified parameter, a value of zero will use the broker-supplied value
       * @param frame_max Request that the server limit the maximum size of any frame to this value
+      * @param heartbeat The number of seconds between heartbeats or 0 to disable heartbeats
       * @return a new Channel object pointer
       */
     static ptr_t Create(const std::string &host = "127.0.0.1",
@@ -89,9 +90,10 @@ public:
                         const std::string &username = "guest",
                         const std::string &password = "guest",
                         const std::string &vhost = "/",
-                        int frame_max = 131072)
+                        int frame_max = 131072,
+                        int heartbeat = 0)
     {
-        return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
+        return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max, heartbeat);
     }
 
 protected:
@@ -173,6 +175,24 @@ public:
                      const std::string &password,
                      const std::string &vhost,
                      int frame_max,
+                     int heartbeat);
+
+
+    explicit Channel(const std::string &host,
+                     int port,
+                     const std::string &username,
+                     const std::string &password,
+                     const std::string &vhost,
+                     int frame_max,
+                     const SSLConnectionParams &ssl_params);
+
+    explicit Channel(const std::string &host,
+                     int port,
+                     const std::string &username,
+                     const std::string &password,
+                     const std::string &vhost,
+                     int frame_max,
+                     int heartbeat,
                      const SSLConnectionParams &ssl_params);
 
 
