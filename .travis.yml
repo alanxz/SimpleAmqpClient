@@ -30,7 +30,7 @@ install:
   - pushd _prereqs
   - git clone https://github.com/alanxz/rabbitmq-c
   - cd rabbitmq-c
-  - git checkout v0.4.1
+  - git checkout v0.5.1
   - export RABBITMQC_DIR=`pwd`/../../_install
   - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${RABBITMQC_DIR} -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF .
   - cmake --build . --target install
