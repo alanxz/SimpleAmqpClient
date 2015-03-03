@@ -328,9 +328,20 @@ public:
         m_is_connected = state;
     }
 
+    // The RabbitMQ broker changed the way that basic.qos worked as of v3.2.0.
+    // See: http://www.rabbitmq.com/consumer-prefetch.html
+    // Newer versions of RabbitMQ basic.qos.global set to false applies to new
+    // consumers made on the channel, and true applies to all consumers on the
+    // channel (not connection).
+    bool BrokerHasNewQosBehavior() const {
+        return 0x030200 <= m_brokerVersion;
+    }
+
     amqp_connection_state_t m_connection;
 
 private:
+    static boost::uint32_t ComputeBrokerVersion(const amqp_connection_state_t state);
+
     frame_queue_t m_frame_queue;
 
     typedef std::vector<Envelope::ptr_t> envelope_list_t;
@@ -347,6 +358,7 @@ private:
     typedef std::vector<channel_state_t> channel_state_list_t;
 
     channel_state_list_t m_channels;
+    boost::uint32_t m_brokerVersion;
     // A channel that is likely to be an CS_Open state
     amqp_channel_t m_last_used_channel;
 

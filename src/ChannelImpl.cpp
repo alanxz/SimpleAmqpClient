@@ -45,7 +45,10 @@
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/array.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <string.h>
 
@@ -90,6 +93,8 @@ void ChannelImpl::DoLogin(const std::string &username,
     CheckRpcReply(0, amqp_login_with_properties(m_connection, vhost.c_str(), 0,
                 frame_max, BROKER_HEARTBEAT, &client_properties,
                 AMQP_SASL_METHOD_PLAIN, username.c_str(), password.c_str()));
+
+    m_brokerVersion = ComputeBrokerVersion(m_connection);
 }
 
 amqp_channel_t ChannelImpl::GetNextChannelId()
@@ -458,6 +463,51 @@ void ChannelImpl::CheckIsConnected()
     {
         throw ConnectionClosedException();
     }
+}
+
+namespace {
+bool bytesEqual(amqp_bytes_t r, amqp_bytes_t l) {
+    if (r.len == l.len) {
+        if (0 == memcmp(r.bytes, l.bytes, r.len)) {
+            return true;
+        }
+    }
+    return false;
+}
+}
+
+boost::uint32_t ChannelImpl::ComputeBrokerVersion(
+    amqp_connection_state_t state) {
+    const amqp_table_t *properties = amqp_get_server_properties(state);
+    const amqp_bytes_t version = amqp_cstring_bytes("version");
+    amqp_table_entry_t *version_entry = NULL;
+
+    for (int i = 0; i < properties->num_entries; ++i) {
+        if (bytesEqual(properties->entries[i].key, version)) {
+            version_entry = &properties->entries[i];
+            break;
+        }
+    }
+    if (NULL == version_entry) {
+        return 0;
+    }
+
+    std::string version_string(
+        static_cast<char *>(version_entry->value.value.bytes.bytes),
+        version_entry->value.value.bytes.len);
+    std::vector<std::string> version_components;
+    boost::split(version_components, version_string, boost::is_any_of("."));
+    if (version_components.size() != 3) {
+        return 0;
+    }
+    boost::uint32_t version_major =
+        boost::lexical_cast<boost::uint32_t>(version_components[0]);
+    boost::uint32_t version_minor =
+        boost::lexical_cast<boost::uint32_t>(version_components[1]);
+    boost::uint32_t version_patch =
+        boost::lexical_cast<boost::uint32_t>(version_components[2]);
+    return (version_major & 0xFF) << 16 | (version_minor & 0xFF) << 8 |
+           (version_patch & 0xFF);
 }
 
 } // namespace Detail

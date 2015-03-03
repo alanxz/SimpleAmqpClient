@@ -628,7 +628,7 @@ std::string Channel::BasicConsume(const std::string &queue,
     amqp_basic_qos_t qos = {};
     qos.prefetch_size = 0;
     qos.prefetch_count = message_prefetch_count;
-    qos.global = false;
+    qos.global = m_impl->BrokerHasNewQosBehavior();
 
     m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
     m_impl->MaybeReleaseBuffersOnChannel(channel);
@@ -667,7 +667,7 @@ void Channel::BasicQos(const std::string &consumer_tag, boost::uint16_t message_
     amqp_basic_qos_t qos = {};
     qos.prefetch_size = 0;
     qos.prefetch_count = message_prefetch_count;
-    qos.global = false;
+    qos.global = m_impl->BrokerHasNewQosBehavior();
 
     m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
     m_impl->MaybeReleaseBuffersOnChannel(channel);
