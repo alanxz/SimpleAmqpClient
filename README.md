@@ -2,7 +2,7 @@ SimpleAmqpClient
 ==================
 
 [SimpleAmqpClient](https://github.com/alanxz/SimpleAmqpClient) is an easy-to-use C++
-wrapper around the [rabbitmq-c](https://github.com/rabbitmq/rabbitmq-c) C library.
+wrapper around the [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) C library.
 It derives inspiration from the [puka](http://majek.github.com/puka/puka.html) AMQP library 
 in that it abstracts away the underlying AMQP wire concept of channels and uses them
 as an error/consumer scope. This should make writing simple single-threaded AMQP-enabled apps easy.
