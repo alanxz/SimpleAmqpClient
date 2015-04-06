@@ -74,7 +74,11 @@ BasicQos, BasicRecover, and BasicCancel.
 
     std::string consumer_tag = channel->BasicConsume("my_queue", "");
     Envelope::ptr_t envelope = channel->BasicConsumeMessage(consumer_tag);
-    envelope = channel->BasicConsumeMessage(consumer_tag);
+    // Alternatively:
+    Envelope::ptr_t envelope;
+    channel->BasicConsumeMessage(consumer_tag, envelope, 10); // 10 ms timeout
+    // To ack:
+    channel->BasicAck(envelope);
+    // To cancel:
     channel->BasicCancel(consumer_tag);
-
 
