@@ -91,6 +91,42 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max)
                   frame_max);
 }
 
+Channel::ptr_t Channel::CreateSecureFromUri(const std::string &uri,
+                                      const std::string &path_to_ca_cert,
+                                      const std::string &path_to_client_key,
+                                      const std::string &path_to_client_cert,
+                                      bool verify_hostname,
+                                      int frame_max)
+{
+    amqp_connection_info info;
+    amqp_default_connection_info(&info);
+
+    boost::shared_ptr<char> uri_dup = boost::shared_ptr<char>(strdup(uri.c_str()), free);
+
+    if (0 != amqp_parse_url(uri_dup.get(), &info))
+    {
+        throw BadUriException();
+    }
+
+    if ( info.ssl )
+    {
+        return CreateSecure(path_to_ca_cert,
+                      std::string(info.host),
+                      path_to_client_key,
+                      path_to_client_cert,
+                      info.port,
+                      std::string(info.user),
+                      std::string(info.password),
+                      std::string(info.vhost),
+                      frame_max,
+                      verify_hostname);
+    }
+    else
+    {
+        throw std::runtime_error("CreateSecureFromUri only supports SSL-enabled URIs.");
+    }
+}
+
 Channel::Channel(const std::string &host,
                  int port,
                  const std::string &username,
