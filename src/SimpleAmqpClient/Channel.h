@@ -161,9 +161,8 @@ public:
     static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
 
     /**
-     * Create a new Channel object from an AMQP URI, optionally secured with SSL
-     * If uri does not start with amqps, path_to_ca_cert, path_to_client_key, path_to_client_cert
-     * verify_hostname are ignored
+     * Create a new Channel object from an AMQP URI, secured with SSL.
+     * If URI should start with amqps://
      *
      * @param uri [in] a URI of the form: amqp[s]://[username:password@]{HOSTNAME}[:PORT][/VHOST]
      * @param path_to_ca_cert Path to ca certificate file
@@ -175,7 +174,7 @@ public:
      * * @param frame_max [in] requests that the broker limit the maximum size of any frame to this value
      * @returns a new Channel object
      */
-    static ptr_t CreateFromUri(const std::string &uri,
+    static ptr_t CreateSecureFromUri(const std::string &uri,
                                const std::string &path_to_ca_cert,
                                const std::string &path_to_client_key="",
                                const std::string &path_to_client_cert="",

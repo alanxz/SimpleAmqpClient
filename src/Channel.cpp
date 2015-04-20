@@ -90,7 +90,7 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max)
                   frame_max);
 }
 
-Channel::ptr_t Channel::CreateFromUri(const std::string &uri,
+Channel::ptr_t Channel::CreateSecureFromUri(const std::string &uri,
                                       const std::string &path_to_ca_cert,
                                       const std::string &path_to_client_key,
                                       const std::string &path_to_client_cert,
@@ -122,12 +122,7 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri,
     }
     else
     {
-        return Create(std::string(info.host),
-                      info.port,
-                      std::string(info.user),
-                      std::string(info.password),
-                      std::string(info.vhost),
-                      frame_max);
+        throw std::runtime_error("CreateSecureFromUri only supports SSL-enabled URIs.");
     }
 }
 
