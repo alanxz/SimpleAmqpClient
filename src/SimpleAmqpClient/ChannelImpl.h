@@ -328,13 +328,13 @@ public:
         m_is_connected = state;
     }
 
-    // The RabbitMQ broker changed the way that basic.qos worked as of v3.2.0.
+    // The RabbitMQ broker changed the way that basic.qos worked as of v3.3.0.
     // See: http://www.rabbitmq.com/consumer-prefetch.html
     // Newer versions of RabbitMQ basic.qos.global set to false applies to new
     // consumers made on the channel, and true applies to all consumers on the
     // channel (not connection).
     bool BrokerHasNewQosBehavior() const {
-        return 0x030200 <= m_brokerVersion;
+        return 0x030300 <= m_brokerVersion;
     }
 
     amqp_connection_state_t m_connection;
