@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+#include <amqp.h>
 
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Envelope.h"
@@ -89,9 +90,11 @@ public:
                         const std::string &username = "guest",
                         const std::string &password = "guest",
                         const std::string &vhost = "/",
-                        int frame_max = 131072)
+                        int frame_max = 131072,
+                        const amqp_sasl_method_enum sasl_method=AMQP_SASL_METHOD_PLAIN)
     {
-        return boost::make_shared<Channel>(host, port, username, password, vhost, frame_max);
+        return boost::make_shared<Channel>(host, port, username, password, vhost,
+                                           frame_max, sasl_method);
     }
 
 protected:
@@ -133,7 +136,8 @@ public:
                               const std::string &password = "guest",
                               const std::string &vhost = "/",
                               int frame_max = 131072,
-                              bool verify_hostname = true)
+                              bool verify_hostname = true,
+                              const amqp_sasl_method_enum sasl_method=AMQP_SASL_METHOD_PLAIN)
     {
         SSLConnectionParams ssl_params;
         ssl_params.path_to_ca_cert = path_to_ca_cert;
@@ -147,7 +151,8 @@ public:
                                            password,
                                            vhost,
                                            frame_max,
-                                           ssl_params);
+                                           ssl_params,
+                                           sasl_method);
     }
 
 
@@ -186,7 +191,8 @@ public:
                      const std::string &username,
                      const std::string &password,
                      const std::string &vhost,
-                     int frame_max);
+                     int frame_max,
+                     const amqp_sasl_method_enum sasl_method);
 
     explicit Channel(const std::string &host,
                      int port,
@@ -194,7 +200,8 @@ public:
                      const std::string &password,
                      const std::string &vhost,
                      int frame_max,
-                     const SSLConnectionParams &ssl_params);
+                     const SSLConnectionParams &ssl_params,
+                     const amqp_sasl_method_enum sasl_method);
 
 
 public:

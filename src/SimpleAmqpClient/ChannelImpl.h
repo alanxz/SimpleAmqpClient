@@ -64,7 +64,8 @@ public:
     typedef channel_map_t::iterator channel_map_iterator_t;
 
     void DoLogin(const std::string &username, const std::string &password,
-            const std::string &vhost, int frame_max);
+            const std::string &vhost, int frame_max,
+            const amqp_sasl_method_enum sasl_method);
     amqp_channel_t GetChannel();
     void ReturnChannel(amqp_channel_t channel);
     bool IsChannelOpen(amqp_channel_t channel);

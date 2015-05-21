@@ -83,6 +83,7 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max)
         throw BadUriException();
     }
 
+    // use PLAIN auth since amqp_connection_info doesn't have an option to specify auth param.
     return Create(std::string(info.host),
                   info.port,
                   std::string(info.user),
@@ -132,7 +133,8 @@ Channel::Channel(const std::string &host,
                  const std::string &username,
                  const std::string &password,
                  const std::string &vhost,
-                 int frame_max) :
+                 int frame_max,
+                 const amqp_sasl_method_enum sasl_method) :
     m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
@@ -148,7 +150,7 @@ Channel::Channel(const std::string &host,
         int sock = amqp_socket_open(socket, host.c_str(), port);
         m_impl->CheckForError(sock);
 
-        m_impl->DoLogin(username, password, vhost, frame_max);
+        m_impl->DoLogin(username, password, vhost, frame_max, sasl_method);
     }
     catch (...)
     {
@@ -166,7 +168,8 @@ Channel::Channel(const std::string &host,
                  const std::string &password,
                  const std::string &vhost,
                  int frame_max,
-                 const SSLConnectionParams &ssl_params)
+                 const SSLConnectionParams &ssl_params,
+                 const amqp_sasl_method_enum sasl_method)
     : m_impl(new Detail::ChannelImpl)
 {
     m_impl->m_connection = amqp_new_connection();
@@ -210,7 +213,7 @@ Channel::Channel(const std::string &host,
                 status, "Error setting client certificate for socket");
         }
 
-        m_impl->DoLogin(username, password, vhost, frame_max);
+        m_impl->DoLogin(username, password, vhost, frame_max, sasl_method);
     }
     catch (...)
     {

@@ -71,7 +71,8 @@ ChannelImpl::~ChannelImpl()
 }
 
 void ChannelImpl::DoLogin(const std::string &username,
-        const std::string &password, const std::string &vhost, int frame_max)
+        const std::string &password, const std::string &vhost, int frame_max,
+        const amqp_sasl_method_enum sasl_method)
 {
     amqp_table_entry_t capabilties[1];
     amqp_table_entry_t capability_entry;
@@ -91,8 +92,9 @@ void ChannelImpl::DoLogin(const std::string &username,
     client_properties.entries = &capability_entry;
 
     CheckRpcReply(0, amqp_login_with_properties(m_connection, vhost.c_str(), 0,
-                frame_max, BROKER_HEARTBEAT, &client_properties,
-                AMQP_SASL_METHOD_PLAIN, username.c_str(), password.c_str()));
+                                                frame_max, BROKER_HEARTBEAT,
+                                                &client_properties, sasl_method,
+                                                username.c_str(), password.c_str()));
 
     m_brokerVersion = ComputeBrokerVersion(m_connection);
 }
