@@ -65,3 +65,11 @@ TEST(connecting_test, connect_using_uri)
     std::string host_uri = "amqp://" + connected_test::GetBrokerHost();
     Channel::ptr_t channel = Channel::CreateFromUri(host_uri);
 }
+
+TEST(connecting_test, DISABLED_external_auth)
+    // This test can be enabled when testing against a server that supports external auth.
+{
+    // AMQP Spec says we have a minimum frame size of 4096
+    EXPECT_NO_THROW(Channel::Create(connected_test::GetBrokerHost(), 5672,
+                                    "guest", "guest", "/", 4096, AMQP_SASL_METHOD_EXTERNAL));
+}
