@@ -149,7 +149,9 @@ amqp_channel_t ChannelImpl::GetChannel()
 
     if (m_channels.end() == it)
     {
-        return CreateNewChannel();
+        amqp_channel_t new_channel = CreateNewChannel();
+        m_channels.at(new_channel) = CS_Used;
+        return new_channel;
     }
 
     *it = CS_Used;
