@@ -25,6 +25,7 @@ addons:
 
 # install pre-reqs
 install:
+  - sudo apt-get update
   - sudo apt-get install libboost1.48-dev libboost-chrono1.48-dev libboost-system1.48-dev
   - mkdir -p _prereqs
   - pushd _prereqs
