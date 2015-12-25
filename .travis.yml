@@ -51,5 +51,5 @@ script:
 
 after_script:
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then
-      LD_LIBRARY_PATH=../_install/lib AMQP_BROKER=`hostname` ctest -V . ;
+      LD_LIBRARY_PATH=../_install/lib AMQP_BROKER=localhost ctest -V . ;
     fi
