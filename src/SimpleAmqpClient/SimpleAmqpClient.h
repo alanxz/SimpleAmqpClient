@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef SIMPLEAMQPCLIENT_H
-#define SIMPLEAMQPCLIENT_H
+#ifndef SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
+#define SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -40,4 +40,4 @@
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Version.h"
 
-#endif // SIMPLEAMQPCLIENT_H
+#endif // SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H

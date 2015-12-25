@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef MESSAGE_H
-#define MESSAGE_H
+#ifndef SIMPLEAMQPCLIENT_BASICMESSAGE_H
+#define SIMPLEAMQPCLIENT_BASICMESSAGE_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -387,4 +387,4 @@ protected:
 # pragma warning ( pop )
 #endif
 
-#endif // MESSAGE_H
+#endif // SIMPLEAMQPCLIENT_BASICMESSAGE_H

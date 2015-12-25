@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef CHANNEL_EXCEPTION_H
-#define CHANNEL_EXCEPTION_H
+#ifndef SIMPLEAMQPCLIENT_AMQPEXCEPTION_H
+#define SIMPLEAMQPCLIENT_AMQPEXCEPTION_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -342,4 +342,4 @@ public:
 # pragma warning ( pop )
 #endif
 
-#endif // CHANNEL_EXCEPTION_H
+#endif // SIMPLEAMQPCLIENT_AMQPEXCEPTION_H

@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef ENVELOPE_H
-#define ENVELOPE_H
+#ifndef SIMPLEAMQPCLIENT_ENVELOPE_H
+#define SIMPLEAMQPCLIENT_ENVELOPE_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -183,4 +183,4 @@ private:
 # pragma warning ( pop )
 #endif // _MSC_VER
 
-#endif // ENVELOPE_H
+#endif // SIMPLEAMQPCLIENT_ENVELOPE_H

@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef SIMPLEAMQPCLIENT_UTIL_H
+#define SIMPLEAMQPCLIENT_UTIL_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -39,4 +39,4 @@
 # define SIMPLEAMQPCLIENT_EXPORT
 #endif
 
-#endif // UTIL_H
+#endif // SIMPLEAMQPCLIENT_UTIL_H

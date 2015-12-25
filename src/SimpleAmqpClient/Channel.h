@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#ifndef SIMPLEAMQPCLIENT_CHANNEL_H
+#define SIMPLEAMQPCLIENT_CHANNEL_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -699,4 +699,4 @@ protected:
 # pragma warning ( pop )
 #endif
 
-#endif // CHANNEL_H
+#endif // SIMPLEAMQPCLIENT_CHANNEL_H

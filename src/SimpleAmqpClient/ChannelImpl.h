@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef CHANNELIMPL_H_
-#define CHANNELIMPL_H_
+#ifndef SIMPLEAMQPCLIENT_CHANNELIMPL_H
+#define SIMPLEAMQPCLIENT_CHANNELIMPL_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -367,4 +367,4 @@ private:
 
 } // namespace Detail
 } // namespace AmqpClient
-#endif // CHANNELIMPL_H_
+#endif // SIMPLEAMQPCLIENT_CHANNELIMPL_H

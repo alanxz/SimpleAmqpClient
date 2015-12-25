@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef BAD_URI_EXCEPTION_H
-#define BAD_URI_EXCEPTION_H
+#ifndef SIMPLEAMQPCLIENT_BADURIEXCEPTION_H
+#define SIMPLEAMQPCLIENT_BADURIEXCEPTION_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -41,4 +41,4 @@ public:
         std::runtime_error("URI is malformed") {}
 };
 } // namespace AmqpClient
-#endif // BAD_URI_EXCEPTION_H
+#endif // SIMPLEAMQPCLIENT_BADURIEXCEPTION_H

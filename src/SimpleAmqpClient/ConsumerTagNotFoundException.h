@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef CONSUMERTAGNOTFOUND_H_
-#define CONSUMERTAGNOTFOUND_H_
+#ifndef SIMPLEAMQPCLIENT_CONSUMERTAGNOTFOUND_H
+#define SIMPLEAMQPCLIENT_CONSUMERTAGNOTFOUND_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -49,4 +49,4 @@ public:
 };
 
 } // namespace AmqpClient
-#endif // CONSUMERTAGNOTFOUND_H_
+#endif // SIMPLEAMQPCLIENT_CONSUMERTAGNOTFOUND_H

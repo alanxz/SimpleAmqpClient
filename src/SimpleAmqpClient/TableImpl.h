@@ -1,6 +1,6 @@
 /* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
-#ifndef TABLEIMPL_H
-#define TABLEIMPL_H
+#ifndef SIMPLEAMQPCLIENT_TABLEIMPL_H
+#define SIMPLEAMQPCLIENT_TABLEIMPL_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -119,4 +119,4 @@ public:
 
 } // namespace Detail
 } // namespace AmqpClient
-#endif // TABLEIMPL_H
+#endif // SIMPLEAMQPCLIENT_TABLEIMPL_H
