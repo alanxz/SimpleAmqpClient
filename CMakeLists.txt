@@ -63,6 +63,10 @@ endif ()
 INCLUDE_DIRECTORIES(BEFORE src
     ${CMAKE_CURRENT_BINARY_DIR})
 
+if (WIN32)
+    set(SOCKET_LIBRARY ws2_32)
+endif ()
+
 option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
 
 if (WIN32 AND NOT BUILD_SHARED_LIBS)
