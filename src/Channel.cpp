@@ -184,22 +184,27 @@ Channel::Channel(const std::string &host,
 
     try
     {
-        int status = amqp_ssl_socket_set_cacert(socket, ssl_params.path_to_ca_cert.c_str());
-        if (status)
-        {
-            throw AmqpLibraryException::CreateException(status, "Error setting CA certificate for socket");
-        }
+        int status;
 
-        if (ssl_params.path_to_client_key != ""
-                && ssl_params.path_to_client_cert != "")
+        if(ssl_params.verify_hostname == true)
         {
-            status = amqp_ssl_socket_set_key(socket,
-                                             ssl_params.path_to_client_cert.c_str(),
-                                             ssl_params.path_to_client_key.c_str());
+            status = amqp_ssl_socket_set_cacert(socket, ssl_params.path_to_ca_cert.c_str());
             if (status)
             {
-                throw AmqpLibraryException::CreateException(
-                    status, "Error setting client certificate for socket");
+                throw AmqpLibraryException::CreateException(status, "Error setting CA certificate for socket");
+            }
+            
+            if (ssl_params.path_to_client_key != ""
+                && ssl_params.path_to_client_cert != "")
+            {
+                status = amqp_ssl_socket_set_key(socket,
+                                                 ssl_params.path_to_client_cert.c_str(),
+                                                 ssl_params.path_to_client_key.c_str());
+                if (status)
+                {
+                    throw AmqpLibraryException::CreateException(
+                        status, "Error setting client certificate for socket");
+                }
             }
         }
 
