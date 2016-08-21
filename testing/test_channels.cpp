@@ -122,7 +122,7 @@ TEST_F(connected_test, channel_consume_success_timeout)
     channel->BasicPublish("", queue, message);
 
     Envelope::ptr_t consumed_envelope;
-    EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope, 1));
+    EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope, 5000));
 }
 
 TEST(test_channels, big_message)
