@@ -57,7 +57,7 @@ TEST(connecting_test, connect_badframesize)
 
 TEST(connecting_test, connect_badvhost)
 {
-    EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "guest", "guest", "nonexitant_vhost"), AmqpResponseLibraryException);
+    EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "guest", "guest", "nonexitant_vhost"), NotAllowedException);
 }
 
 TEST(connecting_test, connect_using_uri)
