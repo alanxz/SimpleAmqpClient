@@ -160,6 +160,8 @@ void AmqpException::Throw(const amqp_connection_close_t &reply)
         throw NotImplementedException(what.str(), reply_text, reply.class_id, reply.method_id);
     case InternalErrorException::REPLY_CODE:
         throw InternalErrorException(what.str(), reply_text, reply.class_id, reply.method_id);
+    case AccessRefusedException::REPLY_CODE:
+        throw AccessRefusedException(what.str(), reply_text, reply.class_id, reply.method_id);
     default:
         throw std::logic_error(std::string("Programming error: unknown connection reply code: ").append(boost::lexical_cast<std::string>(reply.reply_code)));
     }

@@ -46,7 +46,7 @@ TEST(connecting_test, connect_badhost)
 
 TEST(connecting_test, connect_badauth)
 {
-    EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "baduser", "badpass"), AmqpResponseLibraryException);
+    EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "baduser", "badpass"), AccessRefusedException);
 }
 
 TEST(connecting_test, connect_badframesize)
