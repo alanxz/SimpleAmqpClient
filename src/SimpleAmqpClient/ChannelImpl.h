@@ -38,10 +38,10 @@
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 
-#include <boost/array.hpp>
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <vector>
@@ -219,7 +219,7 @@ class ChannelImpl {
     CheckForError(amqp_send_method(m_connection, channel, method_id, decoded));
 
     amqp_frame_t response;
-    boost::array<amqp_channel_t, 1> channels = {{channel}};
+    std::array<amqp_channel_t, 1> channels = {{channel}};
 
     GetMethodOnChannel(channels, response, expected_responses);
     return response;
@@ -262,7 +262,7 @@ class ChannelImpl {
   template <class ChannelListType>
   bool ConsumeMessageOnChannelInner(const ChannelListType channels,
                                     Envelope::ptr_t &message, int timeout) {
-    const boost::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
+    const std::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
         {AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD}};
 
     boost::chrono::microseconds real_timeout =
