@@ -31,6 +31,7 @@
 #include <boost/variant/get.hpp>
 
 #include <algorithm>
+#include <cstdint>
 
 using namespace AmqpClient;
 
@@ -106,8 +107,8 @@ TEST(table_value, bool_value) {
 }
 
 TEST(table_value, int8_value) {
-  boost::int8_t v1 = 1;
-  boost::int8_t v2 = 2;
+  std::int8_t v1 = 1;
+  std::int8_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int8, value.GetType());
@@ -143,8 +144,8 @@ TEST(table_value, int8_value) {
 }
 
 TEST(table_value, int16_value) {
-  boost::int16_t v1 = 1;
-  boost::int16_t v2 = 2;
+  std::int16_t v1 = 1;
+  std::int16_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int16, value.GetType());
@@ -180,8 +181,8 @@ TEST(table_value, int16_value) {
 }
 
 TEST(table_value, int32_value) {
-  boost::int32_t v1 = 1;
-  boost::int32_t v2 = 2;
+  std::int32_t v1 = 1;
+  std::int32_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int32, value.GetType());
@@ -217,8 +218,8 @@ TEST(table_value, int32_value) {
 }
 
 TEST(table_value, int64_value) {
-  boost::int64_t v1 = 1;
-  boost::int64_t v2 = 2;
+  std::int64_t v1 = 1;
+  std::int64_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int64, value.GetType());

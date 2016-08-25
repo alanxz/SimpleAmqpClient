@@ -28,14 +28,16 @@
 
 #include "SimpleAmqpClient/Envelope.h"
 
+#include <cstdint>
+
 namespace AmqpClient {
 
 Envelope::Envelope(const BasicMessage::ptr_t message,
                    const std::string &consumer_tag,
-                   const boost::uint64_t delivery_tag,
+                   const std::uint64_t delivery_tag,
                    const std::string &exchange, bool redelivered,
                    const std::string &routing_key,
-                   const boost::uint16_t delivery_channel)
+                   const std::uint16_t delivery_channel)
     : m_message(message),
       m_consumerTag(consumer_tag),
       m_deliveryTag(delivery_tag),

@@ -33,10 +33,10 @@
 #include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -391,8 +391,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     *  create a unique queue by not providing a queue name
     */
   std::string DeclareQueueWithCounts(const std::string &queue_name,
-                                     boost::uint32_t &message_count,
-                                     boost::uint32_t &consumer_count,
+                                     std::uint32_t &message_count,
+                                     std::uint32_t &consumer_count,
                                      bool passive = false, bool durable = false,
                                      bool exclusive = true,
                                      bool auto_delete = true);
@@ -433,8 +433,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     *  create a unique queue by not providing a queue name
     */
   std::string DeclareQueueWithCounts(const std::string &queue_name,
-                                     boost::uint32_t &message_count,
-                                     boost::uint32_t &consumer_count,
+                                     std::uint32_t &message_count,
+                                     std::uint32_t &consumer_count,
                                      bool passive, bool durable, bool exclusive,
                                      bool auto_delete, const Table &arguments);
 
@@ -627,7 +627,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
                            const std::string &consumer_tag = "",
                            bool no_local = true, bool no_ack = true,
                            bool exclusive = true,
-                           boost::uint16_t message_prefetch_count = 1);
+                           std::uint16_t message_prefetch_count = 1);
 
   /**
     * Starts consuming Basic messages on a queue
@@ -659,7 +659,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
   std::string BasicConsume(const std::string &queue,
                            const std::string &consumer_tag, bool no_local,
                            bool no_ack, bool exclusive,
-                           boost::uint16_t message_prefetch_count,
+                           std::uint16_t message_prefetch_count,
                            const Table &arguments);
 
   /**
@@ -671,7 +671,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     *  broker will deliver. A value of 0 means no limit.
     */
   void BasicQos(const std::string &consumer_tag,
-                boost::uint16_t message_prefetch_count);
+                std::uint16_t message_prefetch_count);
 
   /**
     * Cancels a previously created Consumer

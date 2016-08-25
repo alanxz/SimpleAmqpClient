@@ -30,10 +30,10 @@
 
 #include "SimpleAmqpClient/Table.h"
 
-#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/variant/variant.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -50,8 +50,8 @@ inline bool operator==(const void_t &, const void_t &) { return true; }
 
 typedef std::vector<TableValue> array_t;
 
-typedef boost::variant<void_t, bool, boost::int8_t, boost::int16_t,
-                       boost::int32_t, boost::int64_t, float, double,
+typedef boost::variant<void_t, bool, std::int8_t, std::int16_t,
+                       std::int32_t, std::int64_t, float, double,
                        std::string, array_t, Table>
     value_t;
 
@@ -88,10 +88,10 @@ class TableValueImpl {
 
     amqp_field_value_t operator()(const void_t) const;
     amqp_field_value_t operator()(const bool value) const;
-    amqp_field_value_t operator()(const boost::int8_t value) const;
-    amqp_field_value_t operator()(const boost::int16_t value) const;
-    amqp_field_value_t operator()(const boost::int32_t value) const;
-    amqp_field_value_t operator()(const boost::int64_t value) const;
+    amqp_field_value_t operator()(const std::int8_t value) const;
+    amqp_field_value_t operator()(const std::int16_t value) const;
+    amqp_field_value_t operator()(const std::int32_t value) const;
+    amqp_field_value_t operator()(const std::int64_t value) const;
     amqp_field_value_t operator()(const float value) const;
     amqp_field_value_t operator()(const double value) const;
     amqp_field_value_t operator()(const std::string &value) const;

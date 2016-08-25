@@ -31,10 +31,10 @@
 #include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -183,11 +183,11 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
   /**
     * Gets the priority property
     */
-  boost::uint8_t Priority() const;
+  std::uint8_t Priority() const;
   /**
     * Sets the priority property
     */
-  void Priority(boost::uint8_t priority);
+  void Priority(std::uint8_t priority);
   /**
     * Determines whether the priority property is set
     */
@@ -268,11 +268,11 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
   /**
     * Gets the timestamp property
     */
-  boost::uint64_t Timestamp() const;
+  std::uint64_t Timestamp() const;
   /**
     * Sets the timestamp property
     */
-  void Timestamp(boost::uint64_t timestamp);
+  void Timestamp(std::uint64_t timestamp);
   /**
     * Determines whether the timestamp property is set
     */

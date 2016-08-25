@@ -32,6 +32,7 @@
 #include <boost/variant/get.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <iterator>
 
 namespace AmqpClient {
@@ -41,16 +42,16 @@ TableValue::TableValue()
 TableValue::TableValue(bool value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::int8_t value)
+TableValue::TableValue(std::int8_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::int16_t value)
+TableValue::TableValue(std::int16_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::int32_t value)
+TableValue::TableValue(std::int32_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::int64_t value)
+TableValue::TableValue(std::int64_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
 TableValue::TableValue(float value)
@@ -122,23 +123,23 @@ TableValue::ValueType TableValue::GetType() const {
 
 bool TableValue::GetBool() const { return boost::get<bool>(m_impl->m_value); }
 
-boost::int8_t TableValue::GetInt8() const {
-  return boost::get<boost::int8_t>(m_impl->m_value);
+std::int8_t TableValue::GetInt8() const {
+  return boost::get<std::int8_t>(m_impl->m_value);
 }
 
-boost::int16_t TableValue::GetInt16() const {
-  return boost::get<boost::int16_t>(m_impl->m_value);
+std::int16_t TableValue::GetInt16() const {
+  return boost::get<std::int16_t>(m_impl->m_value);
 }
 
-boost::int32_t TableValue::GetInt32() const {
-  return boost::get<boost::int32_t>(m_impl->m_value);
+std::int32_t TableValue::GetInt32() const {
+  return boost::get<std::int32_t>(m_impl->m_value);
 }
 
-boost::int64_t TableValue::GetInt64() const {
-  return boost::get<boost::int64_t>(m_impl->m_value);
+std::int64_t TableValue::GetInt64() const {
+  return boost::get<std::int64_t>(m_impl->m_value);
 }
 
-boost::int64_t TableValue::GetInteger() const {
+std::int64_t TableValue::GetInteger() const {
   switch (m_impl->m_value.which()) {
     case VT_int8:
       return GetInt8();
@@ -188,13 +189,13 @@ void TableValue::Set() { m_impl->m_value = Detail::void_t(); }
 
 void TableValue::Set(bool value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::int8_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int8_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::int16_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int16_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::int32_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int32_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::int64_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int64_t value) { m_impl->m_value = value; }
 
 void TableValue::Set(float value) { m_impl->m_value = value; }
 

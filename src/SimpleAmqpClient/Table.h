@@ -30,8 +30,7 @@
 
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
-
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -112,28 +111,28 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @param value [in] the value
    */
-  TableValue(boost::int8_t value);
+  TableValue(std::int8_t value);
 
   /**
    * Construct a 2-byte signed integer value
    *
    * @param value [in] the value
    */
-  TableValue(boost::int16_t value);
+  TableValue(std::int16_t value);
 
   /**
    * Construct a 4-byte signed integer value
    *
    * @param value [in] the value
    */
-  TableValue(boost::int32_t value);
+  TableValue(std::int32_t value);
 
   /**
    * Construct a 8-byte signed integer value
    *
    * @param value [in] the value
    */
-  TableValue(boost::int64_t value);
+  TableValue(std::int64_t value);
 
   /**
    * Construct a single-precision floating point value
@@ -219,28 +218,28 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @returns the value if its a VT_int8 type, 0 otherwise
    */
-  boost::int8_t GetInt8() const;
+  std::int8_t GetInt8() const;
 
   /**
    * Get the int16 value
    *
    * @returns the value if its a VT_int16 type, 0 otherwise
    */
-  boost::int16_t GetInt16() const;
+  std::int16_t GetInt16() const;
 
   /**
    * Get the int32 value
    *
    * @returns the value if its a VT_int32 type, 0 otherwise
    */
-  boost::int32_t GetInt32() const;
+  std::int32_t GetInt32() const;
 
   /**
    * Get the int64 value
    *
    * @returns the value if its a VT_int64 type, 0 otherwise
    */
-  boost::int64_t GetInt64() const;
+  std::int64_t GetInt64() const;
 
   /**
    * Get an integral number
@@ -248,7 +247,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    * @returns an integer number if the ValueType is VT_int8, VT_int16, VT_int32,
    * or VT_int64 type, 0 otherwise
    */
-  boost::int64_t GetInteger() const;
+  std::int64_t GetInteger() const;
 
   /**
    * Get a float value
@@ -309,28 +308,28 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @param value [in] the value
    */
-  void Set(boost::int8_t value);
+  void Set(std::int8_t value);
 
   /**
    * Set the value as a int16_t
    *
    * @param value [in] the value
    */
-  void Set(boost::int16_t value);
+  void Set(std::int16_t value);
 
   /**
    * Set the value as a int32_t
    *
    * @param value [in] the value
    */
-  void Set(boost::int32_t value);
+  void Set(std::int32_t value);
 
   /**
    * Set teh value as a int64_t
    *
    * @param value [in] the value
    */
-  void Set(boost::int64_t value);
+  void Set(std::int64_t value);
 
   /**
    * Set the value as a float

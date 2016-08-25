@@ -30,9 +30,11 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <cstdint>
+
 namespace AmqpClient {
 MessageReturnedException::MessageReturnedException(
-    BasicMessage::ptr_t message, boost::uint32_t reply_code,
+    BasicMessage::ptr_t message, std::uint32_t reply_code,
     const std::string &reply_text, const std::string &exchange,
     const std::string &routing_key) throw()
     : std::runtime_error(
