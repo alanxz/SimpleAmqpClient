@@ -31,9 +31,9 @@
 #include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -375,7 +375,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
   void Set(const Table &value);
 
  private:
-  boost::scoped_ptr<Detail::TableValueImpl> m_impl;
+  std::unique_ptr<Detail::TableValueImpl> m_impl;
 };
 
 }  // namespace AmqpClient

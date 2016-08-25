@@ -35,9 +35,10 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -768,7 +769,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   bool BasicConsumeMessage(Envelope::ptr_t &envelope, int timeout = -1);
 
  protected:
-  boost::scoped_ptr<Detail::ChannelImpl> m_impl;
+  std::unique_ptr<Detail::ChannelImpl> m_impl;
 };
 
 }  // namespace AmqpClient

@@ -33,9 +33,10 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+
+#include <memory>
 #include <string>
 
 #ifdef _MSC_VER
@@ -365,7 +366,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
   void HeaderTableClear();
 
  protected:
-  boost::scoped_ptr<Detail::BasicMessageImpl> m_impl;
+  std::unique_ptr<Detail::BasicMessageImpl> m_impl;
 };
 
 }  // namespace AmqpClient
