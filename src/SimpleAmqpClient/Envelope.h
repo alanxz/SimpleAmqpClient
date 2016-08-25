@@ -33,7 +33,6 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <string>
@@ -45,7 +44,7 @@
 
 namespace AmqpClient {
 
-class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
+class SIMPLEAMQPCLIENT_EXPORT Envelope {
  public:
   typedef boost::shared_ptr<Envelope> ptr_t;
 
@@ -78,6 +77,9 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
                     const std::string &exchange, bool redelivered,
                     const std::string &routing_key,
                     const boost::uint16_t delivery_channel);
+
+  Envelope(const Envelope&) = delete;
+  Envelope& operator=(const Envelope&) = delete;
 
  public:
   /**

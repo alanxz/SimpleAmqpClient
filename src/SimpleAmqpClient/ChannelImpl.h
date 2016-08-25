@@ -41,7 +41,6 @@
 #include <boost/array.hpp>
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
-#include <boost/noncopyable.hpp>
 
 #include <map>
 #include <vector>
@@ -49,10 +48,13 @@
 namespace AmqpClient {
 namespace Detail {
 
-class ChannelImpl : boost::noncopyable {
+class ChannelImpl {
  public:
   ChannelImpl();
   virtual ~ChannelImpl();
+
+  ChannelImpl(const ChannelImpl&) = delete;
+  ChannelImpl& operator=(const ChannelImpl&) = delete;
 
   typedef std::vector<amqp_channel_t> channel_list_t;
   typedef std::vector<amqp_frame_t> frame_queue_t;

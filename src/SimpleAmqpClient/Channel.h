@@ -36,7 +36,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 #include <memory>
 #include <string>
@@ -57,7 +56,7 @@ class ChannelImpl;
   * A single channel
   * Represents a logical AMQP channel over a connection
   */
-class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
+class SIMPLEAMQPCLIENT_EXPORT Channel {
  public:
   typedef boost::shared_ptr<Channel> ptr_t;
 
@@ -188,6 +187,9 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                    const std::string &username, const std::string &password,
                    const std::string &vhost, int frame_max,
                    const SSLConnectionParams &ssl_params);
+
+  Channel(const Channel&) = delete;
+  Channel& operator=(const Channel&) = delete;
 
  public:
   virtual ~Channel();

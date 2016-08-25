@@ -34,7 +34,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 
 #include <memory>
 #include <string>
@@ -53,7 +52,7 @@ namespace Detail {
 class BasicMessageImpl;
 }
 
-class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
+class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
  public:
   typedef boost::shared_ptr<BasicMessage> ptr_t;
 
@@ -93,6 +92,9 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
   BasicMessage(const std::string &body);
   BasicMessage(const amqp_bytes_t_ &body,
                const amqp_basic_properties_t_ *properties);
+
+  BasicMessage(const BasicMessage&) = delete;
+  BasicMessage& operator=(const BasicMessage&) = delete;
 
  public:
   /**
