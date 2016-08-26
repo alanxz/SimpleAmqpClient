@@ -30,10 +30,10 @@
 
 #include "SimpleAmqpClient/Table.h"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/variant/variant.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -42,7 +42,18 @@
 namespace AmqpClient {
 namespace Detail {
 
-typedef boost::shared_ptr<amqp_pool_t> amqp_pool_ptr_t;
+amqp_pool_t *make_pool(int block_size);
+
+struct pool_deleter {
+  void operator()(amqp_pool_t *p) {
+    if (p != nullptr) {
+      empty_amqp_pool(p);
+      delete p;
+    }
+  }
+};
+
+typedef std::unique_ptr<amqp_pool_t, pool_deleter> amqp_pool_ptr_t;
 
 struct void_t {};
 

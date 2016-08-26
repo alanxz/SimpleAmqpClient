@@ -150,9 +150,10 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
   return v;
 }
 
-void free_pool(amqp_pool_t *pool) {
-  empty_amqp_pool(pool);
-  delete pool;
+amqp_pool_t *make_pool(int block_size) {
+  amqp_pool_t *pool = new amqp_pool_t;
+  init_amqp_pool(pool, block_size);
+  return pool;
 }
 
 amqp_table_t TableValueImpl::CreateAmqpTable(const Table &table,
@@ -161,8 +162,7 @@ amqp_table_t TableValueImpl::CreateAmqpTable(const Table &table,
     return AMQP_EMPTY_TABLE;
   }
 
-  pool = boost::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
-  init_amqp_pool(pool.get(), 1024);
+  pool.reset(make_pool(1024));
 
   return CreateAmqpTableInner(table, *pool.get());
 }
@@ -258,8 +258,7 @@ amqp_table_t TableValueImpl::CopyTable(const amqp_table_t &table,
     return AMQP_EMPTY_TABLE;
   }
 
-  pool = boost::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
-  init_amqp_pool(pool.get(), 1024);
+  pool.reset(make_pool(1024));
 
   return CopyTableInner(table, *pool.get());
 }
