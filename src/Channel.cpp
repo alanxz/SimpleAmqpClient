@@ -58,7 +58,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
-#include <boost/limits.hpp>
 
 #include <string.h>
 

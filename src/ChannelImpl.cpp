@@ -47,9 +47,11 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+#include <string.h>
+
 #include <array>
 #include <cstdint>
-#include <string.h>
+#include <limits>
 #include <string>
 
 #define BROKER_HEARTBEAT 0
