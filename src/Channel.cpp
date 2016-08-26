@@ -56,8 +56,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/bind.hpp>
-
 #include <string.h>
 
 namespace AmqpClient {

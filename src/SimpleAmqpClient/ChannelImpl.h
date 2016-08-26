@@ -38,8 +38,6 @@
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 
-#include <boost/bind.hpp>
-
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -122,30 +120,19 @@ class ChannelImpl {
       amqp_channel_t channel, amqp_frame_t &frame,
       std::chrono::microseconds timeout = std::chrono::microseconds::max());
 
-  static bool is_on_channel(const amqp_frame_t frame, amqp_channel_t channel) {
-    return channel == frame.channel;
-  }
-
   static bool is_frame_type_on_channel(const amqp_frame_t frame,
                                        uint8_t frame_type,
                                        amqp_channel_t channel) {
     return frame.frame_type == frame_type && frame.channel == channel;
   }
 
-  static bool is_method_on_channel(const amqp_frame_t frame,
-                                   amqp_method_number_t method,
-                                   amqp_channel_t channel) {
-    return frame.channel == channel && frame.frame_type == AMQP_FRAME_METHOD &&
-           frame.payload.method.id == method;
-  }
-
   template <class ChannelListType, class ResponseListType>
   static bool is_expected_method_on_channel(
       const amqp_frame_t &frame, const ChannelListType channels,
       const ResponseListType &expected_responses) {
-    return channels.end() !=
+    return AMQP_FRAME_METHOD == frame.frame_type &&
+           channels.end() !=
                std::find(channels.begin(), channels.end(), frame.channel) &&
-           AMQP_FRAME_METHOD == frame.frame_type &&
            expected_responses.end() != std::find(expected_responses.begin(),
                                                  expected_responses.end(),
                                                  frame.payload.method.id);
@@ -158,10 +145,10 @@ class ChannelImpl {
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) {
     frame_queue_t::iterator desired_frame = std::find_if(
         m_frame_queue.begin(), m_frame_queue.end(),
-        boost::bind(
-            &ChannelImpl::is_expected_method_on_channel<ChannelListType,
-                                                        ResponseListType>,
-            _1, channels, expected_responses));
+        [channels, expected_responses](const amqp_frame_t &f) -> bool {
+          return ChannelImpl::is_expected_method_on_channel(f, channels,
+                                                            expected_responses);
+        });
 
     if (m_frame_queue.end() != desired_frame) {
       frame = *desired_frame;
@@ -233,19 +220,14 @@ class ChannelImpl {
   }
 
   template <class ChannelListType>
-  static bool envelope_on_channel(const Envelope::ptr_t &envelope,
-                                  const ChannelListType channels) {
-    return channels.end() != std::find(channels.begin(), channels.end(),
-                                       envelope->DeliveryChannel());
-  }
-
-  template <class ChannelListType>
   bool ConsumeMessageOnChannel(const ChannelListType channels,
                                Envelope::ptr_t &message, int timeout) {
     envelope_list_t::iterator it = std::find_if(
         m_delivered_messages.begin(), m_delivered_messages.end(),
-        boost::bind(ChannelImpl::envelope_on_channel<ChannelListType>, _1,
-                    channels));
+        [channels](const Envelope::ptr_t &e) -> bool {
+          return channels.end() != std::find(channels.begin(), channels.end(),
+                                             e->DeliveryChannel());
+        });
 
     if (it != m_delivered_messages.end()) {
       message = *it;
