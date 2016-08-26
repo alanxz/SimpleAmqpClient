@@ -32,7 +32,6 @@
 
 #include "SimpleAmqpClient/TableImpl.h"
 
-#include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/static_visitor.hpp>
 
