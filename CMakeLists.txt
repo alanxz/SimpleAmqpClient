@@ -32,7 +32,7 @@ string(REGEX MATCH "[0-9]+" _API_VERSION_PATCH ${_API_VERSION_PATCH})
 
 set(SAC_APIVERSION ${_API_VERSION_MAJOR}.${_API_VERSION_MINOR}.${_API_VERSION_PATCH})
 
-FIND_PACKAGE(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
+FIND_PACKAGE(Boost 1.47.0 REQUIRED)
 INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIRS})
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
@@ -112,7 +112,7 @@ SET(SAC_LIB_SRCS
 
 
 ADD_LIBRARY(SimpleAmqpClient ${SAC_LIB_SRCS})
-TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${Boost_LIBRARIES} ${SOCKET_LIBRARY})
+TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
 
 if (WIN32)
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
@@ -181,19 +181,6 @@ set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}")
 set(libdir "\${exec_prefix}/lib")
 set(includedir "\${prefix}/include")
-
-foreach(_lib ${Boost_LIBRARIES})
-    get_filename_component(_LIBPATH ${_lib} PATH)
-    if (NOT _LIBPATH STREQUAL _LASTLIBPATH)
-        set(libs_private "${libs_private} -L${_LIBPATH}")
-        set(_LASTLIBPATH ${_LIBPATH})
-    endif()
-
-    get_filename_component(_LIBNAME ${_lib} NAME_WE)
-    string(REGEX REPLACE "^lib" "" _LIBNAME ${_LIBNAME})
-    set(_LIBNAME "-l${_LIBNAME}")
-    set(libs_private "${libs_private} ${_LIBNAME}")
-endforeach()
 
 configure_file(libSimpleAmqpClient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAmqpClient.pc @ONLY)
 

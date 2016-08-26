@@ -8,5 +8,4 @@ Description: C++ wrapper of rabbitmq-c AMQP client library
 Version: @SAC_APIVERSION@
 Requires.private: librabbitmq
 Libs: -L${libdir} -lSimpleAmqpClient
-Libs.private: @libs_private@
 CFlags: -I${includedir}

@@ -57,7 +57,6 @@
 #include <vector>
 
 #include <boost/bind.hpp>
-#include <boost/chrono.hpp>
 
 #include <string.h>
 

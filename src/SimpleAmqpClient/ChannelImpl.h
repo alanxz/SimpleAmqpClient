@@ -39,9 +39,9 @@
 #include "SimpleAmqpClient/MessageReturnedException.h"
 
 #include <boost/bind.hpp>
-#include <boost/chrono.hpp>
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <map>
 #include <vector>
@@ -54,8 +54,8 @@ class ChannelImpl {
   ChannelImpl();
   virtual ~ChannelImpl();
 
-  ChannelImpl(const ChannelImpl&) = delete;
-  ChannelImpl& operator=(const ChannelImpl&) = delete;
+  ChannelImpl(const ChannelImpl &) = delete;
+  ChannelImpl &operator=(const ChannelImpl &) = delete;
 
   typedef std::vector<amqp_channel_t> channel_list_t;
   typedef std::vector<amqp_frame_t> frame_queue_t;
@@ -69,20 +69,19 @@ class ChannelImpl {
   bool IsChannelOpen(amqp_channel_t channel);
 
   bool GetNextFrameFromBroker(amqp_frame_t &frame,
-                              boost::chrono::microseconds timeout);
+                              std::chrono::microseconds timeout);
 
   bool CheckForQueuedMessageOnChannel(amqp_channel_t message_on_channel) const;
   void AddToFrameQueue(const amqp_frame_t &frame);
 
   template <class ChannelListType>
-  bool GetNextFrameFromBrokerOnChannel(const ChannelListType channels,
-                                       amqp_frame_t &frame_out,
-                                       boost::chrono::microseconds timeout =
-                                           boost::chrono::microseconds::max()) {
-    boost::chrono::steady_clock::time_point end_point;
-    boost::chrono::microseconds timeout_left = timeout;
-    if (timeout != boost::chrono::microseconds::max()) {
-      end_point = boost::chrono::steady_clock::now() + timeout;
+  bool GetNextFrameFromBrokerOnChannel(
+      const ChannelListType channels, amqp_frame_t &frame_out,
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) {
+    std::chrono::steady_clock::time_point end_point;
+    std::chrono::microseconds timeout_left = timeout;
+    if (timeout != std::chrono::microseconds::max()) {
+      end_point = std::chrono::steady_clock::now() + timeout;
     }
 
     amqp_frame_t frame;
@@ -106,15 +105,14 @@ class ChannelImpl {
         AddToFrameQueue(frame);
       }
 
-      if (timeout != boost::chrono::microseconds::max()) {
-        boost::chrono::steady_clock::time_point now =
-            boost::chrono::steady_clock::now();
+      if (timeout != std::chrono::microseconds::max()) {
+        std::chrono::steady_clock::time_point now =
+            std::chrono::steady_clock::now();
         if (now >= end_point) {
           return false;
         }
-        timeout_left =
-            boost::chrono::duration_cast<boost::chrono::microseconds>(
-                end_point - now);
+        timeout_left = std::chrono::duration_cast<std::chrono::microseconds>(
+            end_point - now);
       }
     }
     return false;
@@ -122,7 +120,7 @@ class ChannelImpl {
 
   bool GetNextFrameOnChannel(
       amqp_channel_t channel, amqp_frame_t &frame,
-      boost::chrono::microseconds timeout = boost::chrono::microseconds::max());
+      std::chrono::microseconds timeout = std::chrono::microseconds::max());
 
   static bool is_on_channel(const amqp_frame_t frame, amqp_channel_t channel) {
     return channel == frame.channel;
@@ -154,10 +152,10 @@ class ChannelImpl {
   }
 
   template <class ChannelListType, class ResponseListType>
-  bool GetMethodOnChannel(const ChannelListType channels, amqp_frame_t &frame,
-                          const ResponseListType &expected_responses,
-                          boost::chrono::microseconds timeout =
-                              boost::chrono::microseconds::max()) {
+  bool GetMethodOnChannel(
+      const ChannelListType channels, amqp_frame_t &frame,
+      const ResponseListType &expected_responses,
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) {
     frame_queue_t::iterator desired_frame = std::find_if(
         m_frame_queue.begin(), m_frame_queue.end(),
         boost::bind(
@@ -171,10 +169,10 @@ class ChannelImpl {
       return true;
     }
 
-    boost::chrono::steady_clock::time_point end_point;
-    boost::chrono::microseconds timeout_left = timeout;
-    if (timeout != boost::chrono::microseconds::max()) {
-      end_point = boost::chrono::steady_clock::now() + timeout;
+    std::chrono::steady_clock::time_point end_point;
+    std::chrono::microseconds timeout_left = timeout;
+    if (timeout != std::chrono::microseconds::max()) {
+      end_point = std::chrono::steady_clock::now() + timeout;
     }
 
     amqp_frame_t incoming_frame;
@@ -198,15 +196,14 @@ class ChannelImpl {
       }
       m_frame_queue.push_back(incoming_frame);
 
-      if (timeout != boost::chrono::microseconds::max()) {
-        boost::chrono::steady_clock::time_point now =
-            boost::chrono::steady_clock::now();
+      if (timeout != std::chrono::microseconds::max()) {
+        std::chrono::steady_clock::time_point now =
+            std::chrono::steady_clock::now();
         if (now >= end_point) {
           return false;
         }
-        timeout_left =
-            boost::chrono::duration_cast<boost::chrono::microseconds>(
-                end_point - now);
+        timeout_left = std::chrono::duration_cast<std::chrono::microseconds>(
+            end_point - now);
       }
     }
     return false;
@@ -265,9 +262,9 @@ class ChannelImpl {
     const std::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
         {AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD}};
 
-    boost::chrono::microseconds real_timeout =
-        (timeout >= 0 ? boost::chrono::milliseconds(timeout)
-                      : boost::chrono::microseconds::max());
+    std::chrono::microseconds real_timeout =
+        (timeout >= 0 ? std::chrono::milliseconds(timeout)
+                      : std::chrono::microseconds::max());
 
     amqp_frame_t deliver;
     if (!GetMethodOnChannel(channels, deliver, DELIVER_OR_CANCEL,
