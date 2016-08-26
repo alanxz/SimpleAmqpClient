@@ -31,39 +31,44 @@
 
 #include "connected_test.h"
 
+#include <memory>
+
 using namespace AmqpClient;
 
 TEST(connecting_test, connect_default) {
-  Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost());
+  std::unique_ptr<Channel> channel(
+      Channel::Create(connected_test::GetBrokerHost()));
 }
 
 TEST(connecting_test, connect_badhost) {
-  EXPECT_THROW(Channel::ptr_t channel = Channel::Create("HostDoesntExist"),
-               std::runtime_error);
+  EXPECT_THROW(
+      std::unique_ptr<Channel> channel(Channel::Create("HostDoesntExist")),
+      std::runtime_error);
 }
 
 TEST(connecting_test, connect_badauth) {
-  EXPECT_THROW(Channel::ptr_t channel = Channel::Create(
-                   connected_test::GetBrokerHost(), 5672, "baduser", "badpass"),
-               AccessRefusedException);
+  EXPECT_THROW(
+      std::unique_ptr<Channel> channel(Channel::Create(
+          connected_test::GetBrokerHost(), 5672, "baduser", "badpass")),
+      AccessRefusedException);
 }
 
 TEST(connecting_test, connect_badframesize) {
   // AMQP Spec says we have a minimum frame size of 4096
   EXPECT_THROW(
-      Channel::ptr_t channel = Channel::Create(
-          connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 400),
+      std::unique_ptr<Channel> channel(Channel::Create(
+          connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 400)),
       AmqpResponseLibraryException);
 }
 
 TEST(connecting_test, connect_badvhost) {
-  EXPECT_THROW(Channel::ptr_t channel =
+  EXPECT_THROW(std::unique_ptr<Channel> channel(
                    Channel::Create(connected_test::GetBrokerHost(), 5672,
-                                   "guest", "guest", "nonexitant_vhost"),
+                                   "guest", "guest", "nonexitant_vhost")),
                NotAllowedException);
 }
 
 TEST(connecting_test, connect_using_uri) {
   std::string host_uri = "amqp://" + connected_test::GetBrokerHost();
-  Channel::ptr_t channel = Channel::CreateFromUri(host_uri);
+  std::unique_ptr<Channel> channel(Channel::CreateFromUri(host_uri));
 }

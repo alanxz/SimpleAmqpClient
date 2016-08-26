@@ -48,7 +48,9 @@
 
 #include <array>
 #include <cstdint>
+#include <cstdlib>
 #include <map>
+#include <memory>
 #include <new>
 #include <queue>
 #include <sstream>
@@ -64,12 +66,13 @@ const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
-Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
+std::unique_ptr<Channel> Channel::CreateFromUri(const std::string &uri,
+                                                int frame_max) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
-  boost::shared_ptr<char> uri_dup =
-      boost::shared_ptr<char>(strdup(uri.c_str()), free);
+  std::unique_ptr<char, decltype(std::free) *> uri_dup(strdup(uri.c_str()),
+                                                       std::free);
 
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();
@@ -79,7 +82,7 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
                 std::string(info.password), std::string(info.vhost), frame_max);
 }
 
-Channel::ptr_t Channel::CreateSecureFromUri(
+std::unique_ptr<Channel> Channel::CreateSecureFromUri(
     const std::string &uri, const std::string &path_to_ca_cert,
     const std::string &path_to_client_key,
     const std::string &path_to_client_cert, bool verify_hostname,
@@ -87,8 +90,8 @@ Channel::ptr_t Channel::CreateSecureFromUri(
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
-  boost::shared_ptr<char> uri_dup =
-      boost::shared_ptr<char>(strdup(uri.c_str()), free);
+  std::unique_ptr<char, decltype(std::free) *> uri_dup(strdup(uri.c_str()),
+                                                       std::free);
 
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();

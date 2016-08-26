@@ -33,9 +33,6 @@
 #include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -58,8 +55,6 @@ class ChannelImpl;
   */
 class SIMPLEAMQPCLIENT_EXPORT Channel {
  public:
-  typedef boost::shared_ptr<Channel> ptr_t;
-
   static const std::string EXCHANGE_TYPE_DIRECT;
   static const std::string EXCHANGE_TYPE_FANOUT;
   static const std::string EXCHANGE_TYPE_TOPIC;
@@ -83,12 +78,14 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    * frame to this value
     * @return a new Channel object pointer
     */
-  static ptr_t Create(const std::string &host = "127.0.0.1", int port = 5672,
-                      const std::string &username = "guest",
-                      const std::string &password = "guest",
-                      const std::string &vhost = "/", int frame_max = 131072) {
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max);
+  static std::unique_ptr<Channel> Create(const std::string &host = "127.0.0.1",
+                                         int port = 5672,
+                                         const std::string &username = "guest",
+                                         const std::string &password = "guest",
+                                         const std::string &vhost = "/",
+                                         int frame_max = 131072) {
+    return std::unique_ptr<Channel>(
+        new Channel(host, port, username, password, vhost, frame_max));
   }
 
  protected:
@@ -125,24 +122,22 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
   * @return a new Channel object pointer
   */
 
-  static ptr_t CreateSecure(const std::string &path_to_ca_cert = "",
-                            const std::string &host = "127.0.0.1",
-                            const std::string &path_to_client_key = "",
-                            const std::string &path_to_client_cert = "",
-                            int port = 5671,
-                            const std::string &username = "guest",
-                            const std::string &password = "guest",
-                            const std::string &vhost = "/",
-                            int frame_max = 131072,
-                            bool verify_hostname = true) {
+  static std::unique_ptr<Channel> CreateSecure(
+      const std::string &path_to_ca_cert = "",
+      const std::string &host = "127.0.0.1",
+      const std::string &path_to_client_key = "",
+      const std::string &path_to_client_cert = "", int port = 5671,
+      const std::string &username = "guest",
+      const std::string &password = "guest", const std::string &vhost = "/",
+      int frame_max = 131072, bool verify_hostname = true) {
     SSLConnectionParams ssl_params;
     ssl_params.path_to_ca_cert = path_to_ca_cert;
     ssl_params.path_to_client_key = path_to_client_key;
     ssl_params.path_to_client_cert = path_to_client_cert;
     ssl_params.verify_hostname = verify_hostname;
 
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max, ssl_params);
+    return std::unique_ptr<Channel>(new Channel(host, port, username, password,
+                                                vhost, frame_max, ssl_params));
   }
 
   /**
@@ -154,7 +149,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    * any frame to this value
    * @returns a new Channel object
    */
-  static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
+  static std::unique_ptr<Channel> CreateFromUri(const std::string &uri,
+                                                int frame_max = 131072);
 
   /**
    * Create a new Channel object from an AMQP URI, secured with SSL.
@@ -172,12 +168,11 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    * any frame to this value
    * @returns a new Channel object
    */
-  static ptr_t CreateSecureFromUri(const std::string &uri,
-                                   const std::string &path_to_ca_cert,
-                                   const std::string &path_to_client_key = "",
-                                   const std::string &path_to_client_cert = "",
-                                   bool verify_hostname = true,
-                                   int frame_max = 131072);
+  static std::unique_ptr<Channel> CreateSecureFromUri(
+      const std::string &uri, const std::string &path_to_ca_cert,
+      const std::string &path_to_client_key = "",
+      const std::string &path_to_client_cert = "", bool verify_hostname = true,
+      int frame_max = 131072);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
