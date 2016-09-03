@@ -62,20 +62,20 @@ TEST_F(connected_test, channel_recover_from_error) {
 }
 
 TEST_F(connected_test, channel_publish_success1) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
 
   channel->BasicPublish("", "test_channel_routingkey", message, false, false);
 }
 
 TEST_F(connected_test, channel_publish_success2) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
 
   channel->BasicPublish("", "test_channel_routingkey", message, false, false);
   channel->BasicPublish("", "test_channel_routingkey", message, false, false);
 }
 
 TEST_F(connected_test, channel_publish_returned_mandatory) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
 
   EXPECT_THROW(
       channel->BasicPublish("", "test_channel_noqueue", message, true, false),
@@ -83,7 +83,7 @@ TEST_F(connected_test, channel_publish_returned_mandatory) {
 }
 
 TEST_F(connected_test, DISABLED_channel_publish_returned_immediate) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
   std::string queue_name = channel->DeclareQueue("");
 
   EXPECT_THROW(channel->BasicPublish("", queue_name, message, false, true),
@@ -91,7 +91,7 @@ TEST_F(connected_test, DISABLED_channel_publish_returned_immediate) {
 }
 
 TEST_F(connected_test, channel_publish_bad_exchange) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
 
   EXPECT_THROW(channel->BasicPublish("test_channel_badexchange",
                                      "test_channel_rk", message, false, false),
@@ -99,7 +99,7 @@ TEST_F(connected_test, channel_publish_bad_exchange) {
 }
 
 TEST_F(connected_test, channel_publish_bad_exchange_recover) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
 
   EXPECT_THROW(channel->BasicPublish("test_channel_badexchange",
                                      "test_channel_rk", message, false, false),
@@ -109,7 +109,7 @@ TEST_F(connected_test, channel_publish_bad_exchange_recover) {
 }
 
 TEST_F(connected_test, channel_consume_success) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message);
 
@@ -120,7 +120,7 @@ TEST_F(connected_test, channel_consume_success) {
 }
 
 TEST_F(connected_test, channel_consume_success_timeout) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Test message");
   std::string queue = channel->DeclareQueue("");
 
   std::string consumer = channel->BasicConsume(queue, "", true, false);
@@ -133,7 +133,8 @@ TEST_F(connected_test, channel_consume_success_timeout) {
 TEST(test_channels, big_message) {
   std::unique_ptr<Channel> channel(Channel::Create(
       connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 4096));
-  BasicMessage::ptr_t message = BasicMessage::Create(std::string(4099, 'a'));
+  std::shared_ptr<BasicMessage> message =
+      BasicMessage::Create(std::string(4099, 'a'));
 
   std::string queue = channel->DeclareQueue("");
 

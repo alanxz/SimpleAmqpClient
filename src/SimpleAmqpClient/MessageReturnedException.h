@@ -31,6 +31,7 @@
 #include "SimpleAmqpClient/BasicMessage.h"
 
 #include <cstdint>
+#include <memory>
 #include <stdexcept>
 
 #ifdef _MSC_VER
@@ -43,7 +44,7 @@ namespace AmqpClient {
 class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
     : public std::runtime_error {
  public:
-  explicit MessageReturnedException(BasicMessage::ptr_t message,
+  explicit MessageReturnedException(std::shared_ptr<BasicMessage> message,
                                     std::uint32_t reply_code,
                                     const std::string &reply_text,
                                     const std::string &exchange,
@@ -51,14 +52,14 @@ class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
 
   virtual ~MessageReturnedException() throw() {}
 
-  BasicMessage::ptr_t message() const throw() { return m_message; }
+  std::shared_ptr<BasicMessage> message() const throw() { return m_message; }
   std::uint32_t reply_code() const throw() { return m_reply_code; }
   std::string reply_text() const throw() { return m_reply_text; }
   std::string exchange() const throw() { return m_exchange; }
   std::string routing_key() const throw() { return m_routing_key; }
 
  private:
-  BasicMessage::ptr_t m_message;
+  std::shared_ptr<BasicMessage> m_message;
   std::uint32_t m_reply_code;
   std::string m_reply_text;
   std::string m_exchange;

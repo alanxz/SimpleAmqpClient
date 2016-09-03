@@ -218,12 +218,12 @@ MessageReturnedException ChannelImpl::CreateMessageReturnedException(
                              return_method.exchange.len);
   const std::string routing_key((char *)return_method.routing_key.bytes,
                                 return_method.routing_key.len);
-  BasicMessage::ptr_t content = ReadContent(channel);
+  std::shared_ptr<BasicMessage> content = ReadContent(channel);
   return MessageReturnedException(content, reply_code, reply_text, exchange,
                                   routing_key);
 }
 
-BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel) {
+std::shared_ptr<BasicMessage> ChannelImpl::ReadContent(amqp_channel_t channel) {
   amqp_frame_t frame;
 
   GetNextFrameOnChannel(channel, frame);

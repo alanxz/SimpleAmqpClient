@@ -66,7 +66,7 @@ TEST_F(connected_test, basic_cancel_cancelled_consumer) {
 }
 
 TEST_F(connected_test, basic_consume_message) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue);
   channel->BasicPublish("", queue, message);
@@ -85,9 +85,9 @@ TEST_F(connected_test, basic_consume_message_bad_consumer) {
 }
 
 TEST_F(connected_test, basic_consume_inital_qos) {
-  BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
-  BasicMessage::ptr_t message2 = BasicMessage::Create("Message2");
-  BasicMessage::ptr_t message3 = BasicMessage::Create("Message3");
+  std::shared_ptr<BasicMessage> message1 = BasicMessage::Create("Message1");
+  std::shared_ptr<BasicMessage> message2 = BasicMessage::Create("Message2");
+  std::shared_ptr<BasicMessage> message3 = BasicMessage::Create("Message3");
 
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message1, true);
@@ -105,9 +105,9 @@ TEST_F(connected_test, basic_consume_inital_qos) {
 }
 
 TEST_F(connected_test, basic_consume_2consumers) {
-  BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
-  BasicMessage::ptr_t message2 = BasicMessage::Create("Message2");
-  BasicMessage::ptr_t message3 = BasicMessage::Create("Message3");
+  std::shared_ptr<BasicMessage> message1 = BasicMessage::Create("Message1");
+  std::shared_ptr<BasicMessage> message2 = BasicMessage::Create("Message2");
+  std::shared_ptr<BasicMessage> message3 = BasicMessage::Create("Message3");
 
   std::string queue1 = channel->DeclareQueue("");
   std::string queue2 = channel->DeclareQueue("");
@@ -133,7 +133,7 @@ TEST_F(connected_test, basic_consume_2consumers) {
 }
 
 TEST_F(connected_test, basic_consume_1000messages) {
-  BasicMessage::ptr_t message1 = BasicMessage::Create("Message1");
+  std::shared_ptr<BasicMessage> message1 = BasicMessage::Create("Message1");
 
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue, "");
@@ -147,7 +147,7 @@ TEST_F(connected_test, basic_consume_1000messages) {
 }
 
 TEST_F(connected_test, basic_recover) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Message1");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message1");
 
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue, "", true, false);

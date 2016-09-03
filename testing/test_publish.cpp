@@ -33,7 +33,7 @@
 using namespace AmqpClient;
 
 TEST_F(connected_test, publish_success) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
 
   channel->BasicPublish("", "test_publish_rk", message);
 }
@@ -43,13 +43,14 @@ TEST(test_publish, publish_large_message) {
   std::unique_ptr<Channel> channel(Channel::Create(
       connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 4096));
   // Create a message with a body larger than a single frame
-  BasicMessage::ptr_t message = BasicMessage::Create(std::string(4099, 'a'));
+  std::shared_ptr<BasicMessage> message =
+      BasicMessage::Create(std::string(4099, 'a'));
 
   channel->BasicPublish("", "test_publish_rk", message);
 }
 
 TEST_F(connected_test, publish_badexchange) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
 
   EXPECT_THROW(channel->BasicPublish("test_publish_notexist", "test_publish_rk",
                                      message),
@@ -57,7 +58,7 @@ TEST_F(connected_test, publish_badexchange) {
 }
 
 TEST_F(connected_test, publish_recover_from_error) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
 
   EXPECT_THROW(channel->BasicPublish("test_publish_notexist", "test_publish_rk",
                                      message),
@@ -66,7 +67,7 @@ TEST_F(connected_test, publish_recover_from_error) {
 }
 
 TEST_F(connected_test, publish_mandatory_fail) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
 
   EXPECT_THROW(
       channel->BasicPublish("", "test_publish_notexist", message, true),
@@ -74,14 +75,14 @@ TEST_F(connected_test, publish_mandatory_fail) {
 }
 
 TEST_F(connected_test, publish_mandatory_success) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
   std::string queue = channel->DeclareQueue("");
 
   channel->BasicPublish("", queue, message, true);
 }
 
 TEST_F(connected_test, DISABLED_publish_immediate_fail1) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
 
   // No queue connected
   EXPECT_THROW(
@@ -90,7 +91,7 @@ TEST_F(connected_test, DISABLED_publish_immediate_fail1) {
 }
 
 TEST_F(connected_test, DISABLED_publish_immediate_fail2) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
   std::string queue = channel->DeclareQueue("");
 
   // No consumer connected
@@ -99,7 +100,7 @@ TEST_F(connected_test, DISABLED_publish_immediate_fail2) {
 }
 
 TEST_F(connected_test, publish_immediate_success) {
-  BasicMessage::ptr_t message = BasicMessage::Create("message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("message body");
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue, "");
 

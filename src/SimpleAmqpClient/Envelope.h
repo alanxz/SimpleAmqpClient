@@ -60,7 +60,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
     * @param routing_key the routing key that the message was published with
     * @returns a boost::shared_ptr to an envelope object
     */
-  static ptr_t Create(const BasicMessage::ptr_t message,
+  static ptr_t Create(std::shared_ptr<BasicMessage> message,
                       const std::string &consumer_tag,
                       const std::uint64_t delivery_tag,
                       const std::string &exchange, bool redelivered,
@@ -71,7 +71,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
                                         delivery_channel);
   }
 
-  explicit Envelope(const BasicMessage::ptr_t message,
+  explicit Envelope(std::shared_ptr<BasicMessage> message,
                     const std::string &consumer_tag,
                     const std::uint64_t delivery_tag,
                     const std::string &exchange, bool redelivered,
@@ -92,7 +92,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
     *
     * @returns the message
     */
-  inline BasicMessage::ptr_t Message() const { return m_message; }
+  inline std::shared_ptr<BasicMessage> Message() const { return m_message; }
 
   /**
     * Get the consumer tag for the consumer that delivered the message
@@ -155,7 +155,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
   }
 
  private:
-  const BasicMessage::ptr_t m_message;
+  std::shared_ptr<BasicMessage> m_message;
   const std::string m_consumerTag;
   const std::uint64_t m_deliveryTag;
   const std::string m_exchange;

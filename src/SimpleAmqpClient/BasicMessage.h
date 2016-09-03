@@ -31,9 +31,6 @@
 #include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -54,14 +51,14 @@ class BasicMessageImpl;
 
 class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
  public:
-  typedef boost::shared_ptr<BasicMessage> ptr_t;
-
   enum delivery_mode_t { dm_nonpersistent = 1, dm_persistent = 2 };
 
   /**
     * Create a new empty BasicMessage object
     */
-  static ptr_t Create() { return boost::make_shared<BasicMessage>(); }
+  static std::shared_ptr<BasicMessage> Create() {
+    return std::make_shared<BasicMessage>();
+  }
 
   /**
     * Create a new BasicMessage object
@@ -69,8 +66,8 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
     * @param body the message body.
     * @returns a new BasicMessage object
     */
-  static ptr_t Create(const std::string &body) {
-    return boost::make_shared<BasicMessage>(body);
+  static std::shared_ptr<BasicMessage> Create(const std::string &body) {
+    return std::make_shared<BasicMessage>(body);
   }
 
   /**
@@ -83,9 +80,9 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
     * copy of the properties struct
     * @returns a new BasicMessage object
     */
-  static ptr_t Create(amqp_bytes_t_ &body,
-                      amqp_basic_properties_t_ *properties) {
-    return boost::make_shared<BasicMessage>(body, properties);
+  static std::shared_ptr<BasicMessage> Create(
+      amqp_bytes_t_ &body, amqp_basic_properties_t_ *properties) {
+    return std::make_shared<BasicMessage>(body, properties);
   }
 
   BasicMessage();

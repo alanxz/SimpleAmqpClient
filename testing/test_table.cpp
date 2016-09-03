@@ -540,7 +540,7 @@ TEST(table, convert_to_rabbitmq) {
 
   table_in.insert(TableEntry("table_key", table_inner));
 
-  BasicMessage::ptr_t message = BasicMessage::Create();
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create();
   message->HeaderTable(table_in);
 
   EXPECT_TRUE(message->HeaderTableIsSet());
@@ -552,7 +552,7 @@ TEST(table, convert_to_rabbitmq) {
 TEST(table, convert_to_rabbitmq_empty) {
   Table table_in;
 
-  BasicMessage::ptr_t message = BasicMessage::Create();
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create();
   message->HeaderTable(table_in);
 
   Table table_out = message->HeaderTable();
@@ -587,13 +587,13 @@ TEST_F(connected_test, basic_message_header_roundtrip) {
   std::string queue = channel->DeclareQueue("");
   std::string tag = channel->BasicConsume(queue, "");
 
-  BasicMessage::ptr_t message_in = BasicMessage::Create("Body");
+  std::shared_ptr<BasicMessage> message_in = BasicMessage::Create("Body");
   message_in->HeaderTable(table_in);
 
   channel->BasicPublish("", queue, message_in);
 
   Envelope::ptr_t envelope = channel->BasicConsumeMessage(tag);
-  BasicMessage::ptr_t message_out = envelope->Message();
+  std::shared_ptr<BasicMessage> message_out = envelope->Message();
   Table table_out = message_out->HeaderTable();
 
   EXPECT_EQ(table_in.size(), table_out.size());
@@ -606,13 +606,13 @@ TEST_F(connected_test, basic_message_empty_table_roundtrip) {
 
   Table table_in;
 
-  BasicMessage::ptr_t message_in = BasicMessage::Create("Body");
+  std::shared_ptr<BasicMessage> message_in = BasicMessage::Create("Body");
   message_in->HeaderTable(table_in);
 
   channel->BasicPublish("", queue, message_in);
 
   Envelope::ptr_t envelope = channel->BasicConsumeMessage(tag);
-  BasicMessage::ptr_t message_out = envelope->Message();
+  std::shared_ptr<BasicMessage> message_out = envelope->Message();
   Table table_out = message_out->HeaderTable();
 
   EXPECT_EQ(table_in.size(), table_out.size());

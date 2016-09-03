@@ -499,8 +499,8 @@ void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue,
 
 void Channel::BasicPublish(const std::string &exchange_name,
                            const std::string &routing_key,
-                           const BasicMessage::ptr_t message, bool mandatory,
-                           bool immediate) {
+                           std::shared_ptr<BasicMessage> message,
+                           bool mandatory, bool immediate) {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
 
@@ -570,7 +570,7 @@ bool Channel::BasicGet(Envelope::ptr_t &envelope, const std::string &queue,
   std::string routing_key((char *)get_ok->routing_key.bytes,
                           get_ok->routing_key.len);
 
-  BasicMessage::ptr_t message = m_impl->ReadContent(channel);
+  std::shared_ptr<BasicMessage> message = m_impl->ReadContent(channel);
   envelope = Envelope::Create(message, "", delivery_tag, exchange, redelivered,
                               routing_key, channel);
 

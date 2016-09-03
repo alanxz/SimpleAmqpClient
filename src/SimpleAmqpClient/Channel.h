@@ -562,8 +562,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     */
   void BasicPublish(const std::string &exchange_name,
                     const std::string &routing_key,
-                    const BasicMessage::ptr_t message, bool mandatory = false,
-                    bool immediate = false);
+                    std::shared_ptr<BasicMessage> message,
+                    bool mandatory = false, bool immediate = false);
 
   /**
     * Attempts to get a message from a queue in a synchronous manner

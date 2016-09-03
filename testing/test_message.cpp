@@ -37,7 +37,7 @@
 using namespace AmqpClient;
 
 TEST(basic_message, empty_message) {
-  BasicMessage::ptr_t empty_message = BasicMessage::Create();
+  std::shared_ptr<BasicMessage> empty_message = BasicMessage::Create();
 
   EXPECT_EQ(std::string(), empty_message->Body());
 
@@ -45,7 +45,7 @@ TEST(basic_message, empty_message) {
 }
 
 TEST(basic_message, empty_message_add_body) {
-  BasicMessage::ptr_t empty_message = BasicMessage::Create();
+  std::shared_ptr<BasicMessage> empty_message = BasicMessage::Create();
 
   EXPECT_EQ(std::string(), empty_message->Body());
 
@@ -58,7 +58,7 @@ TEST(basic_message, empty_message_add_body) {
 }
 
 TEST(basic_message, empty_message_add_body2) {
-  BasicMessage::ptr_t empty_message = BasicMessage::Create();
+  std::shared_ptr<BasicMessage> empty_message = BasicMessage::Create();
 
   EXPECT_EQ(std::string(), empty_message->Body());
 
@@ -76,7 +76,7 @@ TEST(basic_message, empty_message_add_body2) {
 
 TEST(basic_message, initial_message_replace) {
   const std::string first_body("First message Body");
-  BasicMessage::ptr_t message = BasicMessage::Create(first_body);
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create(first_body);
 
   EXPECT_EQ(first_body, message->Body());
 
@@ -90,7 +90,7 @@ TEST(basic_message, initial_message_replace) {
 
 TEST(basic_message, initial_message_replace2) {
   const std::string first_body("First message body");
-  BasicMessage::ptr_t message = BasicMessage::Create(first_body);
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create(first_body);
   EXPECT_EQ(first_body, message->Body());
 
   const std::string second_body("second message body");
@@ -105,7 +105,7 @@ TEST(basic_message, initial_message_replace2) {
 TEST(basic_message, embedded_nulls) {
   const std::array<char, 7> message_data = {{'a', 'b', 'c', 0, '1', '2', '3'}};
   const std::string body(message_data.data(), message_data.size());
-  BasicMessage::ptr_t message = BasicMessage::Create(body);
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create(body);
   EXPECT_EQ(body, message->Body());
 
   amqp_bytes_t amqp_body = message->getAmqpBody();
@@ -129,11 +129,11 @@ TEST_F(connected_test, replaced_received_body) {
   const std::string consumer = channel->BasicConsume(queue);
 
   const std::string body("First Message Body");
-  BasicMessage::ptr_t out_message = BasicMessage::Create(body);
+  std::shared_ptr<BasicMessage> out_message = BasicMessage::Create(body);
   channel->BasicPublish("", queue, out_message);
 
   Envelope::ptr_t envelope = channel->BasicConsumeMessage(consumer);
-  BasicMessage::ptr_t in_message = envelope->Message();
+  std::shared_ptr<BasicMessage> in_message = envelope->Message();
   EXPECT_EQ(out_message->Body(), in_message->Body());
 
   const std::string body2("Second message body");

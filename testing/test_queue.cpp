@@ -87,7 +87,7 @@ TEST_F(connected_test, queue_declare_counts) {
   EXPECT_EQ(0, consumer_count);
 
   const std::string body("Test Message");
-  BasicMessage::ptr_t out_message = BasicMessage::Create(body);
+  std::shared_ptr<BasicMessage> out_message = BasicMessage::Create(body);
   channel->BasicPublish("", queue, out_message);
   channel->BasicPublish("", queue, out_message);
   channel->BasicPublish("", queue, out_message);
@@ -119,7 +119,7 @@ TEST_F(connected_test, queue_declare_counts_table) {
   EXPECT_EQ(0, consumer_count);
 
   const std::string body("Test Message");
-  BasicMessage::ptr_t out_message = BasicMessage::Create(body);
+  std::shared_ptr<BasicMessage> out_message = BasicMessage::Create(body);
   channel->BasicPublish("", queue, out_message);
   channel->BasicPublish("", queue, out_message);
   channel->BasicPublish("", queue, out_message);
@@ -168,7 +168,7 @@ TEST_F(connected_test, queue_delete_ifempty) {
 
 TEST_F(connected_test, queue_delete_ifnotempty) {
   std::string queue = channel->DeclareQueue("delete_queue_ifnotempty");
-  BasicMessage::ptr_t message = BasicMessage::Create("Message body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message body");
   channel->BasicPublish("", queue, message, true);
 
   EXPECT_THROW(channel->DeleteQueue(queue, false, true), ChannelException);
@@ -234,7 +234,7 @@ TEST_F(connected_test, queue_unbind_badbinding) {
 
 TEST_F(connected_test, queue_purge) {
   std::string queue = channel->DeclareQueue("queue_purge");
-  BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   channel->BasicPublish("", queue, message, true);
 
   channel->PurgeQueue(queue);

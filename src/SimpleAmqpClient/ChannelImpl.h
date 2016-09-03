@@ -283,7 +283,7 @@ class ChannelImpl {
     const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
     MaybeReleaseBuffersOnChannel(deliver.channel);
 
-    BasicMessage::ptr_t content = ReadContent(deliver.channel);
+    std::shared_ptr<BasicMessage> content = ReadContent(deliver.channel);
     MaybeReleaseBuffersOnChannel(deliver.channel);
 
     message = Envelope::Create(content, in_consumer_tag, delivery_tag, exchange,
@@ -303,7 +303,7 @@ class ChannelImpl {
 
   MessageReturnedException CreateMessageReturnedException(
       amqp_basic_return_t &return_method, amqp_channel_t channel);
-  AmqpClient::BasicMessage::ptr_t ReadContent(amqp_channel_t channel);
+  std::shared_ptr<BasicMessage> ReadContent(amqp_channel_t channel);
 
   void AddConsumer(const std::string &consumer_tag, amqp_channel_t channel);
   amqp_channel_t RemoveConsumer(const std::string &consumer_tag);

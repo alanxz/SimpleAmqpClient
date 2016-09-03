@@ -32,7 +32,7 @@
 
 namespace AmqpClient {
 
-Envelope::Envelope(const BasicMessage::ptr_t message,
+Envelope::Envelope(std::shared_ptr<BasicMessage> message,
                    const std::string &consumer_tag,
                    const std::uint64_t delivery_tag,
                    const std::string &exchange, bool redelivered,

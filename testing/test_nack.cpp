@@ -32,7 +32,7 @@
 using namespace AmqpClient;
 
 TEST_F(connected_test, basic_nack_envelope) {
-  const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message);
 
@@ -44,7 +44,7 @@ TEST_F(connected_test, basic_nack_envelope) {
 }
 
 TEST_F(connected_test, basic_nack_deliveryinfo) {
-  const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message);
 
@@ -60,7 +60,7 @@ TEST_F(connected_test, basic_nack_deliveryinfo) {
 }
 
 TEST_F(connected_test, basic_nack_envelope_with_requeue) {
-  const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message);
 

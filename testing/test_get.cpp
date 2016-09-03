@@ -33,7 +33,7 @@
 using namespace AmqpClient;
 
 TEST_F(connected_test, get_ok) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message, true);
 
@@ -43,7 +43,7 @@ TEST_F(connected_test, get_ok) {
 }
 
 TEST_F(connected_test, get_empty) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
 
   Envelope::ptr_t new_message;
@@ -55,7 +55,8 @@ TEST(test_get, get_big) {
   std::unique_ptr<Channel> channel(Channel::Create(
       connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 4096));
   // Create a message with a body larger than a single frame
-  BasicMessage::ptr_t message = BasicMessage::Create(std::string(4099, 'a'));
+  std::shared_ptr<BasicMessage> message =
+      BasicMessage::Create(std::string(4099, 'a'));
   std::string queue = channel->DeclareQueue("");
 
   channel->BasicPublish("", queue, message);
@@ -71,7 +72,7 @@ TEST_F(connected_test, bad_queue) {
 }
 
 TEST_F(connected_test, ack_message) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message, true);
 
