@@ -513,7 +513,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     * Acknowledges a message delievered using BasicGet or BasicConsume
     * @param message the message that is being ack'ed
     */
-  void BasicAck(const Envelope::ptr_t &message);
+  void BasicAck(std::shared_ptr<Envelope> &message);
 
   /**
    * Acknowledges a Basic message
@@ -530,7 +530,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     * @param message the message that is being nack'ed
     * @param requeue tells the broker to requeue the message or not
     */
-  void BasicReject(const Envelope::ptr_t &message, bool requeue,
+  void BasicReject(std::shared_ptr<Envelope> &message, bool requeue,
                    bool multiple = false);
 
   /**
@@ -583,7 +583,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     *  (message does not need to be acked)
     * @returns true if a message was delivered, false if the queue was empty
     */
-  bool BasicGet(Envelope::ptr_t &message, const std::string &queue,
+  bool BasicGet(std::shared_ptr<Envelope> &message, const std::string &queue,
                 bool no_ack = true);
 
   /**
@@ -685,7 +685,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     * has successfully been called.
     * @returns The next message on the queue
     */
-  Envelope::ptr_t BasicConsumeMessage(const std::string &consumer_tag);
+  std::shared_ptr<Envelope> BasicConsumeMessage(
+      const std::string &consumer_tag);
 
   /**
    * Consumes a single message from a list of consumers
@@ -695,7 +696,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    *
    * @returns the next message delivered from the broker
    */
-  Envelope::ptr_t BasicConsumeMessage(
+  std::shared_ptr<Envelope> BasicConsumeMessage(
       const std::vector<std::string> &consumer_tags);
 
   /**
@@ -706,7 +707,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    *
    * @returns the next message delivered from the broker
    */
-  Envelope::ptr_t BasicConsumeMessage();
+  std::shared_ptr<Envelope> BasicConsumeMessage();
 
   /**
     * Consumes a single message with a timeout (this gets an envelope object)
@@ -725,7 +726,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
   * otherwise
     */
   bool BasicConsumeMessage(const std::string &consumer_tag,
-                           Envelope::ptr_t &envelope, int timeout = -1);
+                           std::shared_ptr<Envelope> &envelope,
+                           int timeout = -1);
 
   /**
    * Consumes a single message with a timeout from a list of consumers
@@ -746,7 +748,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    * otherwise.
    */
   bool BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
-                           Envelope::ptr_t &envelope, int timeout = -1);
+                           std::shared_ptr<Envelope> &envelope,
+                           int timeout = -1);
 
   /**
    * Consumes a single message from any consumers opened for this Channel object
@@ -763,7 +766,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    * like a non-blocking read, -1 is an infinite timeout.
    * @returns true if a message delivered before the timeout, false otherwise
    */
-  bool BasicConsumeMessage(Envelope::ptr_t &envelope, int timeout = -1);
+  bool BasicConsumeMessage(std::shared_ptr<Envelope> &envelope,
+                           int timeout = -1);
 
  protected:
   std::unique_ptr<Detail::ChannelImpl> m_impl;

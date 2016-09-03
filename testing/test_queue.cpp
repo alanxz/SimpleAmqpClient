@@ -238,7 +238,7 @@ TEST_F(connected_test, queue_purge) {
   channel->BasicPublish("", queue, message, true);
 
   channel->PurgeQueue(queue);
-  Envelope::ptr_t envelope;
+  std::shared_ptr<Envelope> envelope;
   EXPECT_FALSE(channel->BasicGet(envelope, queue));
 
   channel->DeleteQueue(queue);

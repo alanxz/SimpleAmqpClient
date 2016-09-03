@@ -38,6 +38,7 @@
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -221,10 +222,11 @@ class ChannelImpl {
 
   template <class ChannelListType>
   bool ConsumeMessageOnChannel(const ChannelListType channels,
-                               Envelope::ptr_t &message, int timeout) {
+                               std::shared_ptr<Envelope> &message,
+                               int timeout) {
     envelope_list_t::iterator it = std::find_if(
         m_delivered_messages.begin(), m_delivered_messages.end(),
-        [channels](const Envelope::ptr_t &e) -> bool {
+        [channels](std::shared_ptr<Envelope> &e) -> bool {
           return channels.end() != std::find(channels.begin(), channels.end(),
                                              e->DeliveryChannel());
         });
@@ -240,7 +242,8 @@ class ChannelImpl {
 
   template <class ChannelListType>
   bool ConsumeMessageOnChannelInner(const ChannelListType channels,
-                                    Envelope::ptr_t &message, int timeout) {
+                                    std::shared_ptr<Envelope> &message,
+                                    int timeout) {
     const std::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
         {AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD}};
 
@@ -329,7 +332,7 @@ class ChannelImpl {
 
   frame_queue_t m_frame_queue;
 
-  typedef std::vector<Envelope::ptr_t> envelope_list_t;
+  typedef std::vector<std::shared_ptr<Envelope>> envelope_list_t;
   envelope_list_t m_delivered_messages;
 
   typedef std::map<std::string, amqp_channel_t> consumer_map_t;

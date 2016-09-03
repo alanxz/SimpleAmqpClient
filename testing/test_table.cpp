@@ -592,7 +592,7 @@ TEST_F(connected_test, basic_message_header_roundtrip) {
 
   channel->BasicPublish("", queue, message_in);
 
-  Envelope::ptr_t envelope = channel->BasicConsumeMessage(tag);
+  std::shared_ptr<Envelope> envelope = channel->BasicConsumeMessage(tag);
   std::shared_ptr<BasicMessage> message_out = envelope->Message();
   Table table_out = message_out->HeaderTable();
 
@@ -611,7 +611,7 @@ TEST_F(connected_test, basic_message_empty_table_roundtrip) {
 
   channel->BasicPublish("", queue, message_in);
 
-  Envelope::ptr_t envelope = channel->BasicConsumeMessage(tag);
+  std::shared_ptr<Envelope> envelope = channel->BasicConsumeMessage(tag);
   std::shared_ptr<BasicMessage> message_out = envelope->Message();
   Table table_out = message_out->HeaderTable();
 

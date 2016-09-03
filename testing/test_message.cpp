@@ -132,7 +132,7 @@ TEST_F(connected_test, replaced_received_body) {
   std::shared_ptr<BasicMessage> out_message = BasicMessage::Create(body);
   channel->BasicPublish("", queue, out_message);
 
-  Envelope::ptr_t envelope = channel->BasicConsumeMessage(consumer);
+  std::shared_ptr<Envelope> envelope = channel->BasicConsumeMessage(consumer);
   std::shared_ptr<BasicMessage> in_message = envelope->Message();
   EXPECT_EQ(out_message->Body(), in_message->Body());
 

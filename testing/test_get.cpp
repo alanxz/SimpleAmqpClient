@@ -37,7 +37,7 @@ TEST_F(connected_test, get_ok) {
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message, true);
 
-  Envelope::ptr_t new_message;
+  std::shared_ptr<Envelope> new_message;
   EXPECT_TRUE(channel->BasicGet(new_message, queue));
   EXPECT_EQ(message->Body(), new_message->Message()->Body());
 }
@@ -46,7 +46,7 @@ TEST_F(connected_test, get_empty) {
   std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
   std::string queue = channel->DeclareQueue("");
 
-  Envelope::ptr_t new_message;
+  std::shared_ptr<Envelope> new_message;
   EXPECT_FALSE(channel->BasicGet(new_message, queue));
 }
 
@@ -60,13 +60,13 @@ TEST(test_get, get_big) {
   std::string queue = channel->DeclareQueue("");
 
   channel->BasicPublish("", queue, message);
-  Envelope::ptr_t new_message;
+  std::shared_ptr<Envelope> new_message;
   EXPECT_TRUE(channel->BasicGet(new_message, queue));
   EXPECT_EQ(message->Body(), new_message->Message()->Body());
 }
 
 TEST_F(connected_test, bad_queue) {
-  Envelope::ptr_t new_message;
+  std::shared_ptr<Envelope> new_message;
   EXPECT_THROW(channel->BasicGet(new_message, "test_get_nonexistantqueue"),
                ChannelException);
 }
@@ -76,7 +76,7 @@ TEST_F(connected_test, ack_message) {
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message, true);
 
-  Envelope::ptr_t new_message;
+  std::shared_ptr<Envelope> new_message;
   EXPECT_TRUE(channel->BasicGet(new_message, queue, false));
   channel->BasicAck(new_message);
   EXPECT_FALSE(channel->BasicGet(new_message, queue, false));

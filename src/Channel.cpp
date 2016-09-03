@@ -451,7 +451,7 @@ void Channel::PurgeQueue(const std::string &queue_name) {
   m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
-void Channel::BasicAck(const Envelope::ptr_t &message) {
+void Channel::BasicAck(std::shared_ptr<Envelope> &message) {
   BasicAck(message->GetDeliveryInfo());
 }
 
@@ -471,7 +471,7 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
       amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, false));
 }
 
-void Channel::BasicReject(const Envelope::ptr_t &message, bool requeue,
+void Channel::BasicReject(std::shared_ptr<Envelope> &message, bool requeue,
                           bool multiple) {
   BasicReject(message->GetDeliveryInfo(), requeue, multiple);
 }
@@ -542,8 +542,8 @@ void Channel::BasicPublish(const std::string &exchange_name,
   m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
-bool Channel::BasicGet(Envelope::ptr_t &envelope, const std::string &queue,
-                       bool no_ack) {
+bool Channel::BasicGet(std::shared_ptr<Envelope> &envelope,
+                       const std::string &queue, bool no_ack) {
   const std::array<std::uint32_t, 2> GET_RESPONSES = {
       {AMQP_BASIC_GET_OK_METHOD, AMQP_BASIC_GET_EMPTY_METHOD}};
   m_impl->CheckIsConnected();
@@ -689,27 +689,29 @@ void Channel::BasicCancel(const std::string &consumer_tag) {
   m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
-Envelope::ptr_t Channel::BasicConsumeMessage(const std::string &consumer_tag) {
-  Envelope::ptr_t returnval;
+std::shared_ptr<Envelope> Channel::BasicConsumeMessage(
+    const std::string &consumer_tag) {
+  std::shared_ptr<Envelope> returnval;
   BasicConsumeMessage(consumer_tag, returnval);
   return returnval;
 }
 
-Envelope::ptr_t Channel::BasicConsumeMessage(
+std::shared_ptr<Envelope> Channel::BasicConsumeMessage(
     const std::vector<std::string> &consumer_tags) {
-  Envelope::ptr_t returnval;
+  std::shared_ptr<Envelope> returnval;
   BasicConsumeMessage(consumer_tags, returnval);
   return returnval;
 }
 
-Envelope::ptr_t Channel::BasicConsumeMessage() {
-  Envelope::ptr_t returnval;
+std::shared_ptr<Envelope> Channel::BasicConsumeMessage() {
+  std::shared_ptr<Envelope> returnval;
   BasicConsumeMessage(returnval);
   return returnval;
 }
 
 bool Channel::BasicConsumeMessage(const std::string &consumer_tag,
-                                  Envelope::ptr_t &message, int timeout) {
+                                  std::shared_ptr<Envelope> &message,
+                                  int timeout) {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
@@ -719,7 +721,8 @@ bool Channel::BasicConsumeMessage(const std::string &consumer_tag,
 }
 
 bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
-                                  Envelope::ptr_t &message, int timeout) {
+                                  std::shared_ptr<Envelope> &message,
+                                  int timeout) {
   m_impl->CheckIsConnected();
 
   std::vector<amqp_channel_t> channels;
@@ -733,7 +736,8 @@ bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
   return m_impl->ConsumeMessageOnChannel(channels, message, timeout);
 }
 
-bool Channel::BasicConsumeMessage(Envelope::ptr_t &message, int timeout) {
+bool Channel::BasicConsumeMessage(std::shared_ptr<Envelope> &message,
+                                  int timeout) {
   m_impl->CheckIsConnected();
 
   std::vector<amqp_channel_t> channels = m_impl->GetAllConsumerChannels();

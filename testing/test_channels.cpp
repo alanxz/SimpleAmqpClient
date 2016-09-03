@@ -115,7 +115,7 @@ TEST_F(connected_test, channel_consume_success) {
 
   std::string consumer = channel->BasicConsume(queue);
 
-  Envelope::ptr_t consumed_envelope;
+  std::shared_ptr<Envelope> consumed_envelope;
   EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope));
 }
 
@@ -126,7 +126,7 @@ TEST_F(connected_test, channel_consume_success_timeout) {
   std::string consumer = channel->BasicConsume(queue, "", true, false);
   channel->BasicPublish("", queue, message);
 
-  Envelope::ptr_t consumed_envelope;
+  std::shared_ptr<Envelope> consumed_envelope;
   EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope, 5000));
 }
 
@@ -141,6 +141,6 @@ TEST(test_channels, big_message) {
   std::string consumer = channel->BasicConsume(queue);
   channel->BasicPublish("", queue, message);
 
-  Envelope::ptr_t consumed_envelope;
+  std::shared_ptr<Envelope> consumed_envelope;
   EXPECT_TRUE(channel->BasicConsumeMessage(consumer, consumed_envelope));
 }

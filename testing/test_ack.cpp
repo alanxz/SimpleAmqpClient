@@ -38,7 +38,7 @@ TEST_F(connected_test, basic_ack_envelope) {
 
   std::string consumer = channel->BasicConsume(queue, "", true, false);
 
-  Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
+  std::shared_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
 
   channel->BasicAck(env);
 }
@@ -52,7 +52,7 @@ TEST_F(connected_test, basic_ack_deliveryinfo) {
 
   Envelope::DeliveryInfo info;
   {
-    Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
+    std::shared_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
     info = env->GetDeliveryInfo();
   }
 
