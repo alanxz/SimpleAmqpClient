@@ -43,7 +43,7 @@ class connected_test : public ::testing::Test {
 
   static std::string GetBrokerHost() {
     const char *host = getenv("AMQP_BROKER");
-    if (NULL != host) {
+    if (nullptr != host) {
       return std::string(host);
     }
     return std::string("");

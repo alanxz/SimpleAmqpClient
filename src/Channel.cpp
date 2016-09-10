@@ -114,7 +114,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
 
-  if (NULL == m_impl->m_connection) {
+  if (nullptr == m_impl->m_connection) {
     throw std::bad_alloc();
   }
 
@@ -138,12 +138,12 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
                  int frame_max, const SSLConnectionParams &ssl_params)
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
-  if (NULL == m_impl->m_connection) {
+  if (nullptr == m_impl->m_connection) {
     throw std::bad_alloc();
   }
 
   amqp_socket_t *socket = amqp_ssl_socket_new(m_impl->m_connection);
-  if (NULL == socket) {
+  if (nullptr == socket) {
     throw std::bad_alloc();
   }
 #if AMQP_VERSION >= 0x00080001

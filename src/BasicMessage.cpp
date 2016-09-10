@@ -50,7 +50,7 @@ class BasicMessageImpl {
 }
 
 BasicMessage::BasicMessage() : m_impl(new Detail::BasicMessageImpl) {
-  m_impl->m_body.bytes = NULL;
+  m_impl->m_body.bytes = nullptr;
   m_impl->m_body.len = 0;
   m_impl->m_properties._flags = 0;
 }
@@ -124,13 +124,13 @@ const amqp_basic_properties_t *BasicMessage::getAmqpProperties() const {
 const amqp_bytes_t &BasicMessage::getAmqpBody() const { return m_impl->m_body; }
 
 std::string BasicMessage::Body() const {
-  if (m_impl->m_body.bytes == NULL)
+  if (m_impl->m_body.bytes == nullptr)
     return std::string();
   else
     return std::string((char *)m_impl->m_body.bytes, m_impl->m_body.len);
 }
 void BasicMessage::Body(const std::string &body) {
-  if (NULL != m_impl->m_body.bytes) {
+  if (nullptr != m_impl->m_body.bytes) {
     amqp_bytes_free(m_impl->m_body);
   }
   amqp_bytes_t body_bytes;
@@ -470,7 +470,7 @@ void BasicMessage::HeaderTableClear() {
   if (HeaderTableIsSet()) {
     m_impl->m_table_pool.reset();
     m_impl->m_properties.headers.num_entries = 0;
-    m_impl->m_properties.headers.entries = NULL;
+    m_impl->m_properties.headers.entries = nullptr;
   }
   m_impl->m_properties._flags &= ~AMQP_BASIC_HEADERS_FLAG;
 }

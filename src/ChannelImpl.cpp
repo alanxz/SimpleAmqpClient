@@ -387,7 +387,7 @@ void ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame) {
 
 bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame,
                                          std::chrono::microseconds timeout) {
-  struct timeval *tvp = NULL;
+  struct timeval *tvp = nullptr;
   struct timeval tv_timeout;
   memset(&tv_timeout, 0, sizeof(tv_timeout));
 
@@ -471,7 +471,7 @@ bool bytesEqual(amqp_bytes_t r, amqp_bytes_t l) {
 std::uint32_t ChannelImpl::ComputeBrokerVersion(amqp_connection_state_t state) {
   const amqp_table_t *properties = amqp_get_server_properties(state);
   const amqp_bytes_t version = amqp_cstring_bytes("version");
-  amqp_table_entry_t *version_entry = NULL;
+  amqp_table_entry_t *version_entry = nullptr;
 
   for (int i = 0; i < properties->num_entries; ++i) {
     if (bytesEqual(properties->entries[i].key, version)) {
@@ -479,7 +479,7 @@ std::uint32_t ChannelImpl::ComputeBrokerVersion(amqp_connection_state_t state) {
       break;
     }
   }
-  if (NULL == version_entry) {
+  if (nullptr == version_entry) {
     return 0;
   }
 

@@ -129,7 +129,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
   v.value.array.num_entries = value.size();
   v.value.array.entries = (amqp_field_value_t *)amqp_pool_alloc(
       &pool, sizeof(amqp_field_value_t) * value.size());
-  if (NULL == v.value.array.entries) {
+  if (nullptr == v.value.array.entries) {
     throw std::bad_alloc();
   }
 
@@ -176,7 +176,7 @@ amqp_table_t TableValueImpl::CreateAmqpTableInner(const Table &table,
   new_table.entries = (amqp_table_entry_t *)amqp_pool_alloc(
       &pool, sizeof(amqp_table_entry_t) * table.size());
 
-  if (NULL == new_table.entries) {
+  if (nullptr == new_table.entries) {
     throw std::bad_alloc();
   }
 
@@ -185,7 +185,7 @@ amqp_table_t TableValueImpl::CreateAmqpTableInner(const Table &table,
   for (Table::const_iterator it = table.begin(); it != table.end();
        ++it, ++output_it) {
     amqp_pool_alloc_bytes(&pool, it->first.size(), &output_it->key);
-    if (NULL == output_it->key.bytes) {
+    if (nullptr == output_it->key.bytes) {
       throw std::bad_alloc();
     }
 
@@ -270,7 +270,7 @@ amqp_table_t TableValueImpl::CopyTableInner(const amqp_table_t &table,
   new_table.num_entries = table.num_entries;
   new_table.entries = (amqp_table_entry_t *)amqp_pool_alloc(
       &pool, sizeof(amqp_table_entry_t) * table.num_entries);
-  if (NULL == new_table.entries) {
+  if (nullptr == new_table.entries) {
     throw std::bad_alloc();
   }
 
@@ -278,7 +278,7 @@ amqp_table_t TableValueImpl::CopyTableInner(const amqp_table_t &table,
     amqp_table_entry_t *entry = &new_table.entries[i];
     amqp_pool_alloc_bytes(&pool, table.entries[i].key.len, &entry->key);
 
-    if (NULL == entry->key.bytes) {
+    if (nullptr == entry->key.bytes) {
       throw std::bad_alloc();
     }
     memcpy(entry->key.bytes, table.entries[i].key.bytes, entry->key.len);

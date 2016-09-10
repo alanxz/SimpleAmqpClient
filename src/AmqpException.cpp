@@ -84,14 +84,14 @@ void AmqpException::Throw(const amqp_channel_close_t &reply) {
   std::ostringstream what;
 
   std::string reply_text;
-  if (reply.reply_text.bytes != NULL) {
+  if (reply.reply_text.bytes != nullptr) {
     reply_text =
         std::string((char *)reply.reply_text.bytes, reply.reply_text.len);
   }
 
   const char *method_name =
       amqp_method_name(((reply.class_id << 16) | reply.method_id));
-  if (method_name != NULL) {
+  if (method_name != nullptr) {
     what << "channel error: " << reply.reply_code << ": " << method_name
          << " caused: " << reply_text;
   } else {
@@ -133,12 +133,12 @@ void AmqpException::Throw(const amqp_connection_close_t &reply) {
       amqp_method_name(((reply.class_id << 16) | reply.method_id));
 
   std::string reply_text;
-  if (reply.reply_text.bytes != NULL) {
+  if (reply.reply_text.bytes != nullptr) {
     reply_text =
         std::string((char *)reply.reply_text.bytes, reply.reply_text.len);
   }
 
-  if (method_name != NULL) {
+  if (method_name != nullptr) {
     what << "connection error: " << reply.reply_code << ": " << method_name
          << " caused: " << reply_text;
   } else {
