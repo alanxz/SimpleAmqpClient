@@ -66,55 +66,84 @@ BasicMessage::BasicMessage(const amqp_bytes_t &body,
     : m_impl(new Detail::BasicMessageImpl) {
   m_impl->m_body = body;
   m_impl->m_properties = *properties;
-  if (ContentTypeIsSet())
+  if (ContentTypeIsSet()) {
     m_impl->m_properties.content_type =
         amqp_bytes_malloc_dup(m_impl->m_properties.content_type);
-  if (ContentEncodingIsSet())
+  }
+  if (ContentEncodingIsSet()) {
     m_impl->m_properties.content_encoding =
         amqp_bytes_malloc_dup(m_impl->m_properties.content_encoding);
-  if (CorrelationIdIsSet())
+  }
+  if (CorrelationIdIsSet()) {
     m_impl->m_properties.correlation_id =
         amqp_bytes_malloc_dup(m_impl->m_properties.correlation_id);
-  if (ReplyToIsSet())
+  }
+  if (ReplyToIsSet()) {
     m_impl->m_properties.reply_to =
         amqp_bytes_malloc_dup(m_impl->m_properties.reply_to);
-  if (ExpirationIsSet())
+  }
+  if (ExpirationIsSet()) {
     m_impl->m_properties.expiration =
         amqp_bytes_malloc_dup(m_impl->m_properties.expiration);
-  if (MessageIdIsSet())
+  }
+  if (MessageIdIsSet()) {
     m_impl->m_properties.message_id =
         amqp_bytes_malloc_dup(m_impl->m_properties.message_id);
-  if (TypeIsSet())
+  }
+  if (TypeIsSet()) {
     m_impl->m_properties.type =
         amqp_bytes_malloc_dup(m_impl->m_properties.type);
-  if (UserIdIsSet())
+  }
+  if (UserIdIsSet()) {
     m_impl->m_properties.user_id =
         amqp_bytes_malloc_dup(m_impl->m_properties.user_id);
-  if (AppIdIsSet())
+  }
+  if (AppIdIsSet()) {
     m_impl->m_properties.app_id =
         amqp_bytes_malloc_dup(m_impl->m_properties.app_id);
-  if (ClusterIdIsSet())
+  }
+  if (ClusterIdIsSet()) {
     m_impl->m_properties.cluster_id =
         amqp_bytes_malloc_dup(m_impl->m_properties.cluster_id);
-  if (HeaderTableIsSet())
+  }
+  if (HeaderTableIsSet()) {
     m_impl->m_properties.headers = Detail::TableValueImpl::CopyTable(
         m_impl->m_properties.headers, m_impl->m_table_pool);
+  }
 }
 
 BasicMessage::~BasicMessage() {
   amqp_bytes_free(m_impl->m_body);
-  if (ContentTypeIsSet()) amqp_bytes_free(m_impl->m_properties.content_type);
-  if (ContentEncodingIsSet())
+  if (ContentTypeIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.content_type);
+  }
+  if (ContentEncodingIsSet()) {
     amqp_bytes_free(m_impl->m_properties.content_encoding);
-  if (CorrelationIdIsSet())
+  }
+  if (CorrelationIdIsSet()) {
     amqp_bytes_free(m_impl->m_properties.correlation_id);
-  if (ReplyToIsSet()) amqp_bytes_free(m_impl->m_properties.reply_to);
-  if (ExpirationIsSet()) amqp_bytes_free(m_impl->m_properties.expiration);
-  if (MessageIdIsSet()) amqp_bytes_free(m_impl->m_properties.message_id);
-  if (TypeIsSet()) amqp_bytes_free(m_impl->m_properties.type);
-  if (UserIdIsSet()) amqp_bytes_free(m_impl->m_properties.user_id);
-  if (AppIdIsSet()) amqp_bytes_free(m_impl->m_properties.app_id);
-  if (ClusterIdIsSet()) amqp_bytes_free(m_impl->m_properties.cluster_id);
+  }
+  if (ReplyToIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.reply_to);
+  }
+  if (ExpirationIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.expiration);
+  }
+  if (MessageIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.message_id);
+  }
+  if (TypeIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.type);
+  }
+  if (UserIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.user_id);
+  }
+  if (AppIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.app_id);
+  }
+  if (ClusterIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.cluster_id);
+  }
 }
 
 const amqp_basic_properties_t *BasicMessage::getAmqpProperties() const {
@@ -124,7 +153,9 @@ const amqp_basic_properties_t *BasicMessage::getAmqpProperties() const {
 const amqp_bytes_t &BasicMessage::getAmqpBody() const { return m_impl->m_body; }
 
 std::string BasicMessage::Body() const {
-  if (m_impl->m_body.bytes == nullptr) return std::string();
+  if (m_impl->m_body.bytes == nullptr) {
+    return std::string();
+  }
 
   return std::string((char *)m_impl->m_body.bytes, m_impl->m_body.len);
 }
@@ -139,15 +170,18 @@ void BasicMessage::Body(const std::string &body) {
 }
 
 std::string BasicMessage::ContentType() const {
-  if (ContentTypeIsSet())
+  if (ContentTypeIsSet()) {
     return std::string((char *)m_impl->m_properties.content_type.bytes,
                        m_impl->m_properties.content_type.len);
+  }
 
   return std::string();
 }
 
 void BasicMessage::ContentType(const std::string &content_type) {
-  if (ContentTypeIsSet()) amqp_bytes_free(m_impl->m_properties.content_type);
+  if (ContentTypeIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.content_type);
+  }
   m_impl->m_properties.content_type =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(content_type.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_CONTENT_TYPE_FLAG;
@@ -159,21 +193,25 @@ bool BasicMessage::ContentTypeIsSet() const {
 }
 
 void BasicMessage::ContentTypeClear() {
-  if (ContentTypeIsSet()) amqp_bytes_free(m_impl->m_properties.content_type);
+  if (ContentTypeIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.content_type);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_CONTENT_TYPE_FLAG;
 }
 
 std::string BasicMessage::ContentEncoding() const {
-  if (ContentEncodingIsSet())
+  if (ContentEncodingIsSet()) {
     return std::string((char *)m_impl->m_properties.content_encoding.bytes,
                        m_impl->m_properties.content_encoding.len);
+  }
 
   return std::string();
 }
 
 void BasicMessage::ContentEncoding(const std::string &content_encoding) {
-  if (ContentEncodingIsSet())
+  if (ContentEncodingIsSet()) {
     amqp_bytes_free(m_impl->m_properties.content_encoding);
+  }
   m_impl->m_properties.content_encoding =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(content_encoding.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_CONTENT_ENCODING_FLAG;
@@ -185,14 +223,16 @@ bool BasicMessage::ContentEncodingIsSet() const {
 }
 
 void BasicMessage::ContentEncodingClear() {
-  if (ContentEncodingIsSet())
+  if (ContentEncodingIsSet()) {
     amqp_bytes_free(m_impl->m_properties.content_encoding);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_CONTENT_ENCODING_FLAG;
 }
 
 BasicMessage::delivery_mode_t BasicMessage::DeliveryMode() const {
-  if (DeliveryModeIsSet())
+  if (DeliveryModeIsSet()) {
     return (delivery_mode_t)m_impl->m_properties.delivery_mode;
+  }
 
   return (delivery_mode_t)0;
 }
@@ -212,7 +252,9 @@ void BasicMessage::DeliveryModeClear() {
 }
 
 std::uint8_t BasicMessage::Priority() const {
-  if (PriorityIsSet()) return m_impl->m_properties.priority;
+  if (PriorityIsSet()) {
+    return m_impl->m_properties.priority;
+  }
 
   return 0;
 }
@@ -231,16 +273,18 @@ void BasicMessage::PriorityClear() {
 }
 
 std::string BasicMessage::CorrelationId() const {
-  if (CorrelationIdIsSet())
+  if (CorrelationIdIsSet()) {
     return std::string((char *)m_impl->m_properties.correlation_id.bytes,
                        m_impl->m_properties.correlation_id.len);
+  }
 
   return std::string();
 }
 
 void BasicMessage::CorrelationId(const std::string &correlation_id) {
-  if (CorrelationIdIsSet())
+  if (CorrelationIdIsSet()) {
     amqp_bytes_free(m_impl->m_properties.correlation_id);
+  }
   m_impl->m_properties.correlation_id =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(correlation_id.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_CORRELATION_ID_FLAG;
@@ -252,20 +296,24 @@ bool BasicMessage::CorrelationIdIsSet() const {
 }
 
 void BasicMessage::CorrelationIdClear() {
-  if (CorrelationIdIsSet())
+  if (CorrelationIdIsSet()) {
     amqp_bytes_free(m_impl->m_properties.correlation_id);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_CORRELATION_ID_FLAG;
 }
 
 std::string BasicMessage::ReplyTo() const {
-  if (ReplyToIsSet())
+  if (ReplyToIsSet()) {
     return std::string((char *)m_impl->m_properties.reply_to.bytes,
                        m_impl->m_properties.reply_to.len);
+  }
 
   return std::string();
 }
 void BasicMessage::ReplyTo(const std::string &reply_to) {
-  if (ReplyToIsSet()) amqp_bytes_free(m_impl->m_properties.reply_to);
+  if (ReplyToIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.reply_to);
+  }
   m_impl->m_properties.reply_to =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(reply_to.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_REPLY_TO_FLAG;
@@ -277,19 +325,24 @@ bool BasicMessage::ReplyToIsSet() const {
 }
 
 void BasicMessage::ReplyToClear() {
-  if (ReplyToIsSet()) amqp_bytes_free(m_impl->m_properties.reply_to);
+  if (ReplyToIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.reply_to);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_REPLY_TO_FLAG;
 }
 
 std::string BasicMessage::Expiration() const {
-  if (ExpirationIsSet())
+  if (ExpirationIsSet()) {
     return std::string((char *)m_impl->m_properties.expiration.bytes,
                        m_impl->m_properties.expiration.len);
+  }
 
   return std::string();
 }
 void BasicMessage::Expiration(const std::string &expiration) {
-  if (ExpirationIsSet()) amqp_bytes_free(m_impl->m_properties.expiration);
+  if (ExpirationIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.expiration);
+  }
   m_impl->m_properties.expiration =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(expiration.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_EXPIRATION_FLAG;
@@ -301,19 +354,24 @@ bool BasicMessage::ExpirationIsSet() const {
 }
 
 void BasicMessage::ExpirationClear() {
-  if (ExpirationIsSet()) amqp_bytes_free(m_impl->m_properties.expiration);
+  if (ExpirationIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.expiration);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_EXPIRATION_FLAG;
 }
 
 std::string BasicMessage::MessageId() const {
-  if (MessageIdIsSet())
+  if (MessageIdIsSet()) {
     return std::string((char *)m_impl->m_properties.message_id.bytes,
                        m_impl->m_properties.message_id.len);
+  }
 
   return std::string();
 }
 void BasicMessage::MessageId(const std::string &message_id) {
-  if (MessageIdIsSet()) amqp_bytes_free(m_impl->m_properties.message_id);
+  if (MessageIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.message_id);
+  }
   m_impl->m_properties.message_id =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(message_id.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_MESSAGE_ID_FLAG;
@@ -325,12 +383,16 @@ bool BasicMessage::MessageIdIsSet() const {
 }
 
 void BasicMessage::MessageIdClear() {
-  if (MessageIdIsSet()) amqp_bytes_free(m_impl->m_properties.message_id);
+  if (MessageIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.message_id);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_MESSAGE_ID_FLAG;
 }
 
 std::uint64_t BasicMessage::Timestamp() const {
-  if (TimestampIsSet()) return m_impl->m_properties.timestamp;
+  if (TimestampIsSet()) {
+    return m_impl->m_properties.timestamp;
+  }
 
   return 0;
 }
@@ -349,14 +411,17 @@ void BasicMessage::TimestampClear() {
 }
 
 std::string BasicMessage::Type() const {
-  if (TypeIsSet())
+  if (TypeIsSet()) {
     return std::string((char *)m_impl->m_properties.type.bytes,
                        m_impl->m_properties.type.len);
+  }
 
   return std::string();
 }
 void BasicMessage::Type(const std::string &type) {
-  if (TypeIsSet()) amqp_bytes_free(m_impl->m_properties.type);
+  if (TypeIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.type);
+  }
   m_impl->m_properties.type =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(type.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_TYPE_FLAG;
@@ -368,20 +433,25 @@ bool BasicMessage::TypeIsSet() const {
 }
 
 void BasicMessage::TypeClear() {
-  if (TypeIsSet()) amqp_bytes_free(m_impl->m_properties.type);
+  if (TypeIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.type);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_TYPE_FLAG;
 }
 
 std::string BasicMessage::UserId() const {
-  if (UserIdIsSet())
+  if (UserIdIsSet()) {
     return std::string((char *)m_impl->m_properties.user_id.bytes,
                        m_impl->m_properties.user_id.len);
+  }
 
   return std::string();
 }
 
 void BasicMessage::UserId(const std::string &user_id) {
-  if (UserIdIsSet()) amqp_bytes_free(m_impl->m_properties.user_id);
+  if (UserIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.user_id);
+  }
   m_impl->m_properties.user_id =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(user_id.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_USER_ID_FLAG;
@@ -393,19 +463,24 @@ bool BasicMessage::UserIdIsSet() const {
 }
 
 void BasicMessage::UserIdClear() {
-  if (UserIdIsSet()) amqp_bytes_free(m_impl->m_properties.user_id);
+  if (UserIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.user_id);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_USER_ID_FLAG;
 }
 
 std::string BasicMessage::AppId() const {
-  if (AppIdIsSet())
+  if (AppIdIsSet()) {
     return std::string((char *)m_impl->m_properties.app_id.bytes,
                        m_impl->m_properties.app_id.len);
+  }
 
   return std::string();
 }
 void BasicMessage::AppId(const std::string &app_id) {
-  if (AppIdIsSet()) amqp_bytes_free(m_impl->m_properties.app_id);
+  if (AppIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.app_id);
+  }
   m_impl->m_properties.app_id =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(app_id.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_APP_ID_FLAG;
@@ -417,19 +492,24 @@ bool BasicMessage::AppIdIsSet() const {
 }
 
 void BasicMessage::AppIdClear() {
-  if (AppIdIsSet()) amqp_bytes_free(m_impl->m_properties.app_id);
+  if (AppIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.app_id);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_APP_ID_FLAG;
 }
 
 std::string BasicMessage::ClusterId() const {
-  if (ClusterIdIsSet())
+  if (ClusterIdIsSet()) {
     return std::string((char *)m_impl->m_properties.cluster_id.bytes,
                        m_impl->m_properties.cluster_id.len);
+  }
 
   return std::string();
 }
 void BasicMessage::ClusterId(const std::string &cluster_id) {
-  if (AppIdIsSet()) amqp_bytes_free(m_impl->m_properties.cluster_id);
+  if (AppIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.cluster_id);
+  }
   m_impl->m_properties.cluster_id =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(cluster_id.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_CLUSTER_ID_FLAG;
@@ -441,13 +521,16 @@ bool BasicMessage::ClusterIdIsSet() const {
 }
 
 void BasicMessage::ClusterIdClear() {
-  if (ClusterIdIsSet()) amqp_bytes_free(m_impl->m_properties.cluster_id);
+  if (ClusterIdIsSet()) {
+    amqp_bytes_free(m_impl->m_properties.cluster_id);
+  }
   m_impl->m_properties._flags &= ~AMQP_BASIC_CLUSTER_ID_FLAG;
 }
 
 Table BasicMessage::HeaderTable() const {
-  if (HeaderTableIsSet())
+  if (HeaderTableIsSet()) {
     return Detail::TableValueImpl::CreateTable(m_impl->m_properties.headers);
+  }
 
   return Table();
 }
