@@ -96,7 +96,7 @@ void ChannelImpl::DoLogin(const std::string &username,
 }
 
 amqp_channel_t ChannelImpl::GetNextChannelId() {
-  channel_state_list_t::iterator unused_channel =
+  auto unused_channel =
       std::find(m_channels.begin(), m_channels.end(), CS_Closed);
 
   if (m_channels.end() == unused_channel) {
@@ -141,8 +141,7 @@ amqp_channel_t ChannelImpl::GetChannel() {
     return m_last_used_channel;
   }
 
-  channel_state_list_t::iterator it =
-      std::find(m_channels.begin(), m_channels.end(), CS_Open);
+  auto it = std::find(m_channels.begin(), m_channels.end(), CS_Open);
 
   if (m_channels.end() == it) {
     amqp_channel_t new_channel = CreateNewChannel();
@@ -292,8 +291,7 @@ void ChannelImpl::AddConsumer(const std::string &consumer_tag,
 }
 
 amqp_channel_t ChannelImpl::RemoveConsumer(const std::string &consumer_tag) {
-  std::map<std::string, amqp_channel_t>::iterator it =
-      m_consumer_channel_map.find(consumer_tag);
+  auto it = m_consumer_channel_map.find(consumer_tag);
   if (it == m_consumer_channel_map.end()) {
     throw ConsumerTagNotFoundException();
   }
@@ -317,7 +315,7 @@ amqp_channel_t ChannelImpl::GetConsumerChannel(
 
 std::vector<amqp_channel_t> ChannelImpl::GetAllConsumerChannels() const {
   std::vector<amqp_channel_t> ret;
-  for (consumer_map_t::const_iterator it = m_consumer_channel_map.begin();
+  for (auto it = m_consumer_channel_map.begin();
        it != m_consumer_channel_map.end(); ++it) {
     ret.push_back(it->second);
   }
@@ -326,7 +324,7 @@ std::vector<amqp_channel_t> ChannelImpl::GetAllConsumerChannels() const {
 }
 
 bool ChannelImpl::CheckForQueuedMessageOnChannel(amqp_channel_t channel) const {
-  frame_queue_t::const_iterator it = std::find_if(
+  auto it = std::find_if(
       m_frame_queue.begin(), m_frame_queue.end(),
       [channel](const amqp_frame_t &f) -> bool {
         return f.channel == channel && f.frame_type == AMQP_FRAME_METHOD &&
@@ -420,7 +418,7 @@ bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame,
 bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel,
                                         amqp_frame_t &frame,
                                         std::chrono::microseconds timeout) {
-  frame_queue_t::iterator it = std::find_if(
+  auto it = std::find_if(
       m_frame_queue.begin(), m_frame_queue.end(),
       [channel](amqp_frame_t &f) -> bool { return channel == f.channel; });
 

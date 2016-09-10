@@ -728,8 +728,7 @@ bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
   std::vector<amqp_channel_t> channels;
   channels.reserve(consumer_tags.size());
 
-  for (std::vector<std::string>::const_iterator it = consumer_tags.begin();
-       it != consumer_tags.end(); ++it) {
+  for (auto it = consumer_tags.begin(); it != consumer_tags.end(); ++it) {
     channels.push_back(m_impl->GetConsumerChannel(*it));
   }
 

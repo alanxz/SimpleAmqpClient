@@ -144,7 +144,7 @@ class ChannelImpl {
       const ChannelListType channels, amqp_frame_t &frame,
       const ResponseListType &expected_responses,
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) {
-    frame_queue_t::iterator desired_frame = std::find_if(
+    auto desired_frame = std::find_if(
         m_frame_queue.begin(), m_frame_queue.end(),
         [channels, expected_responses](const amqp_frame_t &f) -> bool {
           return ChannelImpl::is_expected_method_on_channel(f, channels,
@@ -224,7 +224,7 @@ class ChannelImpl {
   bool ConsumeMessageOnChannel(const ChannelListType channels,
                                std::shared_ptr<Envelope> &message,
                                int timeout) {
-    envelope_list_t::iterator it = std::find_if(
+    auto it = std::find_if(
         m_delivered_messages.begin(), m_delivered_messages.end(),
         [channels](std::shared_ptr<Envelope> &e) -> bool {
           return channels.end() != std::find(channels.begin(), channels.end(),
