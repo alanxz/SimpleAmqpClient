@@ -709,18 +709,18 @@ std::shared_ptr<Envelope> Channel::BasicConsumeMessage() {
 }
 
 bool Channel::BasicConsumeMessage(const std::string &consumer_tag,
-                                  std::shared_ptr<Envelope> &message,
+                                  std::shared_ptr<Envelope> &envelope,
                                   int timeout) {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
 
   std::array<amqp_channel_t, 1> channels = {{channel}};
 
-  return m_impl->ConsumeMessageOnChannel(channels, message, timeout);
+  return m_impl->ConsumeMessageOnChannel(channels, envelope, timeout);
 }
 
 bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
-                                  std::shared_ptr<Envelope> &message,
+                                  std::shared_ptr<Envelope> &envelope,
                                   int timeout) {
   m_impl->CheckIsConnected();
 
@@ -731,10 +731,10 @@ bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
     channels.push_back(m_impl->GetConsumerChannel(consumer_tag));
   }
 
-  return m_impl->ConsumeMessageOnChannel(channels, message, timeout);
+  return m_impl->ConsumeMessageOnChannel(channels, envelope, timeout);
 }
 
-bool Channel::BasicConsumeMessage(std::shared_ptr<Envelope> &message,
+bool Channel::BasicConsumeMessage(std::shared_ptr<Envelope> &envelope,
                                   int timeout) {
   m_impl->CheckIsConnected();
 
@@ -744,7 +744,7 @@ bool Channel::BasicConsumeMessage(std::shared_ptr<Envelope> &message,
     throw ConsumerTagNotFoundException();
   }
 
-  return m_impl->ConsumeMessageOnChannel(channels, message, timeout);
+  return m_impl->ConsumeMessageOnChannel(channels, envelope, timeout);
 }
 
 }  // namespace AmqpClient

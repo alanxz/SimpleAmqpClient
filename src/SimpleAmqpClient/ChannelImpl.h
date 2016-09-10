@@ -70,7 +70,7 @@ class ChannelImpl {
   bool GetNextFrameFromBroker(amqp_frame_t &frame,
                               std::chrono::microseconds timeout);
 
-  bool CheckForQueuedMessageOnChannel(amqp_channel_t message_on_channel) const;
+  bool CheckForQueuedMessageOnChannel(amqp_channel_t channel) const;
   void AddToFrameQueue(const amqp_frame_t &frame);
 
   template <class ChannelListType>

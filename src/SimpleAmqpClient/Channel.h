@@ -583,7 +583,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     *  (message does not need to be acked)
     * @returns true if a message was delivered, false if the queue was empty
     */
-  bool BasicGet(std::shared_ptr<Envelope> &message, const std::string &queue,
+  bool BasicGet(std::shared_ptr<Envelope> &envelope, const std::string &queue,
                 bool no_ack = true);
 
   /**
