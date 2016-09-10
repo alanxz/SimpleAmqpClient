@@ -124,10 +124,9 @@ const amqp_basic_properties_t *BasicMessage::getAmqpProperties() const {
 const amqp_bytes_t &BasicMessage::getAmqpBody() const { return m_impl->m_body; }
 
 std::string BasicMessage::Body() const {
-  if (m_impl->m_body.bytes == nullptr)
-    return std::string();
-  else
-    return std::string((char *)m_impl->m_body.bytes, m_impl->m_body.len);
+  if (m_impl->m_body.bytes == nullptr) return std::string();
+
+  return std::string((char *)m_impl->m_body.bytes, m_impl->m_body.len);
 }
 void BasicMessage::Body(const std::string &body) {
   if (nullptr != m_impl->m_body.bytes) {
@@ -143,8 +142,8 @@ std::string BasicMessage::ContentType() const {
   if (ContentTypeIsSet())
     return std::string((char *)m_impl->m_properties.content_type.bytes,
                        m_impl->m_properties.content_type.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 
 void BasicMessage::ContentType(const std::string &content_type) {
@@ -168,8 +167,8 @@ std::string BasicMessage::ContentEncoding() const {
   if (ContentEncodingIsSet())
     return std::string((char *)m_impl->m_properties.content_encoding.bytes,
                        m_impl->m_properties.content_encoding.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 
 void BasicMessage::ContentEncoding(const std::string &content_encoding) {
@@ -194,8 +193,8 @@ void BasicMessage::ContentEncodingClear() {
 BasicMessage::delivery_mode_t BasicMessage::DeliveryMode() const {
   if (DeliveryModeIsSet())
     return (delivery_mode_t)m_impl->m_properties.delivery_mode;
-  else
-    return (delivery_mode_t)0;
+
+  return (delivery_mode_t)0;
 }
 
 void BasicMessage::DeliveryMode(delivery_mode_t delivery_mode) {
@@ -213,10 +212,9 @@ void BasicMessage::DeliveryModeClear() {
 }
 
 std::uint8_t BasicMessage::Priority() const {
-  if (PriorityIsSet())
-    return m_impl->m_properties.priority;
-  else
-    return 0;
+  if (PriorityIsSet()) return m_impl->m_properties.priority;
+
+  return 0;
 }
 void BasicMessage::Priority(std::uint8_t priority) {
   m_impl->m_properties.priority = priority;
@@ -236,8 +234,8 @@ std::string BasicMessage::CorrelationId() const {
   if (CorrelationIdIsSet())
     return std::string((char *)m_impl->m_properties.correlation_id.bytes,
                        m_impl->m_properties.correlation_id.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 
 void BasicMessage::CorrelationId(const std::string &correlation_id) {
@@ -263,8 +261,8 @@ std::string BasicMessage::ReplyTo() const {
   if (ReplyToIsSet())
     return std::string((char *)m_impl->m_properties.reply_to.bytes,
                        m_impl->m_properties.reply_to.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 void BasicMessage::ReplyTo(const std::string &reply_to) {
   if (ReplyToIsSet()) amqp_bytes_free(m_impl->m_properties.reply_to);
@@ -287,8 +285,8 @@ std::string BasicMessage::Expiration() const {
   if (ExpirationIsSet())
     return std::string((char *)m_impl->m_properties.expiration.bytes,
                        m_impl->m_properties.expiration.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 void BasicMessage::Expiration(const std::string &expiration) {
   if (ExpirationIsSet()) amqp_bytes_free(m_impl->m_properties.expiration);
@@ -311,8 +309,8 @@ std::string BasicMessage::MessageId() const {
   if (MessageIdIsSet())
     return std::string((char *)m_impl->m_properties.message_id.bytes,
                        m_impl->m_properties.message_id.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 void BasicMessage::MessageId(const std::string &message_id) {
   if (MessageIdIsSet()) amqp_bytes_free(m_impl->m_properties.message_id);
@@ -332,10 +330,9 @@ void BasicMessage::MessageIdClear() {
 }
 
 std::uint64_t BasicMessage::Timestamp() const {
-  if (TimestampIsSet())
-    return m_impl->m_properties.timestamp;
-  else
-    return 0;
+  if (TimestampIsSet()) return m_impl->m_properties.timestamp;
+
+  return 0;
 }
 void BasicMessage::Timestamp(std::uint64_t timestamp) {
   m_impl->m_properties.timestamp = timestamp;
@@ -355,8 +352,8 @@ std::string BasicMessage::Type() const {
   if (TypeIsSet())
     return std::string((char *)m_impl->m_properties.type.bytes,
                        m_impl->m_properties.type.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 void BasicMessage::Type(const std::string &type) {
   if (TypeIsSet()) amqp_bytes_free(m_impl->m_properties.type);
@@ -379,8 +376,8 @@ std::string BasicMessage::UserId() const {
   if (UserIdIsSet())
     return std::string((char *)m_impl->m_properties.user_id.bytes,
                        m_impl->m_properties.user_id.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 
 void BasicMessage::UserId(const std::string &user_id) {
@@ -404,8 +401,8 @@ std::string BasicMessage::AppId() const {
   if (AppIdIsSet())
     return std::string((char *)m_impl->m_properties.app_id.bytes,
                        m_impl->m_properties.app_id.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 void BasicMessage::AppId(const std::string &app_id) {
   if (AppIdIsSet()) amqp_bytes_free(m_impl->m_properties.app_id);
@@ -428,8 +425,8 @@ std::string BasicMessage::ClusterId() const {
   if (ClusterIdIsSet())
     return std::string((char *)m_impl->m_properties.cluster_id.bytes,
                        m_impl->m_properties.cluster_id.len);
-  else
-    return std::string();
+
+  return std::string();
 }
 void BasicMessage::ClusterId(const std::string &cluster_id) {
   if (AppIdIsSet()) amqp_bytes_free(m_impl->m_properties.cluster_id);
@@ -451,8 +448,8 @@ void BasicMessage::ClusterIdClear() {
 Table BasicMessage::HeaderTable() const {
   if (HeaderTableIsSet())
     return Detail::TableValueImpl::CreateTable(m_impl->m_properties.headers);
-  else
-    return Table();
+
+  return Table();
 }
 
 void BasicMessage::HeaderTable(const Table &header_table) {
