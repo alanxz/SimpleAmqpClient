@@ -47,7 +47,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-#include <string.h>
+#include <cstring>
 
 #include <array>
 #include <chrono>

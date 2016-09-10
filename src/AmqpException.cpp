@@ -31,7 +31,7 @@
 
 #include "SimpleAmqpClient/AmqpException.h"
 
-#include <assert.h>
+#include <cassert>
 #include <cstdint>
 #include <sstream>
 #include <string>

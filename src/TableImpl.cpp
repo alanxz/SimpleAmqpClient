@@ -37,7 +37,7 @@
 
 #include <amqp.h>
 
-#include <string.h>
+#include <cstring>
 
 #include <algorithm>
 #include <cstdint>

@@ -31,7 +31,7 @@
 
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace AmqpClient {
 

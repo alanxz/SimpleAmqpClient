@@ -58,7 +58,7 @@
 #include <utility>
 #include <vector>
 
-#include <string.h>
+#include <cstring>
 
 namespace AmqpClient {
 
