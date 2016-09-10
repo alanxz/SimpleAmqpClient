@@ -163,7 +163,7 @@ amqp_table_t TableValueImpl::CreateAmqpTable(const Table &table,
 
   pool.reset(make_pool(1024));
 
-  return CreateAmqpTableInner(table, *pool.get());
+  return CreateAmqpTableInner(table, *pool);
 }
 
 amqp_table_t TableValueImpl::CreateAmqpTableInner(const Table &table,
@@ -258,7 +258,7 @@ amqp_table_t TableValueImpl::CopyTable(const amqp_table_t &table,
 
   pool.reset(make_pool(1024));
 
-  return CopyTableInner(table, *pool.get());
+  return CopyTableInner(table, *pool);
 }
 
 amqp_table_t TableValueImpl::CopyTableInner(const amqp_table_t &table,
