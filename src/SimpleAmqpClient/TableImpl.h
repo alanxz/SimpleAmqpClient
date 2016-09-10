@@ -69,7 +69,7 @@ typedef boost::variant<void_t, bool, std::int8_t, std::int16_t,
 class TableValueImpl {
  public:
   explicit TableValueImpl(const value_t &v) : m_value(v) {}
-  virtual ~TableValueImpl() {}
+  virtual ~TableValueImpl() = default;
 
   value_t m_value;
 
@@ -95,7 +95,7 @@ class TableValueImpl {
       : public boost::static_visitor<amqp_field_value_t> {
    public:
     explicit generate_field_value(amqp_pool_t &p) : pool(p) {}
-    virtual ~generate_field_value() {}
+    virtual ~generate_field_value() = default;
 
     amqp_field_value_t operator()(const void_t) const;
     amqp_field_value_t operator()(const bool value) const;

@@ -51,7 +51,7 @@ namespace Detail {
 class ChannelImpl {
  public:
   ChannelImpl();
-  virtual ~ChannelImpl();
+  virtual ~ChannelImpl() = default;
 
   ChannelImpl(const ChannelImpl &) = delete;
   ChannelImpl &operator=(const ChannelImpl &) = delete;

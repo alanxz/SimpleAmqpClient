@@ -183,8 +183,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
                    const std::string &vhost, int frame_max,
                    const SSLConnectionParams &ssl_params);
 
-  Channel(const Channel&) = delete;
-  Channel& operator=(const Channel&) = delete;
+  Channel(const Channel &) = delete;
+  Channel &operator=(const Channel &) = delete;
 
  public:
   virtual ~Channel();

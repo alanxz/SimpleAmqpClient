@@ -54,7 +54,7 @@ class SIMPLEAMQPCLIENT_EXPORT AmqpException : public std::runtime_error {
   explicit AmqpException(const std::string &what, const std::string &reply_text,
                          std::uint16_t class_id,
                          std::uint16_t method_id) throw();
-  virtual ~AmqpException() throw() {}
+  virtual ~AmqpException() throw() = default;
 
   virtual bool is_soft_error() const throw() = 0;
   virtual std::uint16_t reply_code() const throw() = 0;

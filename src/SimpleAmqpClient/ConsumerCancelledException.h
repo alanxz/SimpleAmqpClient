@@ -40,7 +40,7 @@ class ConsumerCancelledException : public std::runtime_error {
             std::string("Consumer was cancelled: ").append(consumer_tag)),
         m_consumer_tag(consumer_tag) {}
 
-  virtual ~ConsumerCancelledException() throw() {}
+  virtual ~ConsumerCancelledException() throw() = default;
 
   std::string GetConsumerTag() const { return m_consumer_tag; }
 

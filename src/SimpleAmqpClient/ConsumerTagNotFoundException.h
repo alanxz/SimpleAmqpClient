@@ -44,7 +44,7 @@ class SIMPLEAMQPCLIENT_EXPORT ConsumerTagNotFoundException
  public:
   ConsumerTagNotFoundException() throw()
       : std::runtime_error("The specified consumer tag is unknown") {}
-  virtual ~ConsumerTagNotFoundException() throw() {}
+  virtual ~ConsumerTagNotFoundException() throw() = default;
 };
 
 }  // namespace AmqpClient

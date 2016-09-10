@@ -64,8 +64,6 @@ ChannelImpl::ChannelImpl() : m_last_used_channel(0), m_is_connected(false) {
   m_channels.push_back(CS_Used);
 }
 
-ChannelImpl::~ChannelImpl() {}
-
 void ChannelImpl::DoLogin(const std::string &username,
                           const std::string &password, const std::string &vhost,
                           int frame_max) {

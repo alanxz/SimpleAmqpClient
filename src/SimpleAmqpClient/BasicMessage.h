@@ -90,8 +90,8 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
   BasicMessage(const amqp_bytes_t_ &body,
                const amqp_basic_properties_t_ *properties);
 
-  BasicMessage(const BasicMessage&) = delete;
-  BasicMessage& operator=(const BasicMessage&) = delete;
+  BasicMessage(const BasicMessage &) = delete;
+  BasicMessage &operator=(const BasicMessage &) = delete;
 
  public:
   /**

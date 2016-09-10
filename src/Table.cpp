@@ -115,7 +115,7 @@ bool TableValue::operator!=(const TableValue &l) const {
   return !(m_impl->m_value == l.m_impl->m_value);
 }
 
-TableValue::~TableValue() {}
+TableValue::~TableValue() = default;
 
 TableValue::ValueType TableValue::GetType() const {
   return static_cast<ValueType>(m_impl->m_value.which());

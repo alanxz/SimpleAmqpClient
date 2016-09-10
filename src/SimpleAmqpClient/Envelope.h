@@ -73,14 +73,14 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
                     const std::string &routing_key,
                     const std::uint16_t delivery_channel);
 
-  Envelope(const Envelope&) = delete;
-  Envelope& operator=(const Envelope&) = delete;
+  Envelope(const Envelope &) = delete;
+  Envelope &operator=(const Envelope &) = delete;
 
  public:
   /**
     * destructor
     */
-  virtual ~Envelope();
+  virtual ~Envelope() = default;
 
   /**
     * Get the payload of the envelope

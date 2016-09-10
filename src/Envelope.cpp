@@ -45,6 +45,4 @@ Envelope::Envelope(std::shared_ptr<BasicMessage> message,
       m_redelivered(redelivered),
       m_routingKey(routing_key),
       m_deliveryChannel(delivery_channel) {}
-
-Envelope::~Envelope() {}
 }
