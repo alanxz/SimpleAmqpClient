@@ -741,7 +741,7 @@ bool Channel::BasicConsumeMessage(std::shared_ptr<Envelope> &message,
 
   std::vector<amqp_channel_t> channels = m_impl->GetAllConsumerChannels();
 
-  if (0 == channels.size()) {
+  if (channels.empty()) {
     throw ConsumerTagNotFoundException();
   }
 

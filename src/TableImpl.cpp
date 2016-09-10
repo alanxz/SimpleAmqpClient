@@ -157,7 +157,7 @@ amqp_pool_t *make_pool(int block_size) {
 
 amqp_table_t TableValueImpl::CreateAmqpTable(const Table &table,
                                              amqp_pool_ptr_t &pool) {
-  if (0 == table.size()) {
+  if (table.empty()) {
     return AMQP_EMPTY_TABLE;
   }
 
