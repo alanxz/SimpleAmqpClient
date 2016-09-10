@@ -56,10 +56,10 @@ class ChannelImpl {
   ChannelImpl(const ChannelImpl &) = delete;
   ChannelImpl &operator=(const ChannelImpl &) = delete;
 
-  typedef std::vector<amqp_channel_t> channel_list_t;
-  typedef std::vector<amqp_frame_t> frame_queue_t;
-  typedef std::map<amqp_channel_t, frame_queue_t> channel_map_t;
-  typedef channel_map_t::iterator channel_map_iterator_t;
+  using channel_list_t = std::vector<amqp_channel_t>;
+  using frame_queue_t = std::vector<amqp_frame_t>;
+  using channel_map_t = std::map<amqp_channel_t, frame_queue_t>;
+  using channel_map_iterator_t = channel_map_t::iterator;
 
   void DoLogin(const std::string &username, const std::string &password,
                const std::string &vhost, int frame_max);
@@ -332,14 +332,14 @@ class ChannelImpl {
 
   frame_queue_t m_frame_queue;
 
-  typedef std::vector<std::shared_ptr<Envelope>> envelope_list_t;
+  using envelope_list_t = std::vector<std::shared_ptr<Envelope> >;
   envelope_list_t m_delivered_messages;
 
-  typedef std::map<std::string, amqp_channel_t> consumer_map_t;
+  using consumer_map_t = std::map<std::string, amqp_channel_t>;
   consumer_map_t m_consumer_channel_map;
 
   enum channel_state_t { CS_Closed = 0, CS_Open, CS_Used };
-  typedef std::vector<channel_state_t> channel_state_list_t;
+  using channel_state_list_t = std::vector<channel_state_t>;
 
   channel_state_list_t m_channels;
   std::uint32_t m_brokerVersion;

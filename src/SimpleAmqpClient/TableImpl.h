@@ -53,18 +53,17 @@ struct pool_deleter {
   }
 };
 
-typedef std::unique_ptr<amqp_pool_t, pool_deleter> amqp_pool_ptr_t;
+using amqp_pool_ptr_t = std::unique_ptr<amqp_pool_t, pool_deleter>;
 
 struct void_t {};
 
 inline bool operator==(const void_t &, const void_t &) { return true; }
 
-typedef std::vector<TableValue> array_t;
+using array_t = std::vector<TableValue>;
 
-typedef boost::variant<void_t, bool, std::int8_t, std::int16_t,
-                       std::int32_t, std::int64_t, float, double,
-                       std::string, array_t, Table>
-    value_t;
+using value_t =
+    boost::variant<void_t, bool, std::int8_t, std::int16_t, std::int32_t,
+                   std::int64_t, float, double, std::string, array_t, Table>;
 
 class TableValueImpl {
  public:

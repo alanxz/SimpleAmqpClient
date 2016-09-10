@@ -52,23 +52,23 @@ class TableValueImpl;
  *
  * Note this must be less than 128 bytes long
  */
-typedef std::string TableKey;
+using TableKey = std::string;
 
 class TableValue;
 
 /**
  * Array field value
  */
-typedef std::vector<TableValue> Array;
+using Array = std::vector<TableValue>;
 
 /**
  * Field table
  *
  * Is just an STL map
  */
-typedef std::map<TableKey, TableValue> Table;
+using Table = std::map<TableKey, TableValue>;
 
-typedef Table::value_type TableEntry;
+using TableEntry = Table::value_type;
 
 /**
  * A variant type for the Table Value
