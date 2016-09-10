@@ -54,7 +54,7 @@ class SIMPLEAMQPCLIENT_EXPORT AmqpException : public std::runtime_error {
   explicit AmqpException(const std::string &what, const std::string &reply_text,
                          std::uint16_t class_id,
                          std::uint16_t method_id) throw();
-  virtual ~AmqpException() throw() = default;
+  ~AmqpException() throw() override = default;
 
   virtual bool is_soft_error() const throw() = 0;
   virtual std::uint16_t reply_code() const throw() = 0;
@@ -76,7 +76,7 @@ class SIMPLEAMQPCLIENT_EXPORT ConnectionException : public AmqpException {
                                std::uint16_t method_id) throw()
       : AmqpException(what, reply_text, class_id, method_id) {}
 
-  virtual bool is_soft_error() const throw() { return false; }
+  bool is_soft_error() const throw() override { return false; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT ChannelException : public AmqpException {
@@ -87,7 +87,7 @@ class SIMPLEAMQPCLIENT_EXPORT ChannelException : public AmqpException {
                             std::uint16_t method_id) throw()
       : AmqpException(what, reply_text, class_id, method_id) {}
 
-  virtual bool is_soft_error() const throw() { return true; }
+  bool is_soft_error() const throw() override { return true; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT ConnectionForcedException
@@ -100,7 +100,7 @@ class SIMPLEAMQPCLIENT_EXPORT ConnectionForcedException
                                      std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT InvalidPathException
@@ -113,7 +113,7 @@ class SIMPLEAMQPCLIENT_EXPORT InvalidPathException
                                 std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT FrameErrorException : public ConnectionException {
@@ -125,7 +125,7 @@ class SIMPLEAMQPCLIENT_EXPORT FrameErrorException : public ConnectionException {
                                std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT SyntaxErrorException
@@ -138,7 +138,7 @@ class SIMPLEAMQPCLIENT_EXPORT SyntaxErrorException
                                 std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT CommandInvalidException
@@ -151,7 +151,7 @@ class SIMPLEAMQPCLIENT_EXPORT CommandInvalidException
                                    std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT ChannelErrorException
@@ -164,7 +164,7 @@ class SIMPLEAMQPCLIENT_EXPORT ChannelErrorException
                                  std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT UnexpectedFrameException
@@ -177,7 +177,7 @@ class SIMPLEAMQPCLIENT_EXPORT UnexpectedFrameException
                                     std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT ResourceErrorException
@@ -190,7 +190,7 @@ class SIMPLEAMQPCLIENT_EXPORT ResourceErrorException
                                   std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT NotAllowedException : public ConnectionException {
@@ -202,7 +202,7 @@ class SIMPLEAMQPCLIENT_EXPORT NotAllowedException : public ConnectionException {
                                std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT NotImplementedException
@@ -215,7 +215,7 @@ class SIMPLEAMQPCLIENT_EXPORT NotImplementedException
                                    std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT InternalErrorException
@@ -228,7 +228,7 @@ class SIMPLEAMQPCLIENT_EXPORT InternalErrorException
                                   std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT ContentTooLargeException
@@ -241,7 +241,7 @@ class SIMPLEAMQPCLIENT_EXPORT ContentTooLargeException
                                     std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT NoRouteException : public ChannelException {
@@ -253,7 +253,7 @@ class SIMPLEAMQPCLIENT_EXPORT NoRouteException : public ChannelException {
                             std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 class SIMPLEAMQPCLIENT_EXPORT NoConsumersException : public ChannelException {
  public:
@@ -264,7 +264,7 @@ class SIMPLEAMQPCLIENT_EXPORT NoConsumersException : public ChannelException {
                                 std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT AccessRefusedException : public ChannelException {
@@ -276,7 +276,7 @@ class SIMPLEAMQPCLIENT_EXPORT AccessRefusedException : public ChannelException {
                                   std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT NotFoundException : public ChannelException {
@@ -288,7 +288,7 @@ class SIMPLEAMQPCLIENT_EXPORT NotFoundException : public ChannelException {
                              std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT ResourceLockedException
@@ -301,7 +301,7 @@ class SIMPLEAMQPCLIENT_EXPORT ResourceLockedException
                                    std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 class SIMPLEAMQPCLIENT_EXPORT PreconditionFailedException
@@ -314,7 +314,7 @@ class SIMPLEAMQPCLIENT_EXPORT PreconditionFailedException
                                        std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  std::uint16_t reply_code() const throw() override { return REPLY_CODE; }
 };
 
 }  // namespace AmqpClient

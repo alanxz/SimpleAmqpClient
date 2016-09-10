@@ -50,7 +50,7 @@ class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
                                     const std::string &exchange,
                                     const std::string &routing_key) throw();
 
-  virtual ~MessageReturnedException() throw() = default;
+  ~MessageReturnedException() throw() override = default;
 
   std::shared_ptr<BasicMessage> message() const throw() { return m_message; }
   std::uint32_t reply_code() const throw() { return m_reply_code; }

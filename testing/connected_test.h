@@ -37,7 +37,7 @@ using namespace AmqpClient;
 
 class connected_test : public ::testing::Test {
  public:
-  virtual void SetUp() { channel = Channel::Create(GetBrokerHost()); }
+  void SetUp() override { channel = Channel::Create(GetBrokerHost()); }
 
   std::unique_ptr<Channel> channel;
 
