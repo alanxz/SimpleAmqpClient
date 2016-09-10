@@ -315,9 +315,8 @@ amqp_channel_t ChannelImpl::GetConsumerChannel(
 
 std::vector<amqp_channel_t> ChannelImpl::GetAllConsumerChannels() const {
   std::vector<amqp_channel_t> ret;
-  for (auto it = m_consumer_channel_map.begin();
-       it != m_consumer_channel_map.end(); ++it) {
-    ret.push_back(it->second);
+  for (const auto &it : m_consumer_channel_map) {
+    ret.push_back(it.second);
   }
 
   return ret;
