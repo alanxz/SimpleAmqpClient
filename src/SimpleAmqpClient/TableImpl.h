@@ -86,7 +86,7 @@ class TableValueImpl {
   static TableValue CreateTableValue(const amqp_field_value_t &entry);
   static amqp_table_t CopyTableInner(const amqp_table_t &table,
                                      amqp_pool_t &pool);
-  static amqp_field_value_t CopyValue(const amqp_field_value_t value,
+  static amqp_field_value_t CopyValue(amqp_field_value_t value,
                                       amqp_pool_t &pool);
 
  public:
@@ -96,14 +96,14 @@ class TableValueImpl {
     explicit generate_field_value(amqp_pool_t &p) : pool(p) {}
     virtual ~generate_field_value() = default;
 
-    amqp_field_value_t operator()(const void_t) const;
-    amqp_field_value_t operator()(const bool value) const;
-    amqp_field_value_t operator()(const std::int8_t value) const;
-    amqp_field_value_t operator()(const std::int16_t value) const;
-    amqp_field_value_t operator()(const std::int32_t value) const;
-    amqp_field_value_t operator()(const std::int64_t value) const;
-    amqp_field_value_t operator()(const float value) const;
-    amqp_field_value_t operator()(const double value) const;
+    amqp_field_value_t operator()(void_t) const;
+    amqp_field_value_t operator()(bool value) const;
+    amqp_field_value_t operator()(std::int8_t value) const;
+    amqp_field_value_t operator()(std::int16_t value) const;
+    amqp_field_value_t operator()(std::int32_t value) const;
+    amqp_field_value_t operator()(std::int64_t value) const;
+    amqp_field_value_t operator()(float value) const;
+    amqp_field_value_t operator()(double value) const;
     amqp_field_value_t operator()(const std::string &value) const;
     amqp_field_value_t operator()(const array_t &value) const;
     amqp_field_value_t operator()(const Table &value) const;

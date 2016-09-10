@@ -67,11 +67,10 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
   }
 
   explicit Envelope(std::shared_ptr<BasicMessage> message,
-                    const std::string &consumer_tag,
-                    const std::uint64_t delivery_tag,
+                    const std::string &consumer_tag, std::uint64_t delivery_tag,
                     const std::string &exchange, bool redelivered,
                     const std::string &routing_key,
-                    const std::uint16_t delivery_channel);
+                    std::uint16_t delivery_channel);
 
   Envelope(const Envelope &) = delete;
   Envelope &operator=(const Envelope &) = delete;

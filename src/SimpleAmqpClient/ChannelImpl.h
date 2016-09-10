@@ -327,8 +327,7 @@ class ChannelImpl {
   amqp_connection_state_t m_connection;
 
  private:
-  static std::uint32_t ComputeBrokerVersion(
-      const amqp_connection_state_t state);
+  static std::uint32_t ComputeBrokerVersion(amqp_connection_state_t state);
 
   frame_queue_t m_frame_queue;
 
