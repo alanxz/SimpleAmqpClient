@@ -57,7 +57,9 @@ using amqp_pool_ptr_t = std::unique_ptr<amqp_pool_t, pool_deleter>;
 
 struct void_t {};
 
-inline bool operator==(const void_t &, const void_t &) { return true; }
+inline bool operator==(const void_t & /*unused*/, const void_t & /*unused*/) {
+  return true;
+}
 
 using array_t = std::vector<TableValue>;
 
@@ -96,7 +98,7 @@ class TableValueImpl {
     explicit generate_field_value(amqp_pool_t &p) : pool(p) {}
     virtual ~generate_field_value() = default;
 
-    amqp_field_value_t operator()(void_t) const;
+    amqp_field_value_t operator()(void_t /*unused*/) const;
     amqp_field_value_t operator()(bool value) const;
     amqp_field_value_t operator()(std::int8_t value) const;
     amqp_field_value_t operator()(std::int16_t value) const;

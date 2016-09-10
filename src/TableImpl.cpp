@@ -51,7 +51,7 @@ namespace AmqpClient {
 namespace Detail {
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const void_t) const {
+    const void_t /*unused*/) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_VOID;
   return v;
