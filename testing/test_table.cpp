@@ -367,10 +367,10 @@ TEST(table_value, string_value) {
 
 TEST(table_value, array_value) {
   Array v1;
-  v1.push_back(TableValue("first"));
+  v1.emplace_back("first");
 
   Array v2;
-  v2.push_back(TableValue((int32_t)2));
+  v2.emplace_back((int32_t)2);
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_array, value.GetType());
@@ -528,9 +528,9 @@ TEST(table, convert_to_rabbitmq) {
   table_in.insert(TableEntry("string_key", "A string!"));
 
   std::vector<TableValue> array_in;
-  array_in.push_back(TableValue(false));
-  array_in.push_back(TableValue(int32_t(10)));
-  array_in.push_back(TableValue(std::string("Another string")));
+  array_in.emplace_back(false);
+  array_in.emplace_back(int32_t(10));
+  array_in.emplace_back(std::string("Another string"));
 
   table_in.insert(TableEntry("array_key", array_in));
 
@@ -572,9 +572,9 @@ TEST_F(connected_test, basic_message_header_roundtrip) {
   table_in.insert(TableEntry("string_key", "A string!"));
 
   std::vector<TableValue> array_in;
-  array_in.push_back(TableValue(false));
-  array_in.push_back(TableValue(int32_t(10)));
-  array_in.push_back(TableValue(std::string("Another string")));
+  array_in.emplace_back(false);
+  array_in.emplace_back(int32_t(10));
+  array_in.emplace_back(std::string("Another string"));
 
   table_in.insert(TableEntry("array_key", array_in));
 
