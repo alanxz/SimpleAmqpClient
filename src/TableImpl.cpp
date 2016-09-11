@@ -61,7 +61,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
     const bool value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_BOOLEAN;
-  v.value.boolean = value;
+  v.value.boolean = static_cast<amqp_boolean_t>(value);
   return v;
 }
 

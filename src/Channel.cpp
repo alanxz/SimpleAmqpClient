@@ -97,7 +97,7 @@ std::unique_ptr<Channel> Channel::CreateSecureFromUri(
     throw BadUriException();
   }
 
-  if (info.ssl) {
+  if (info.ssl != 0) {
     return CreateSecure(path_to_ca_cert, std::string(info.host),
                         path_to_client_key, path_to_client_cert, info.port,
                         std::string(info.user), std::string(info.password),
@@ -146,16 +146,19 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
     throw std::bad_alloc();
   }
 #if AMQP_VERSION >= 0x00080001
-  amqp_ssl_socket_set_verify_peer(socket, ssl_params.verify_hostname);
-  amqp_ssl_socket_set_verify_hostname(socket, ssl_params.verify_hostname);
+  amqp_ssl_socket_set_verify_peer(
+      socket, static_cast<amqp_boolean_t>(ssl_params.verify_hostname));
+  amqp_ssl_socket_set_verify_hostname(
+      socket, static_cast<amqp_boolean_t>(ssl_params.verify_hostname));
 #else
-  amqp_ssl_socket_set_verify(socket, ssl_params.verify_hostname);
+  amqp_ssl_socket_set_verify(
+      socket, static_cast<amqp_boolean_t>(ssl_params.verify_hostname));
 #endif
 
   try {
     int status =
         amqp_ssl_socket_set_cacert(socket, ssl_params.path_to_ca_cert.c_str());
-    if (status) {
+    if (status != AMQP_STATUS_OK) {
       throw AmqpLibraryException::CreateException(
           status, "Error setting CA certificate for socket");
     }
@@ -165,14 +168,14 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
       status = amqp_ssl_socket_set_key(socket,
                                        ssl_params.path_to_client_cert.c_str(),
                                        ssl_params.path_to_client_key.c_str());
-      if (status) {
+      if (status != AMQP_STATUS_OK) {
         throw AmqpLibraryException::CreateException(
             status, "Error setting client certificate for socket");
       }
     }
 
     status = amqp_socket_open(socket, host.c_str(), port);
-    if (status) {
+    if (status != AMQP_STATUS_OK) {
       throw AmqpLibraryException::CreateException(
           status, "Error setting client certificate for socket");
     }
@@ -217,11 +220,11 @@ void Channel::DeclareExchange(const std::string &exchange_name,
   amqp_exchange_declare_t declare = {};
   declare.exchange = amqp_cstring_bytes(exchange_name.c_str());
   declare.type = amqp_cstring_bytes(exchange_type.c_str());
-  declare.passive = passive;
-  declare.durable = durable;
-  declare.auto_delete = auto_delete;
-  declare.internal = false;
-  declare.nowait = false;
+  declare.passive = static_cast<amqp_boolean_t>(passive);
+  declare.durable = static_cast<amqp_boolean_t>(durable);
+  declare.auto_delete = static_cast<amqp_boolean_t>(auto_delete);
+  declare.internal = 0;
+  declare.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
   declare.arguments =
@@ -239,8 +242,8 @@ void Channel::DeleteExchange(const std::string &exchange_name, bool if_unused) {
 
   amqp_exchange_delete_t del = {};
   del.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  del.if_unused = if_unused;
-  del.nowait = false;
+  del.if_unused = static_cast<amqp_boolean_t>(if_unused);
+  del.nowait = 0;
 
   amqp_frame_t frame =
       m_impl->DoRpc(AMQP_EXCHANGE_DELETE_METHOD, &del, DELETE_OK);
@@ -264,7 +267,7 @@ void Channel::BindExchange(const std::string &destination,
   bind.destination = amqp_cstring_bytes(destination.c_str());
   bind.source = amqp_cstring_bytes(source.c_str());
   bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
-  bind.nowait = false;
+  bind.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
   bind.arguments =
@@ -292,7 +295,7 @@ void Channel::UnbindExchange(const std::string &destination,
   unbind.destination = amqp_cstring_bytes(destination.c_str());
   unbind.source = amqp_cstring_bytes(source.c_str());
   unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
-  unbind.nowait = false;
+  unbind.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
   unbind.arguments =
@@ -342,11 +345,11 @@ std::string Channel::DeclareQueueWithCounts(const std::string &queue_name,
 
   amqp_queue_declare_t declare = {};
   declare.queue = amqp_cstring_bytes(queue_name.c_str());
-  declare.passive = passive;
-  declare.durable = durable;
-  declare.exclusive = exclusive;
-  declare.auto_delete = auto_delete;
-  declare.nowait = false;
+  declare.passive = static_cast<amqp_boolean_t>(passive);
+  declare.durable = static_cast<amqp_boolean_t>(durable);
+  declare.exclusive = static_cast<amqp_boolean_t>(exclusive);
+  declare.auto_delete = static_cast<amqp_boolean_t>(auto_delete);
+  declare.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
   declare.arguments =
@@ -375,9 +378,9 @@ void Channel::DeleteQueue(const std::string &queue_name, bool if_unused,
 
   amqp_queue_delete_t del = {};
   del.queue = amqp_cstring_bytes(queue_name.c_str());
-  del.if_unused = if_unused;
-  del.if_empty = if_empty;
-  del.nowait = false;
+  del.if_unused = static_cast<amqp_boolean_t>(if_unused);
+  del.if_empty = static_cast<amqp_boolean_t>(if_empty);
+  del.nowait = 0;
 
   amqp_frame_t frame = m_impl->DoRpc(AMQP_QUEUE_DELETE_METHOD, &del, DELETE_OK);
   m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
@@ -400,7 +403,7 @@ void Channel::BindQueue(const std::string &queue_name,
   bind.queue = amqp_cstring_bytes(queue_name.c_str());
   bind.exchange = amqp_cstring_bytes(exchange_name.c_str());
   bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
-  bind.nowait = false;
+  bind.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
   bind.arguments =
@@ -444,7 +447,7 @@ void Channel::PurgeQueue(const std::string &queue_name) {
 
   amqp_queue_purge_t purge = {};
   purge.queue = amqp_cstring_bytes(queue_name.c_str());
-  purge.nowait = false;
+  purge.nowait = 0;
 
   amqp_frame_t frame = m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
   m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
@@ -467,7 +470,7 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
   }
 
   m_impl->CheckForError(
-      amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, false));
+      amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, 0));
 }
 
 void Channel::BasicReject(std::shared_ptr<Envelope> &message, bool requeue,
@@ -489,8 +492,8 @@ void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue,
   }
   amqp_basic_nack_t req;
   req.delivery_tag = info.delivery_tag;
-  req.multiple = multiple;
-  req.requeue = requeue;
+  req.multiple = static_cast<amqp_boolean_t>(multiple);
+  req.requeue = static_cast<amqp_boolean_t>(requeue);
 
   m_impl->CheckForError(amqp_send_method(m_impl->m_connection, channel,
                                          AMQP_BASIC_NACK_METHOD, &req));
@@ -505,8 +508,10 @@ void Channel::BasicPublish(const std::string &exchange_name,
 
   m_impl->CheckForError(amqp_basic_publish(
       m_impl->m_connection, channel, amqp_cstring_bytes(exchange_name.c_str()),
-      amqp_cstring_bytes(routing_key.c_str()), mandatory, immediate,
-      message->getAmqpProperties(), message->getAmqpBody()));
+      amqp_cstring_bytes(routing_key.c_str()),
+      static_cast<amqp_boolean_t>(mandatory),
+      static_cast<amqp_boolean_t>(immediate), message->getAmqpProperties(),
+      message->getAmqpBody()));
 
   // If we've done things correctly we can get one of 4 things back from the
   // broker
@@ -549,7 +554,7 @@ bool Channel::BasicGet(std::shared_ptr<Envelope> &envelope,
 
   amqp_basic_get_t get = {};
   get.queue = amqp_cstring_bytes(queue.c_str());
-  get.no_ack = no_ack;
+  get.no_ack = static_cast<amqp_boolean_t>(no_ack);
 
   amqp_channel_t channel = m_impl->GetChannel();
   amqp_frame_t response = m_impl->DoRpcOnChannel(channel, AMQP_BASIC_GET_METHOD,
@@ -584,7 +589,7 @@ void Channel::BasicRecover(const std::string &consumer) {
   m_impl->CheckIsConnected();
 
   amqp_basic_recover_t recover = {};
-  recover.requeue = true;
+  recover.requeue = 1;
 
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer);
 
@@ -615,7 +620,7 @@ std::string Channel::BasicConsume(const std::string &queue,
   amqp_basic_qos_t qos = {};
   qos.prefetch_size = 0;
   qos.prefetch_count = message_prefetch_count;
-  qos.global = m_impl->BrokerHasNewQosBehavior();
+  qos.global = static_cast<amqp_boolean_t>(m_impl->BrokerHasNewQosBehavior());
 
   m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
   m_impl->MaybeReleaseBuffersOnChannel(channel);
@@ -626,10 +631,10 @@ std::string Channel::BasicConsume(const std::string &queue,
   amqp_basic_consume_t consume = {};
   consume.queue = amqp_cstring_bytes(queue.c_str());
   consume.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
-  consume.no_local = no_local;
-  consume.no_ack = no_ack;
-  consume.exclusive = exclusive;
-  consume.nowait = false;
+  consume.no_local = static_cast<amqp_boolean_t>(no_local);
+  consume.no_ack = static_cast<amqp_boolean_t>(no_ack);
+  consume.exclusive = static_cast<amqp_boolean_t>(exclusive);
+  consume.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
   consume.arguments =
@@ -659,7 +664,7 @@ void Channel::BasicQos(const std::string &consumer_tag,
   amqp_basic_qos_t qos = {};
   qos.prefetch_size = 0;
   qos.prefetch_count = message_prefetch_count;
-  qos.global = m_impl->BrokerHasNewQosBehavior();
+  qos.global = static_cast<amqp_boolean_t>(m_impl->BrokerHasNewQosBehavior());
 
   m_impl->DoRpcOnChannel(channel, AMQP_BASIC_QOS_METHOD, &qos, QOS_OK);
   m_impl->MaybeReleaseBuffersOnChannel(channel);
@@ -674,7 +679,7 @@ void Channel::BasicCancel(const std::string &consumer_tag) {
 
   amqp_basic_cancel_t cancel = {};
   cancel.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
-  cancel.nowait = false;
+  cancel.nowait = 0;
 
   m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CANCEL_METHOD, &cancel, CANCEL_OK);
 
