@@ -569,7 +569,7 @@ bool Channel::BasicGet(std::shared_ptr<Envelope> &envelope,
   amqp_basic_get_ok_t *get_ok =
       (amqp_basic_get_ok_t *)response.payload.method.decoded;
   std::uint64_t delivery_tag = get_ok->delivery_tag;
-  bool redelivered = (get_ok->redelivered == 0 ? false : true);
+  bool redelivered = (get_ok->redelivered != 0);
   std::string exchange((char *)get_ok->exchange.bytes, get_ok->exchange.len);
   std::string routing_key((char *)get_ok->routing_key.bytes,
                           get_ok->routing_key.len);
