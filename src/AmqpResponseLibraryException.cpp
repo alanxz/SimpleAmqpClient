@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -34,21 +33,19 @@
 
 #include <stdlib.h>
 
-namespace AmqpClient
-{
+namespace AmqpClient {
 
-AmqpResponseLibraryException AmqpResponseLibraryException::CreateException(const amqp_rpc_reply_t_& reply, const std::string &context)
-{
-    std::string message(context);
-    message.append(": ");
-    message.append(amqp_error_string2(reply.library_error));
+AmqpResponseLibraryException AmqpResponseLibraryException::CreateException(
+    const amqp_rpc_reply_t_ &reply, const std::string &context) {
+  std::string message(context);
+  message.append(": ");
+  message.append(amqp_error_string2(reply.library_error));
 
-    return AmqpResponseLibraryException(message);
+  return AmqpResponseLibraryException(message);
 }
 
-AmqpResponseLibraryException::AmqpResponseLibraryException(const std::string &message) throw() :
-    std::runtime_error(message)
-{
-}
+AmqpResponseLibraryException::AmqpResponseLibraryException(
+    const std::string &message) throw()
+    : std::runtime_error(message) {}
 
-} // namespace AmqpClient
+}  // namespace AmqpClient

@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 #ifndef SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
 #define SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
 /*
@@ -29,15 +28,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/Channel.h"
-#include "SimpleAmqpClient/Envelope.h"
-#include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
+#include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Channel.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
+#include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Version.h"
 
-#endif // SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
+#endif  // SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H

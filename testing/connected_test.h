@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 #ifndef CONNECTED_TEST_H
 #define CONNECTED_TEST_H
 /*
@@ -34,25 +33,19 @@
 
 using namespace AmqpClient;
 
-class connected_test : public ::testing::Test
-{
-public:
-    virtual void SetUp()
-    {
-        channel = Channel::Create(GetBrokerHost());
-    }
+class connected_test : public ::testing::Test {
+ public:
+  virtual void SetUp() { channel = Channel::Create(GetBrokerHost()); }
 
-    Channel::ptr_t channel;
+  Channel::ptr_t channel;
 
-    static std::string GetBrokerHost()
-    {
-        const char *host = getenv("AMQP_BROKER");
-        if (NULL != host)
-        {
-            return std::string(host);
-        }
-        return std::string("");
+  static std::string GetBrokerHost() {
+    const char *host = getenv("AMQP_BROKER");
+    if (NULL != host) {
+      return std::string(host);
     }
+    return std::string("");
+  }
 };
 
-#endif // CONNECTED_TEST_H
+#endif  // CONNECTED_TEST_H

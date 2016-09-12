@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -27,41 +26,44 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/SimpleAmqpClient.h"
 #include <gtest/gtest.h>
+#include "SimpleAmqpClient/SimpleAmqpClient.h"
 
 #include "connected_test.h"
 
 using namespace AmqpClient;
 
-TEST(connecting_test, connect_default)
-{
-    Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost());
+TEST(connecting_test, connect_default) {
+  Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost());
 }
 
-TEST(connecting_test, connect_badhost)
-{
-    EXPECT_THROW(Channel::ptr_t channel = Channel::Create("HostDoesntExist"), std::runtime_error);
+TEST(connecting_test, connect_badhost) {
+  EXPECT_THROW(Channel::ptr_t channel = Channel::Create("HostDoesntExist"),
+               std::runtime_error);
 }
 
-TEST(connecting_test, connect_badauth)
-{
-    EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "baduser", "badpass"), AccessRefusedException);
+TEST(connecting_test, connect_badauth) {
+  EXPECT_THROW(Channel::ptr_t channel = Channel::Create(
+                   connected_test::GetBrokerHost(), 5672, "baduser", "badpass"),
+               AccessRefusedException);
 }
 
-TEST(connecting_test, connect_badframesize)
-{
-    // AMQP Spec says we have a minimum frame size of 4096
-    EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 400), AmqpResponseLibraryException);
+TEST(connecting_test, connect_badframesize) {
+  // AMQP Spec says we have a minimum frame size of 4096
+  EXPECT_THROW(
+      Channel::ptr_t channel = Channel::Create(
+          connected_test::GetBrokerHost(), 5672, "guest", "guest", "/", 400),
+      AmqpResponseLibraryException);
 }
 
-TEST(connecting_test, connect_badvhost)
-{
-    EXPECT_THROW(Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(), 5672, "guest", "guest", "nonexitant_vhost"), NotAllowedException);
+TEST(connecting_test, connect_badvhost) {
+  EXPECT_THROW(Channel::ptr_t channel =
+                   Channel::Create(connected_test::GetBrokerHost(), 5672,
+                                   "guest", "guest", "nonexitant_vhost"),
+               NotAllowedException);
 }
 
-TEST(connecting_test, connect_using_uri)
-{
-    std::string host_uri = "amqp://" + connected_test::GetBrokerHost();
-    Channel::ptr_t channel = Channel::CreateFromUri(host_uri);
+TEST(connecting_test, connect_using_uri) {
+  std::string host_uri = "amqp://" + connected_test::GetBrokerHost();
+  Channel::ptr_t channel = Channel::CreateFromUri(host_uri);
 }

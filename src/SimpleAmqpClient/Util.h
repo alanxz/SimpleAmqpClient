@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 #ifndef SIMPLEAMQPCLIENT_UTIL_H
 #define SIMPLEAMQPCLIENT_UTIL_H
 /*
@@ -30,13 +29,13 @@
  */
 
 #ifdef WIN32
-# ifdef SimpleAmqpClient_EXPORTS
-#  define SIMPLEAMQPCLIENT_EXPORT __declspec(dllexport)
-# else
-#  define SIMPLEAMQPCLIENT_EXPORT __declspec(dllimport)
-# endif
+#ifdef SimpleAmqpClient_EXPORTS
+#define SIMPLEAMQPCLIENT_EXPORT __declspec(dllexport)
 #else
-# define SIMPLEAMQPCLIENT_EXPORT
+#define SIMPLEAMQPCLIENT_EXPORT __declspec(dllimport)
+#endif
+#else
+#define SIMPLEAMQPCLIENT_EXPORT
 #endif
 
-#endif // SIMPLEAMQPCLIENT_UTIL_H
+#endif  // SIMPLEAMQPCLIENT_UTIL_H

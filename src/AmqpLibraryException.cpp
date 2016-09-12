@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -34,31 +33,25 @@
 
 #include <stdlib.h>
 
-namespace AmqpClient
-{
+namespace AmqpClient {
 
-AmqpLibraryException AmqpLibraryException::CreateException(int error_code)
-{
-    std::string message(amqp_error_string2(error_code));
+AmqpLibraryException AmqpLibraryException::CreateException(int error_code) {
+  std::string message(amqp_error_string2(error_code));
 
-    return AmqpLibraryException(message, error_code);
+  return AmqpLibraryException(message, error_code);
 }
 
 AmqpLibraryException AmqpLibraryException::CreateException(
-    int error_code, const std::string &context)
-{
-    std::string message(context);
-    message.append(": ");
-    message.append(amqp_error_string2(error_code));
+    int error_code, const std::string &context) {
+  std::string message(context);
+  message.append(": ");
+  message.append(amqp_error_string2(error_code));
 
-    return AmqpLibraryException(message, error_code);
+  return AmqpLibraryException(message, error_code);
 }
 
 AmqpLibraryException::AmqpLibraryException(const std::string &message,
                                            int error_code) throw()
-    : std::runtime_error(message), m_errorCode(error_code)
-{
-}
+    : std::runtime_error(message), m_errorCode(error_code) {}
 
-} // namespace AmqpClient
-
+}  // namespace AmqpClient

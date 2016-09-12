@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -27,38 +26,35 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "connected_test.h"
 #include <iostream>
+#include "connected_test.h"
 
 using namespace AmqpClient;
 
-TEST_F(connected_test, basic_ack_envelope)
-{
-    const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
-    std::string queue = channel->DeclareQueue("");
-    channel->BasicPublish("", queue, message);
+TEST_F(connected_test, basic_ack_envelope) {
+  const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::string queue = channel->DeclareQueue("");
+  channel->BasicPublish("", queue, message);
 
-    std::string consumer = channel->BasicConsume(queue, "", true, false);
+  std::string consumer = channel->BasicConsume(queue, "", true, false);
 
-    Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
+  Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
 
-    channel->BasicAck(env);
+  channel->BasicAck(env);
 }
 
-TEST_F(connected_test, basic_ack_deliveryinfo)
-{
-    const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
-    std::string queue = channel->DeclareQueue("");
-    channel->BasicPublish("", queue, message);
+TEST_F(connected_test, basic_ack_deliveryinfo) {
+  const BasicMessage::ptr_t message = BasicMessage::Create("Message Body");
+  std::string queue = channel->DeclareQueue("");
+  channel->BasicPublish("", queue, message);
 
-    std::string consumer = channel->BasicConsume(queue, "", true, false);
+  std::string consumer = channel->BasicConsume(queue, "", true, false);
 
-    Envelope::DeliveryInfo info;
-    {
-        Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
-        info = env->GetDeliveryInfo();
-    }
+  Envelope::DeliveryInfo info;
+  {
+    Envelope::ptr_t env = channel->BasicConsumeMessage(consumer);
+    info = env->GetDeliveryInfo();
+  }
 
-    channel->BasicAck(info);
-
+  channel->BasicAck(info);
 }

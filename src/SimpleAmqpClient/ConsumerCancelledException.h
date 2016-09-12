@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 #ifndef SIMPLEAMQPCLIENT_CONSUMERCANCELLEDEXCEPTION_H
 #define SIMPLEAMQPCLIENT_CONSUMERCANCELLEDEXCEPTION_H
 /*
@@ -32,23 +31,21 @@
 #include <stdexcept>
 #include <string>
 
-namespace AmqpClient
-{
+namespace AmqpClient {
 
-class ConsumerCancelledException : public std::runtime_error
-{
-public:
-    explicit ConsumerCancelledException(const std::string &consumer_tag) throw() :
-        std::runtime_error(std::string("Consumer was cancelled: ").append(consumer_tag))
-      , m_consumer_tag(consumer_tag)
-    {}
+class ConsumerCancelledException : public std::runtime_error {
+ public:
+  explicit ConsumerCancelledException(const std::string &consumer_tag) throw()
+      : std::runtime_error(
+            std::string("Consumer was cancelled: ").append(consumer_tag)),
+        m_consumer_tag(consumer_tag) {}
 
-    virtual ~ConsumerCancelledException() throw() {}
+  virtual ~ConsumerCancelledException() throw() {}
 
-    std::string GetConsumerTag() const { return m_consumer_tag; }
+  std::string GetConsumerTag() const { return m_consumer_tag; }
 
-private:
-    std::string m_consumer_tag;
+ private:
+  std::string m_consumer_tag;
 };
-} // namespace AmqpClient
-#endif // SIMPLEAMQPCLIENT_CONSUMERCANCELLEDEXCEPTION_H
+}  // namespace AmqpClient
+#endif  // SIMPLEAMQPCLIENT_CONSUMERCANCELLEDEXCEPTION_H

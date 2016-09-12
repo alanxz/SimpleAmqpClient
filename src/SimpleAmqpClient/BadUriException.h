@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 #ifndef SIMPLEAMQPCLIENT_BADURIEXCEPTION_H
 #define SIMPLEAMQPCLIENT_BADURIEXCEPTION_H
 /*
@@ -31,14 +30,11 @@
 
 #include <stdexcept>
 
-namespace AmqpClient
-{
+namespace AmqpClient {
 
-class BadUriException : public std::runtime_error
-{
-public:
-    explicit BadUriException() :
-        std::runtime_error("URI is malformed") {}
+class BadUriException : public std::runtime_error {
+ public:
+  explicit BadUriException() : std::runtime_error("URI is malformed") {}
 };
-} // namespace AmqpClient
-#endif // SIMPLEAMQPCLIENT_BADURIEXCEPTION_H
+}  // namespace AmqpClient
+#endif  // SIMPLEAMQPCLIENT_BADURIEXCEPTION_H

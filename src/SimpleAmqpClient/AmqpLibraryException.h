@@ -1,4 +1,3 @@
-/* vim:set ft=cpp ts=4 sw=4 sts=4 et cindent: */
 #ifndef SIMPLEAMQPCLIENT_AMQPLIBRARYEXCEPTION_H
 #define SIMPLEAMQPCLIENT_AMQPLIBRARYEXCEPTION_H
 /*
@@ -35,36 +34,34 @@
 #include <string>
 
 #ifdef _MSC_VER
-# pragma warning ( push )
-# pragma warning ( disable: 4251 4275 )
+#pragma warning(push)
+#pragma warning(disable : 4251 4275)
 #endif
 
 struct amqp_rpc_reply_t_;
 
-namespace AmqpClient
-{
+namespace AmqpClient {
 
-class SIMPLEAMQPCLIENT_EXPORT AmqpLibraryException : public std::runtime_error
-{
-public:
- static AmqpLibraryException CreateException(int error_code);
- static AmqpLibraryException CreateException(int error_code,
-                                             const std::string &context);
+class SIMPLEAMQPCLIENT_EXPORT AmqpLibraryException : public std::runtime_error {
+ public:
+  static AmqpLibraryException CreateException(int error_code);
+  static AmqpLibraryException CreateException(int error_code,
+                                              const std::string &context);
 
-    int ErrorCode() const { return m_errorCode; }
+  int ErrorCode() const { return m_errorCode; }
 
-protected:
- explicit AmqpLibraryException(const std::string &message,
-                               int error_code) throw();
+ protected:
+  explicit AmqpLibraryException(const std::string &message,
+                                int error_code) throw();
 
-private:
-    int m_errorCode;
+ private:
+  int m_errorCode;
 };
 
-} // namespace AmqpClient
+}  // namespace AmqpClient
 
 #ifdef _MSC_VER
-# pragma warning ( pop )
+#pragma warning(pop)
 #endif
 
-#endif // SIMPLEAMQPCLIENT_AMQPLIBRARYEXCEPTION_H
+#endif  // SIMPLEAMQPCLIENT_AMQPLIBRARYEXCEPTION_H
