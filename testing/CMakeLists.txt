@@ -1,4 +1,4 @@
-include_directories(BEFORE SYSTEM ${GTEST_INCLUDE_DIRS})
+include_directories(BEFORE SYSTEM ${gtest_SOURCE_DIR}/include)
 include_directories(../src)
 
 add_executable(test_api
@@ -15,5 +15,5 @@ add_executable(test_api
     test_ack.cpp
     test_nack.cpp
     )
-target_link_libraries(test_api SimpleAmqpClient ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(test_api SimpleAmqpClient gtest gtest_main)
 add_test(test_api test_api)
