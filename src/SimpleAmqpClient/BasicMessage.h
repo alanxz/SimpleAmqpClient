@@ -365,7 +365,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
   void HeaderTableClear();
 
  protected:
-  std::unique_ptr<Detail::BasicMessageImpl> m_impl;
+  const std::unique_ptr<Detail::BasicMessageImpl> m_impl;
 };
 
 }  // namespace AmqpClient

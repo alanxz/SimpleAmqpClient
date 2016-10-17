@@ -374,7 +374,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
   void Set(const Table &value);
 
  private:
-  std::unique_ptr<Detail::TableValueImpl> m_impl;
+  const std::unique_ptr<Detail::TableValueImpl> m_impl;
 };
 
 }  // namespace AmqpClient

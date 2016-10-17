@@ -770,7 +770,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
                            int timeout = -1);
 
  protected:
-  std::unique_ptr<Detail::ChannelImpl> m_impl;
+  const std::unique_ptr<Detail::ChannelImpl> m_impl;
 };
 
 }  // namespace AmqpClient
