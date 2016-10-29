@@ -43,6 +43,7 @@
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
+#include "SimpleAmqpClient/TableImpl.h"
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -59,6 +60,61 @@
 
 namespace AmqpClient {
 namespace Detail {
+
+namespace {
+
+std::string BytesToString(amqp_bytes_t bytes) {
+  return std::string(reinterpret_cast<char*>(bytes.bytes), bytes.len);
+}
+
+void SetMessageProperties(const amqp_basic_properties_t &props,
+                          BasicMessage *message) {
+  if ((props._flags & AMQP_BASIC_CONTENT_TYPE_FLAG) != 0u) {
+    message->ContentType(BytesToString(props.content_type));
+  }
+  if ((props._flags & AMQP_BASIC_CONTENT_ENCODING_FLAG) != 0u) {
+    message->ContentEncoding(BytesToString(props.content_encoding));
+  }
+  if ((props._flags & AMQP_BASIC_HEADERS_FLAG) != 0u) {
+    message->HeaderTable(TableValueImpl::CreateTable(props.headers));
+  }
+  if ((props._flags & AMQP_BASIC_DELIVERY_MODE_FLAG) != 0u) {
+    message->DeliveryMode(
+        static_cast<BasicMessage::delivery_mode_t>(props.delivery_mode));
+  }
+  if ((props._flags & AMQP_BASIC_PRIORITY_FLAG) != 0u) {
+    message->Priority(props.priority);
+  }
+  if ((props._flags & AMQP_BASIC_CORRELATION_ID_FLAG) != 0u) {
+    message->CorrelationId(BytesToString(props.correlation_id));
+  }
+  if ((props._flags & AMQP_BASIC_REPLY_TO_FLAG) != 0u) {
+    message->ReplyTo(BytesToString(props.reply_to));
+  }
+  if ((props._flags & AMQP_BASIC_EXPIRATION_FLAG) != 0u) {
+    message->Expiration(BytesToString(props.expiration));
+  }
+  if ((props._flags & AMQP_BASIC_MESSAGE_ID_FLAG) != 0u) {
+    message->MessageId(BytesToString(props.message_id));
+  }
+  if ((props._flags & AMQP_BASIC_TIMESTAMP_FLAG) != 0u) {
+    message->Timestamp(props.timestamp);
+  }
+  if ((props._flags & AMQP_BASIC_TYPE_FLAG) != 0u) {
+    message->Type(BytesToString(props.type));
+  }
+  if ((props._flags & AMQP_BASIC_USER_ID_FLAG) != 0u) {
+    message->UserId(BytesToString(props.user_id));
+  }
+  if ((props._flags & AMQP_BASIC_APP_ID_FLAG) != 0u) {
+    message->AppId(BytesToString(props.app_id));
+  }
+  if ((props._flags & AMQP_BASIC_CLUSTER_ID_FLAG) != 0u) {
+    message->ClusterId(BytesToString(props.cluster_id));
+  }
+}
+
+}
 
 ChannelImpl::ChannelImpl() : m_last_used_channel(0), m_is_connected(false) {
   m_channels.push_back(CS_Used);
@@ -245,7 +301,8 @@ std::shared_ptr<BasicMessage> ChannelImpl::ReadContent(amqp_channel_t channel) {
   size_t body_size = static_cast<size_t>(frame.payload.properties.body_size);
   size_t received_size = 0;
 
-  amqp_bytes_t body = amqp_bytes_malloc(body_size);
+  std::string body;
+  body.reserve(body_size);
 
   // frame #3 and up:
   while (received_size < body_size) {
@@ -258,12 +315,13 @@ std::shared_ptr<BasicMessage> ChannelImpl::ReadContent(amqp_channel_t channel) {
           "expecting AMQP_FRAME_BODY)");
     }
 
-    void *body_ptr = reinterpret_cast<char *>(body.bytes) + received_size;
-    memcpy(body_ptr, frame.payload.body_fragment.bytes,
-           frame.payload.body_fragment.len);
+    body.append(reinterpret_cast<char *>(frame.payload.body_fragment.bytes),
+                frame.payload.body_fragment.len);
     received_size += frame.payload.body_fragment.len;
   }
-  return BasicMessage::Create(body, properties);
+  auto ret = std::shared_ptr<BasicMessage>(new BasicMessage(body));
+  SetMessageProperties(*properties, ret.get());
+  return ret;
 }
 
 void ChannelImpl::CheckFrameForClose(amqp_frame_t &frame,

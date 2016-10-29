@@ -61,57 +61,6 @@ BasicMessage::BasicMessage(const std::string &body)
   m_impl->m_properties._flags = 0;
 }
 
-BasicMessage::BasicMessage(const amqp_bytes_t &body,
-                           const amqp_basic_properties_t *properties)
-    : m_impl(new Detail::BasicMessageImpl) {
-  m_impl->m_body = body;
-  m_impl->m_properties = *properties;
-  if (ContentTypeIsSet()) {
-    m_impl->m_properties.content_type =
-        amqp_bytes_malloc_dup(m_impl->m_properties.content_type);
-  }
-  if (ContentEncodingIsSet()) {
-    m_impl->m_properties.content_encoding =
-        amqp_bytes_malloc_dup(m_impl->m_properties.content_encoding);
-  }
-  if (CorrelationIdIsSet()) {
-    m_impl->m_properties.correlation_id =
-        amqp_bytes_malloc_dup(m_impl->m_properties.correlation_id);
-  }
-  if (ReplyToIsSet()) {
-    m_impl->m_properties.reply_to =
-        amqp_bytes_malloc_dup(m_impl->m_properties.reply_to);
-  }
-  if (ExpirationIsSet()) {
-    m_impl->m_properties.expiration =
-        amqp_bytes_malloc_dup(m_impl->m_properties.expiration);
-  }
-  if (MessageIdIsSet()) {
-    m_impl->m_properties.message_id =
-        amqp_bytes_malloc_dup(m_impl->m_properties.message_id);
-  }
-  if (TypeIsSet()) {
-    m_impl->m_properties.type =
-        amqp_bytes_malloc_dup(m_impl->m_properties.type);
-  }
-  if (UserIdIsSet()) {
-    m_impl->m_properties.user_id =
-        amqp_bytes_malloc_dup(m_impl->m_properties.user_id);
-  }
-  if (AppIdIsSet()) {
-    m_impl->m_properties.app_id =
-        amqp_bytes_malloc_dup(m_impl->m_properties.app_id);
-  }
-  if (ClusterIdIsSet()) {
-    m_impl->m_properties.cluster_id =
-        amqp_bytes_malloc_dup(m_impl->m_properties.cluster_id);
-  }
-  if (HeaderTableIsSet()) {
-    m_impl->m_properties.headers = Detail::TableValueImpl::CopyTable(
-        m_impl->m_properties.headers, m_impl->m_table_pool);
-  }
-}
-
 BasicMessage::~BasicMessage() {
   amqp_bytes_free(m_impl->m_body);
   if (ContentTypeIsSet()) {
@@ -145,12 +94,6 @@ BasicMessage::~BasicMessage() {
     amqp_bytes_free(m_impl->m_properties.cluster_id);
   }
 }
-
-const amqp_basic_properties_t *BasicMessage::getAmqpProperties() const {
-  return &m_impl->m_properties;
-}
-
-const amqp_bytes_t &BasicMessage::getAmqpBody() const { return m_impl->m_body; }
 
 std::string BasicMessage::Body() const {
   if (m_impl->m_body.bytes == nullptr) {
@@ -396,6 +339,7 @@ std::uint64_t BasicMessage::Timestamp() const {
 
   return 0;
 }
+
 void BasicMessage::Timestamp(std::uint64_t timestamp) {
   m_impl->m_properties.timestamp = timestamp;
   m_impl->m_properties._flags |= AMQP_BASIC_TIMESTAMP_FLAG;

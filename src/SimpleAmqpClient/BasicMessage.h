@@ -40,9 +40,6 @@
 #pragma warning(disable : 4275 4251)
 #endif
 
-struct amqp_bytes_t_;
-struct amqp_basic_properties_t_;
-
 namespace AmqpClient {
 
 namespace Detail {
@@ -70,25 +67,9 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
     return std::make_shared<BasicMessage>(body);
   }
 
-  /**
-    * Create a new BasicMessage object
-    * Creates a new BasicMessage object with a given body, properties
-    * @param body the message body. The message body is NOT duplicated.
-    * Passed in message body is deallocated when: body is set or message is
-    * destructed.
-    * @properties the amqp_basic_properties_t struct. Note this makes a deep
-    * copy of the properties struct
-    * @returns a new BasicMessage object
-    */
-  static std::shared_ptr<BasicMessage> Create(
-      amqp_bytes_t_ &body, amqp_basic_properties_t_ *properties) {
-    return std::make_shared<BasicMessage>(body, properties);
-  }
 
   BasicMessage();
   BasicMessage(const std::string &body);
-  BasicMessage(const amqp_bytes_t_ &body,
-               const amqp_basic_properties_t_ *properties);
 
   BasicMessage(const BasicMessage &) = delete;
   BasicMessage &operator=(const BasicMessage &) = delete;
@@ -98,24 +79,6 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
     * Destructor
     */
   virtual ~BasicMessage();
-
-  /**
-    * INTERNAL INTERFACE: Gets the internal amqp_basic_properties_t struct
-    *
-    * Retrieves a reference to the internal structure used to keep track of
-    * the properties of the message. Changing members of this structure will
-    * modify the properties on the message.
-    * @returns the amqp_basic_properties_t* struct
-    */
-  const amqp_basic_properties_t_ *getAmqpProperties() const;
-  /**
-    * INTERNAL INTERFACE: Gets the amqp_bytes_t representation of the message
-   * body
-    *
-    * @returns the message body. Note this is owned by the message and will
-    * be freed when the BasicMessage is destructed
-    */
-  const amqp_bytes_t_ &getAmqpBody() const;
 
   /**
     * Gets the message body as a std::string

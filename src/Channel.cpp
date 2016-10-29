@@ -75,6 +75,71 @@ amqp_bytes_t StringToBytes(const std::string& str) {
   return ret;
 }
 
+amqp_basic_properties_t CreateProperties(const BasicMessage &message,
+                                         Detail::amqp_pool_ptr_t &pool) {
+  amqp_basic_properties_t ret;
+  ret._flags = 0;
+
+  if (message.ContentTypeIsSet()) {
+    ret.content_type = StringToBytes(message.ContentType());
+    ret._flags |= AMQP_BASIC_CONTENT_TYPE_FLAG;
+  }
+  if (message.ContentEncodingIsSet()) {
+    ret.content_encoding = StringToBytes(message.ContentEncoding());
+    ret._flags |= AMQP_BASIC_CONTENT_ENCODING_FLAG;
+  }
+  if (message.HeaderTableIsSet()) {
+    ret.headers =
+        Detail::TableValueImpl::CreateAmqpTable(message.HeaderTable(), pool);
+    ret._flags |= AMQP_BASIC_HEADERS_FLAG;
+  }
+  if (message.DeliveryModeIsSet()) {
+    ret.delivery_mode = static_cast<std::uint8_t>(message.DeliveryMode());
+    ret._flags |= AMQP_BASIC_DELIVERY_MODE_FLAG;
+  }
+  if (message.PriorityIsSet()) {
+    ret.priority = message.Priority();
+    ret._flags |= AMQP_BASIC_PRIORITY_FLAG;
+  }
+  if (message.CorrelationIdIsSet()) {
+    ret.correlation_id = StringToBytes(message.CorrelationId());
+    ret._flags |= AMQP_BASIC_CORRELATION_ID_FLAG;
+  }
+  if (message.ReplyToIsSet()) {
+    ret.reply_to = StringToBytes(message.ReplyTo());
+    ret._flags |= AMQP_BASIC_REPLY_TO_FLAG;
+  }
+  if (message.ExpirationIsSet()) {
+    ret.expiration = StringToBytes(message.Expiration());
+    ret._flags |= AMQP_BASIC_EXPIRATION_FLAG;
+  }
+  if (message.MessageIdIsSet()) {
+    ret.message_id = StringToBytes(message.MessageId());
+    ret._flags |= AMQP_BASIC_MESSAGE_ID_FLAG;
+  }
+  if (message.TimestampIsSet()) {
+    ret.timestamp = message.Timestamp();
+    ret._flags |= AMQP_BASIC_TIMESTAMP_FLAG;
+  }
+  if (message.TypeIsSet()) {
+    ret.type = StringToBytes(message.Type());
+    ret._flags = AMQP_BASIC_TYPE_FLAG;
+  }
+  if (message.UserIdIsSet()) {
+    ret.user_id = StringToBytes(message.UserId());
+    ret._flags = AMQP_BASIC_USER_ID_FLAG;
+  }
+  if (message.AppIdIsSet()) {
+    ret.app_id = StringToBytes(message.AppId());
+    ret._flags = AMQP_BASIC_APP_ID_FLAG;
+  }
+  if (message.ClusterIdIsSet()) {
+    ret.cluster_id = StringToBytes(message.ClusterId());
+    ret._flags = AMQP_BASIC_CLUSTER_ID_FLAG;
+  }
+  return ret;
+}
+
 }
 
 std::unique_ptr<Channel> Channel::CreateFromUri(const std::string &uri,
@@ -516,13 +581,15 @@ void Channel::BasicPublish(const std::string &exchange_name,
                            bool mandatory, bool immediate) {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
+  Detail::amqp_pool_ptr_t pool;
+  amqp_basic_properties_t properties = CreateProperties(*message.get(), pool);
 
   m_impl->CheckForError(amqp_basic_publish(
       m_impl->m_connection, channel, StringToBytes(exchange_name),
       StringToBytes(routing_key),
       static_cast<amqp_boolean_t>(mandatory),
-      static_cast<amqp_boolean_t>(immediate), message->getAmqpProperties(),
-      message->getAmqpBody()));
+      static_cast<amqp_boolean_t>(immediate), &properties,
+      StringToBytes(message->Body())));
 
   // If we've done things correctly we can get one of 4 things back from the
   // broker
