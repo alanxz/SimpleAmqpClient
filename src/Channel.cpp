@@ -66,6 +66,17 @@ const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
+namespace {
+
+amqp_bytes_t StringToBytes(const std::string& str) {
+  amqp_bytes_t ret;
+  ret.bytes = reinterpret_cast<void*>(const_cast<char*>(str.c_str()));
+  ret.len = str.length();
+  return ret;
+}
+
+}
+
 std::unique_ptr<Channel> Channel::CreateFromUri(const std::string &uri,
                                                 int frame_max) {
   amqp_connection_info info;
@@ -218,8 +229,8 @@ void Channel::DeclareExchange(const std::string &exchange_name,
   m_impl->CheckIsConnected();
 
   amqp_exchange_declare_t declare = {};
-  declare.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  declare.type = amqp_cstring_bytes(exchange_type.c_str());
+  declare.exchange = StringToBytes(exchange_name);
+  declare.type = StringToBytes(exchange_type);
   declare.passive = static_cast<amqp_boolean_t>(passive);
   declare.durable = static_cast<amqp_boolean_t>(durable);
   declare.auto_delete = static_cast<amqp_boolean_t>(auto_delete);
@@ -241,7 +252,7 @@ void Channel::DeleteExchange(const std::string &exchange_name, bool if_unused) {
   m_impl->CheckIsConnected();
 
   amqp_exchange_delete_t del = {};
-  del.exchange = amqp_cstring_bytes(exchange_name.c_str());
+  del.exchange = StringToBytes(exchange_name);
   del.if_unused = static_cast<amqp_boolean_t>(if_unused);
   del.nowait = 0;
 
@@ -264,9 +275,9 @@ void Channel::BindExchange(const std::string &destination,
   m_impl->CheckIsConnected();
 
   amqp_exchange_bind_t bind = {};
-  bind.destination = amqp_cstring_bytes(destination.c_str());
-  bind.source = amqp_cstring_bytes(source.c_str());
-  bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+  bind.destination = StringToBytes(destination);
+  bind.source = StringToBytes(source);
+  bind.routing_key = StringToBytes(routing_key);
   bind.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
@@ -292,9 +303,9 @@ void Channel::UnbindExchange(const std::string &destination,
   m_impl->CheckIsConnected();
 
   amqp_exchange_unbind_t unbind = {};
-  unbind.destination = amqp_cstring_bytes(destination.c_str());
-  unbind.source = amqp_cstring_bytes(source.c_str());
-  unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+  unbind.destination = StringToBytes(destination);
+  unbind.source = StringToBytes(source);
+  unbind.routing_key = StringToBytes(routing_key);
   unbind.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
@@ -344,7 +355,7 @@ std::string Channel::DeclareQueueWithCounts(const std::string &queue_name,
   m_impl->CheckIsConnected();
 
   amqp_queue_declare_t declare = {};
-  declare.queue = amqp_cstring_bytes(queue_name.c_str());
+  declare.queue = StringToBytes(queue_name);
   declare.passive = static_cast<amqp_boolean_t>(passive);
   declare.durable = static_cast<amqp_boolean_t>(durable);
   declare.exclusive = static_cast<amqp_boolean_t>(exclusive);
@@ -377,7 +388,7 @@ void Channel::DeleteQueue(const std::string &queue_name, bool if_unused,
   m_impl->CheckIsConnected();
 
   amqp_queue_delete_t del = {};
-  del.queue = amqp_cstring_bytes(queue_name.c_str());
+  del.queue = StringToBytes(queue_name);
   del.if_unused = static_cast<amqp_boolean_t>(if_unused);
   del.if_empty = static_cast<amqp_boolean_t>(if_empty);
   del.nowait = 0;
@@ -400,9 +411,9 @@ void Channel::BindQueue(const std::string &queue_name,
   m_impl->CheckIsConnected();
 
   amqp_queue_bind_t bind = {};
-  bind.queue = amqp_cstring_bytes(queue_name.c_str());
-  bind.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  bind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+  bind.queue = StringToBytes(queue_name);
+  bind.exchange = StringToBytes(exchange_name);
+  bind.routing_key = StringToBytes(routing_key);
   bind.nowait = 0;
 
   Detail::amqp_pool_ptr_t table_pool;
@@ -428,9 +439,9 @@ void Channel::UnbindQueue(const std::string &queue_name,
   m_impl->CheckIsConnected();
 
   amqp_queue_unbind_t unbind = {};
-  unbind.queue = amqp_cstring_bytes(queue_name.c_str());
-  unbind.exchange = amqp_cstring_bytes(exchange_name.c_str());
-  unbind.routing_key = amqp_cstring_bytes(routing_key.c_str());
+  unbind.queue = StringToBytes(queue_name);
+  unbind.exchange = StringToBytes(exchange_name);
+  unbind.routing_key = StringToBytes(routing_key);
 
   Detail::amqp_pool_ptr_t table_pool;
   unbind.arguments =
@@ -446,7 +457,7 @@ void Channel::PurgeQueue(const std::string &queue_name) {
   m_impl->CheckIsConnected();
 
   amqp_queue_purge_t purge = {};
-  purge.queue = amqp_cstring_bytes(queue_name.c_str());
+  purge.queue = StringToBytes(queue_name);
   purge.nowait = 0;
 
   amqp_frame_t frame = m_impl->DoRpc(AMQP_QUEUE_PURGE_METHOD, &purge, PURGE_OK);
@@ -507,8 +518,8 @@ void Channel::BasicPublish(const std::string &exchange_name,
   amqp_channel_t channel = m_impl->GetChannel();
 
   m_impl->CheckForError(amqp_basic_publish(
-      m_impl->m_connection, channel, amqp_cstring_bytes(exchange_name.c_str()),
-      amqp_cstring_bytes(routing_key.c_str()),
+      m_impl->m_connection, channel, StringToBytes(exchange_name),
+      StringToBytes(routing_key),
       static_cast<amqp_boolean_t>(mandatory),
       static_cast<amqp_boolean_t>(immediate), message->getAmqpProperties(),
       message->getAmqpBody()));
@@ -553,7 +564,7 @@ bool Channel::BasicGet(std::shared_ptr<Envelope> &envelope,
   m_impl->CheckIsConnected();
 
   amqp_basic_get_t get = {};
-  get.queue = amqp_cstring_bytes(queue.c_str());
+  get.queue = StringToBytes(queue);
   get.no_ack = static_cast<amqp_boolean_t>(no_ack);
 
   amqp_channel_t channel = m_impl->GetChannel();
@@ -629,8 +640,8 @@ std::string Channel::BasicConsume(const std::string &queue,
       {AMQP_BASIC_CONSUME_OK_METHOD}};
 
   amqp_basic_consume_t consume = {};
-  consume.queue = amqp_cstring_bytes(queue.c_str());
-  consume.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
+  consume.queue = StringToBytes(queue);
+  consume.consumer_tag = StringToBytes(consumer_tag);
   consume.no_local = static_cast<amqp_boolean_t>(no_local);
   consume.no_ack = static_cast<amqp_boolean_t>(no_ack);
   consume.exclusive = static_cast<amqp_boolean_t>(exclusive);
@@ -678,7 +689,7 @@ void Channel::BasicCancel(const std::string &consumer_tag) {
       {AMQP_BASIC_CANCEL_OK_METHOD}};
 
   amqp_basic_cancel_t cancel = {};
-  cancel.consumer_tag = amqp_cstring_bytes(consumer_tag.c_str());
+  cancel.consumer_tag = StringToBytes(consumer_tag);
   cancel.nowait = 0;
 
   m_impl->DoRpcOnChannel(channel, AMQP_BASIC_CANCEL_METHOD, &cancel, CANCEL_OK);
