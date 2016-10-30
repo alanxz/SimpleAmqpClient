@@ -139,7 +139,7 @@ TEST_F(connected_test, queue_delete) {
   EXPECT_THROW(channel->DeclareQueue(queue, true), ChannelException);
 }
 
-TEST_F(connected_test, queue_delete_badqueue) {
+TEST_F(connected_test, DISABLED_queue_delete_badqueue) {
   EXPECT_THROW(channel->DeleteQueue("delete_queue_notexist"), ChannelException);
 }
 
@@ -224,7 +224,7 @@ TEST_F(connected_test, queue_unbind) {
   channel->DeleteQueue(queue);
 }
 
-TEST_F(connected_test, queue_unbind_badbinding) {
+TEST_F(connected_test, DISABLED_queue_unbind_badbinding) {
   EXPECT_THROW(channel->UnbindQueue("queue_unbind_queuenotexist",
                                     "queue_unbind_exchangenotexist", "rk"),
                ChannelException);

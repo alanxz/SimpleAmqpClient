@@ -105,7 +105,7 @@ TEST_F(connected_test, delete_exchange) {
   channel->DeleteExchange("delete_exchange");
 }
 
-TEST_F(connected_test, delete_exchange_notexist) {
+TEST_F(connected_test, DISABLED_delete_exchange_notexist) {
   EXPECT_THROW(channel->DeleteExchange("exchange_notexist"), ChannelException);
 }
 
@@ -158,7 +158,7 @@ TEST_F(connected_test, unbind_exchange) {
   channel->DeleteExchange("exchange_bind_src");
 }
 
-TEST_F(connected_test, unbind_exchange_badbinding) {
+TEST_F(connected_test, DISABLED_unbind_exchange_badbinding) {
   EXPECT_THROW(channel->UnbindExchange("exchange_notexist", "exchange_notexist",
                                        "notexist"),
                ChannelException);
