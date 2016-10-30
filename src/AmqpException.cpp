@@ -190,11 +190,11 @@ void AmqpException::Throw(const amqp_connection_close_t &reply) {
 }
 
 AmqpException::AmqpException(const std::string &what,
-                             const std::string &reply_text,
+                             std::string reply_text,
                              std::uint16_t class_id,
                              std::uint16_t method_id) throw()
     : std::runtime_error(what),
-      m_reply_text(reply_text),
+      m_reply_text(std::move(reply_text)),
       m_class_id(class_id),
       m_method_id(method_id) {}
 }

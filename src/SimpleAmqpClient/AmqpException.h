@@ -51,7 +51,7 @@ class SIMPLEAMQPCLIENT_EXPORT AmqpException : public std::runtime_error {
   static void Throw(const amqp_channel_close_t_ &reply);
   static void Throw(const amqp_connection_close_t_ &reply);
 
-  explicit AmqpException(const std::string &what, const std::string &reply_text,
+  explicit AmqpException(const std::string &what, std::string reply_text,
                          std::uint16_t class_id,
                          std::uint16_t method_id) throw();
   ~AmqpException() throw() override = default;

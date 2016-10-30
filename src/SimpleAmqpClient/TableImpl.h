@@ -69,7 +69,7 @@ using value_t =
 
 class TableValueImpl {
  public:
-  explicit TableValueImpl(const value_t &v) : m_value(v) {}
+  explicit TableValueImpl(value_t v) : m_value(std::move(v)) {}
   virtual ~TableValueImpl() = default;
 
   value_t m_value;

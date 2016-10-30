@@ -46,9 +46,9 @@ class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
  public:
   explicit MessageReturnedException(BasicMessage message,
                                     std::uint32_t reply_code,
-                                    const std::string &reply_text,
-                                    const std::string &exchange,
-                                    const std::string &routing_key) throw();
+                                    std::string reply_text,
+                                    std::string exchange,
+                                    std::string routing_key) throw();
 
   ~MessageReturnedException() throw() override = default;
 
