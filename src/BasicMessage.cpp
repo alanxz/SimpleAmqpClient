@@ -118,7 +118,7 @@ BasicMessage &BasicMessage::operator=(BasicMessage &&other) noexcept {
   return *this;
 }
 
-BasicMessage::~BasicMessage() {}
+BasicMessage::~BasicMessage() = default;
 
 std::string BasicMessage::Body() const {
   return m_impl->m_body;
