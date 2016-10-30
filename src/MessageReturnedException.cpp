@@ -33,14 +33,14 @@
 
 namespace AmqpClient {
 MessageReturnedException::MessageReturnedException(
-    std::shared_ptr<BasicMessage> message, std::uint32_t reply_code,
+    BasicMessage message, std::uint32_t reply_code,
     const std::string &reply_text, const std::string &exchange,
     const std::string &routing_key) throw()
     : std::runtime_error(std::string("Message returned. Reply code: ")
                              .append(std::to_string(reply_code))
                              .append(" ")
                              .append(reply_text)),
-      m_message(message),
+      m_message(std::move(message)),
       m_reply_code(reply_code),
       m_reply_text(reply_text),
       m_exchange(exchange),

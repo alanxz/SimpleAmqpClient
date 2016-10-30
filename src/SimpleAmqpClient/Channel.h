@@ -562,7 +562,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     */
   void BasicPublish(const std::string &exchange_name,
                     const std::string &routing_key,
-                    std::shared_ptr<BasicMessage> message,
+                    const BasicMessage &message,
                     bool mandatory = false, bool immediate = false);
 
   /**

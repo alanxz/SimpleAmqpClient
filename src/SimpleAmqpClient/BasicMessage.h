@@ -42,39 +42,23 @@
 
 namespace AmqpClient {
 
-namespace Detail {
-class BasicMessageImpl;
-}
-
 class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
  public:
-  enum delivery_mode_t { dm_nonpersistent = 1, dm_persistent = 2 };
-
-  /**
-    * Create a new empty BasicMessage object
-    */
-  static std::shared_ptr<BasicMessage> Create() {
-    return std::make_shared<BasicMessage>();
-  }
-
-  /**
-    * Create a new BasicMessage object
-    * Creates a new BasicMessage object with a given body
-    * @param body the message body.
-    * @returns a new BasicMessage object
-    */
-  static std::shared_ptr<BasicMessage> Create(const std::string &body) {
-    return std::make_shared<BasicMessage>(body);
-  }
-
+  enum delivery_mode_t {
+    dm_notset = 0,
+    dm_nonpersistent = 1,
+    dm_persistent = 2
+  };
 
   BasicMessage();
-  BasicMessage(const std::string &body);
+  explicit BasicMessage(const std::string &body);
 
-  BasicMessage(const BasicMessage &) = delete;
-  BasicMessage &operator=(const BasicMessage &) = delete;
+  BasicMessage(const BasicMessage &other);
+  BasicMessage &operator=(const BasicMessage &other);
 
- public:
+  BasicMessage(BasicMessage &&other) noexcept;
+  BasicMessage &operator=(BasicMessage &&other) noexcept;
+
   /**
     * Destructor
     */
@@ -327,8 +311,9 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
     */
   void HeaderTableClear();
 
- protected:
-  const std::unique_ptr<Detail::BasicMessageImpl> m_impl;
+ private:
+  struct Impl;
+  std::unique_ptr<Impl> m_impl;
 };
 
 }  // namespace AmqpClient

@@ -577,29 +577,29 @@ void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue,
 
 void Channel::BasicPublish(const std::string &exchange_name,
                            const std::string &routing_key,
-                           std::shared_ptr<BasicMessage> message,
+                           const BasicMessage &message,
                            bool mandatory, bool immediate) {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
   Detail::amqp_pool_ptr_t pool;
-  amqp_basic_properties_t properties = CreateProperties(*message.get(), pool);
+  amqp_basic_properties_t properties = CreateProperties(message, pool);
 
   m_impl->CheckForError(amqp_basic_publish(
       m_impl->m_connection, channel, StringToBytes(exchange_name),
       StringToBytes(routing_key),
       static_cast<amqp_boolean_t>(mandatory),
       static_cast<amqp_boolean_t>(immediate), &properties,
-      StringToBytes(message->Body())));
+      StringToBytes(message.Body())));
 
   // If we've done things correctly we can get one of 4 things back from the
   // broker
-  // - basic.ack - our channel is in confirm mode, messsage was 'dealt with' by
-  // the broker
-  // - basic.return then basic.ack - the message wasn't delievered, but was
-  // dealt with
-  // - channel.close - probably tried to publish to a non-existant exchange, in
-  // any case error!
-  // - connection.clsoe - something really bad happened
+  // - basic.ack - our channel is in confirm mode, message was 'dealt with' by
+  //   the broker
+  // - basic.return then basic.ack - the message wasn't delivered, but was
+  //   dealt with
+  // - channel.close - probably tried to publish to a non-existent exchange, in
+  //   any case error!
+  // - connection.close - something really bad happened
   const std::array<std::uint32_t, 2> PUBLISH_ACK = {
       {AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD}};
   amqp_frame_t response;
@@ -652,9 +652,8 @@ bool Channel::BasicGet(std::shared_ptr<Envelope> &envelope,
   std::string routing_key((char *)get_ok->routing_key.bytes,
                           get_ok->routing_key.len);
 
-  std::shared_ptr<BasicMessage> message = m_impl->ReadContent(channel);
-  envelope = Envelope::Create(message, "", delivery_tag, exchange, redelivered,
-                              routing_key, channel);
+  envelope = Envelope::Create(m_impl->ReadContent(channel), "", delivery_tag,
+                              exchange, redelivered, routing_key, channel);
 
   m_impl->ReturnChannel(channel);
   m_impl->MaybeReleaseBuffersOnChannel(channel);

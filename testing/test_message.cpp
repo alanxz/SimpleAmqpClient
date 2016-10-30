@@ -37,69 +37,69 @@
 using namespace AmqpClient;
 
 TEST(basic_message, empty_message) {
-  std::shared_ptr<BasicMessage> empty_message = BasicMessage::Create();
+  BasicMessage empty_message;
 
-  EXPECT_EQ(std::string(), empty_message->Body());
+  EXPECT_EQ(std::string(), empty_message.Body());
 
   // Allow the message to destruct
 }
 
 TEST(basic_message, empty_message_add_body) {
-  std::shared_ptr<BasicMessage> empty_message = BasicMessage::Create();
+  BasicMessage empty_message;
 
-  EXPECT_EQ(std::string(), empty_message->Body());
+  EXPECT_EQ(std::string(), empty_message.Body());
 
   const std::string body("Message Body");
-  empty_message->Body(body);
+  empty_message.Body(body);
 
-  EXPECT_EQ(body, empty_message->Body());
+  EXPECT_EQ(body, empty_message.Body());
 
   // Allow the message to destruct
 }
 
 TEST(basic_message, empty_message_add_body2) {
-  std::shared_ptr<BasicMessage> empty_message = BasicMessage::Create();
+  BasicMessage empty_message;
 
-  EXPECT_EQ(std::string(), empty_message->Body());
+  EXPECT_EQ(std::string(), empty_message.Body());
 
   const std::string body("Message Body");
-  empty_message->Body(body);
+  empty_message.Body(body);
 
-  EXPECT_EQ(body, empty_message->Body());
+  EXPECT_EQ(body, empty_message.Body());
 
   const std::string body2("Second body");
-  empty_message->Body(body2);
-  EXPECT_EQ(body2, empty_message->Body());
+  empty_message.Body(body2);
+  EXPECT_EQ(body2, empty_message.Body());
 
   // Allow the message to destruct
 }
 
 TEST(basic_message, initial_message_replace) {
   const std::string first_body("First message Body");
-  std::shared_ptr<BasicMessage> message = BasicMessage::Create(first_body);
+  BasicMessage message(first_body);
 
-  EXPECT_EQ(first_body, message->Body());
+  EXPECT_EQ(first_body, message.Body());
 
   const std::string second_body("Second message Body");
-  message->Body(second_body);
+  message.Body(second_body);
 
-  EXPECT_EQ(second_body, message->Body());
+  EXPECT_EQ(second_body, message.Body());
 
   // Allow the message to destruct
 }
 
 TEST(basic_message, initial_message_replace2) {
   const std::string first_body("First message body");
-  std::shared_ptr<BasicMessage> message = BasicMessage::Create(first_body);
-  EXPECT_EQ(first_body, message->Body());
+  BasicMessage message(first_body);
+  EXPECT_EQ(first_body, message.Body());
 
   const std::string second_body("second message body");
-  message->Body(second_body);
-  EXPECT_EQ(second_body, message->Body());
+  message.Body(second_body);
+  EXPECT_EQ(second_body, message.Body());
 
   const std::string third_body("3rd Body");
-  message->Body(third_body);
-  EXPECT_EQ(third_body, message->Body());
+  message.Body(third_body);
+  EXPECT_EQ(third_body, message.Body());
 }
 
 TEST_F(connected_test, replaced_received_body) {
@@ -107,14 +107,14 @@ TEST_F(connected_test, replaced_received_body) {
   const std::string consumer = channel->BasicConsume(queue);
 
   const std::string body("First Message Body");
-  std::shared_ptr<BasicMessage> out_message = BasicMessage::Create(body);
+  BasicMessage out_message(body);
   channel->BasicPublish("", queue, out_message);
 
   std::shared_ptr<Envelope> envelope = channel->BasicConsumeMessage(consumer);
-  std::shared_ptr<BasicMessage> in_message = envelope->Message();
-  EXPECT_EQ(out_message->Body(), in_message->Body());
+  BasicMessage in_message = envelope->Message();
+  EXPECT_EQ(out_message.Body(), in_message.Body());
 
   const std::string body2("Second message body");
-  in_message->Body(body2);
-  EXPECT_EQ(body2, in_message->Body());
+  in_message.Body(body2);
+  EXPECT_EQ(body2, in_message.Body());
 }

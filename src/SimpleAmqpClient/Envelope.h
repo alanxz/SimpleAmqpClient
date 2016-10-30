@@ -57,19 +57,18 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
     * @returns a boost::shared_ptr to an envelope object
     */
   static std::shared_ptr<Envelope> Create(
-      std::shared_ptr<BasicMessage> message, const std::string &consumer_tag,
+      const BasicMessage &message, const std::string &consumer_tag,
       const std::uint64_t delivery_tag, const std::string &exchange,
       bool redelivered, const std::string &routing_key,
       const std::uint16_t delivery_channel) {
-    return std::make_shared<Envelope>(message, consumer_tag, delivery_tag,
-                                      exchange, redelivered, routing_key,
-                                      delivery_channel);
+    return std::make_shared<Envelope>(std::move(message), consumer_tag,
+                                      delivery_tag, exchange, redelivered,
+                                      routing_key, delivery_channel);
   }
 
-  explicit Envelope(std::shared_ptr<BasicMessage> message,
-                    const std::string &consumer_tag, std::uint64_t delivery_tag,
-                    const std::string &exchange, bool redelivered,
-                    const std::string &routing_key,
+  explicit Envelope(BasicMessage message, const std::string &consumer_tag,
+                    std::uint64_t delivery_tag, const std::string &exchange,
+                    bool redelivered, const std::string &routing_key,
                     std::uint16_t delivery_channel);
 
   Envelope(const Envelope &) = delete;
@@ -86,7 +85,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
     *
     * @returns the message
     */
-  inline std::shared_ptr<BasicMessage> Message() const { return m_message; }
+  inline const BasicMessage &Message() const { return m_message; }
 
   /**
     * Get the consumer tag for the consumer that delivered the message
@@ -149,7 +148,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
   }
 
  private:
-  std::shared_ptr<BasicMessage> m_message;
+  const BasicMessage m_message;
   const std::string m_consumerTag;
   const std::uint64_t m_deliveryTag;
   const std::string m_exchange;

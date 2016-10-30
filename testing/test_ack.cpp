@@ -32,7 +32,7 @@
 using namespace AmqpClient;
 
 TEST_F(connected_test, basic_ack_envelope) {
-  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
+  BasicMessage message("Message Body");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message);
 
@@ -44,7 +44,7 @@ TEST_F(connected_test, basic_ack_envelope) {
 }
 
 TEST_F(connected_test, basic_ack_deliveryinfo) {
-  std::shared_ptr<BasicMessage> message = BasicMessage::Create("Message Body");
+  BasicMessage message("Message Body");
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message);
 
