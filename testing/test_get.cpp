@@ -37,8 +37,8 @@ TEST_F(connected_test, get_ok) {
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message, true);
 
-  std::shared_ptr<Envelope> new_message;
-  EXPECT_TRUE(channel->BasicGet(new_message, queue));
+  std::unique_ptr<Envelope> new_message;
+  EXPECT_TRUE(channel->BasicGet(queue, &new_message));
   EXPECT_EQ(message.Body(), new_message->Message().Body());
 }
 
@@ -46,8 +46,8 @@ TEST_F(connected_test, get_empty) {
   BasicMessage message("Message Body");
   std::string queue = channel->DeclareQueue("");
 
-  std::shared_ptr<Envelope> new_message;
-  EXPECT_FALSE(channel->BasicGet(new_message, queue));
+  std::unique_ptr<Envelope> new_message;
+  EXPECT_FALSE(channel->BasicGet(queue, &new_message));
 }
 
 TEST(test_get, get_big) {
@@ -59,14 +59,14 @@ TEST(test_get, get_big) {
   std::string queue = channel->DeclareQueue("");
 
   channel->BasicPublish("", queue, message);
-  std::shared_ptr<Envelope> new_message;
-  EXPECT_TRUE(channel->BasicGet(new_message, queue));
+  std::unique_ptr<Envelope> new_message;
+  EXPECT_TRUE(channel->BasicGet(queue, &new_message));
   EXPECT_EQ(message.Body(), new_message->Message().Body());
 }
 
 TEST_F(connected_test, bad_queue) {
-  std::shared_ptr<Envelope> new_message;
-  EXPECT_THROW(channel->BasicGet(new_message, "test_get_nonexistantqueue"),
+  std::unique_ptr<Envelope> new_message;
+  EXPECT_THROW(channel->BasicGet("test_get_nonexistantqueue", &new_message),
                ChannelException);
 }
 
@@ -75,8 +75,8 @@ TEST_F(connected_test, ack_message) {
   std::string queue = channel->DeclareQueue("");
   channel->BasicPublish("", queue, message, true);
 
-  std::shared_ptr<Envelope> new_message;
-  EXPECT_TRUE(channel->BasicGet(new_message, queue, false));
-  channel->BasicAck(new_message);
-  EXPECT_FALSE(channel->BasicGet(new_message, queue, false));
+  std::unique_ptr<Envelope> new_message;
+  EXPECT_TRUE(channel->BasicGet(queue, &new_message, false));
+  channel->BasicAck(*new_message);
+  EXPECT_FALSE(channel->BasicGet(queue, &new_message, false));
 }

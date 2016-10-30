@@ -44,41 +44,9 @@ namespace AmqpClient {
 
 class SIMPLEAMQPCLIENT_EXPORT Envelope {
  public:
-  /**
-    * Creates an new envelope object
-    * @param message the payload
-    * @param consumer_tag the consumer tag the message was delivered to
-    * @param delivery_tag the delivery tag that the broker assigned to the
-   * message
-    * @param exchange the name of the exchange that the message was published to
-    * @param redelivered a flag indicating whether the message consumed as a
-   * result of a redelivery
-    * @param routing_key the routing key that the message was published with
-    * @returns a boost::shared_ptr to an envelope object
-    */
-  static std::shared_ptr<Envelope> Create(
-      const BasicMessage &message, const std::string &consumer_tag,
-      const std::uint64_t delivery_tag, const std::string &exchange,
-      bool redelivered, const std::string &routing_key,
-      const std::uint16_t delivery_channel) {
-    return std::make_shared<Envelope>(std::move(message), consumer_tag,
-                                      delivery_tag, exchange, redelivered,
-                                      routing_key, delivery_channel);
-  }
-
-  explicit Envelope(BasicMessage message, const std::string &consumer_tag,
-                    std::uint64_t delivery_tag, const std::string &exchange,
-                    bool redelivered, const std::string &routing_key,
-                    std::uint16_t delivery_channel);
-
-  Envelope(const Envelope &) = delete;
-  Envelope &operator=(const Envelope &) = delete;
-
- public:
-  /**
-    * destructor
-    */
-  virtual ~Envelope() = default;
+  Envelope(BasicMessage message, std::string consumer_tag,
+           std::uint64_t delivery_tag, std::string exchange, bool redelivered,
+           std::string routing_key, std::uint16_t delivery_channel);
 
   /**
     * Get the payload of the envelope
@@ -148,13 +116,13 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope {
   }
 
  private:
-  const BasicMessage m_message;
-  const std::string m_consumerTag;
-  const std::uint64_t m_deliveryTag;
-  const std::string m_exchange;
-  const bool m_redelivered;
-  const std::string m_routingKey;
-  const std::uint16_t m_deliveryChannel;
+  BasicMessage m_message;
+  std::string m_consumerTag;
+  std::uint64_t m_deliveryTag;
+  std::string m_exchange;
+  bool m_redelivered;
+  std::string m_routingKey;
+  std::uint16_t m_deliveryChannel;
 };
 
 }  // namespace AmqpClient

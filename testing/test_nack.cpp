@@ -38,9 +38,9 @@ TEST_F(connected_test, basic_nack_envelope) {
 
   std::string consumer = channel->BasicConsume(queue, "", true, false);
 
-  std::shared_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
+  std::unique_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
 
-  channel->BasicReject(env, false);
+  channel->BasicReject(*env, false);
 }
 
 TEST_F(connected_test, basic_nack_deliveryinfo) {
@@ -52,7 +52,7 @@ TEST_F(connected_test, basic_nack_deliveryinfo) {
 
   Envelope::DeliveryInfo info;
   {
-    std::shared_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
+    std::unique_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
     info = env->GetDeliveryInfo();
   }
 
@@ -66,11 +66,11 @@ TEST_F(connected_test, basic_nack_envelope_with_requeue) {
 
   std::string consumer = channel->BasicConsume(queue, "", true, false);
 
-  std::shared_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
+  std::unique_ptr<Envelope> env = channel->BasicConsumeMessage(consumer);
 
-  channel->BasicReject(env, true);
+  channel->BasicReject(*env, true);
 
-  std::shared_ptr<Envelope> env2 = channel->BasicConsumeMessage(consumer);
+  std::unique_ptr<Envelope> env2 = channel->BasicConsumeMessage(consumer);
 
-  channel->BasicReject(env2, false);
+  channel->BasicReject(*env2, false);
 }

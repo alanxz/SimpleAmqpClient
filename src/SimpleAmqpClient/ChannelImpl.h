@@ -222,17 +222,17 @@ class ChannelImpl {
 
   template <class ChannelListType>
   bool ConsumeMessageOnChannel(const ChannelListType channels,
-                               std::shared_ptr<Envelope> &message,
+                               std::unique_ptr<Envelope> *message,
                                int timeout) {
     auto it = std::find_if(
         m_delivered_messages.begin(), m_delivered_messages.end(),
-        [channels](std::shared_ptr<Envelope> &e) -> bool {
+        [channels](std::unique_ptr<Envelope> &e) -> bool {
           return channels.end() != std::find(channels.begin(), channels.end(),
                                              e->DeliveryChannel());
         });
 
     if (it != m_delivered_messages.end()) {
-      message = *it;
+      *message = std::move(*it);
       m_delivered_messages.erase(it);
       return true;
     }
@@ -242,7 +242,7 @@ class ChannelImpl {
 
   template <class ChannelListType>
   bool ConsumeMessageOnChannelInner(const ChannelListType channels,
-                                    std::shared_ptr<Envelope> &message,
+                                    std::unique_ptr<Envelope> *message,
                                     int timeout) {
     const std::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
         {AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD}};
@@ -286,9 +286,9 @@ class ChannelImpl {
     const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
     MaybeReleaseBuffersOnChannel(deliver.channel);
 
-    message = Envelope::Create(ReadContent(deliver.channel), in_consumer_tag,
-                               delivery_tag, exchange, redelivered, routing_key,
-                               deliver.channel);
+    message->reset(new Envelope(ReadContent(deliver.channel), in_consumer_tag,
+                                delivery_tag, exchange, redelivered,
+                                routing_key, deliver.channel));
     MaybeReleaseBuffersOnChannel(deliver.channel);
     return true;
   }
@@ -330,8 +330,7 @@ class ChannelImpl {
 
   frame_queue_t m_frame_queue;
 
-  using envelope_list_t = std::vector<std::shared_ptr<Envelope> >;
-  envelope_list_t m_delivered_messages;
+  std::vector<std::unique_ptr<Envelope>> m_delivered_messages;
 
   using consumer_map_t = std::map<std::string, amqp_channel_t>;
   consumer_map_t m_consumer_channel_map;

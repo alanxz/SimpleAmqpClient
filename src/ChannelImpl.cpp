@@ -429,13 +429,13 @@ void ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame) {
 
   if (CheckForQueuedMessageOnChannel(frame.channel)) {
     std::array<amqp_channel_t, 1> channel = {{frame.channel}};
-    std::shared_ptr<Envelope> envelope;
-    if (!ConsumeMessageOnChannelInner(channel, envelope, -1)) {
+    std::unique_ptr<Envelope> envelope;
+    if (!ConsumeMessageOnChannelInner(channel, &envelope, -1)) {
       throw std::logic_error(
           "ConsumeMessageOnChannelInner returned false unexpectedly");
     }
 
-    m_delivered_messages.push_back(envelope);
+    m_delivered_messages.push_back(std::move(envelope));
   }
 }
 

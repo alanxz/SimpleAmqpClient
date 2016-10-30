@@ -529,8 +529,8 @@ void Channel::PurgeQueue(const std::string &queue_name) {
   m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
-void Channel::BasicAck(std::shared_ptr<Envelope> &message) {
-  BasicAck(message->GetDeliveryInfo());
+void Channel::BasicAck(const Envelope &message) {
+  BasicAck(message.GetDeliveryInfo());
 }
 
 void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
@@ -549,9 +549,9 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
       amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, 0));
 }
 
-void Channel::BasicReject(std::shared_ptr<Envelope> &message, bool requeue,
+void Channel::BasicReject(const Envelope &message, bool requeue,
                           bool multiple) {
-  BasicReject(message->GetDeliveryInfo(), requeue, multiple);
+  BasicReject(message.GetDeliveryInfo(), requeue, multiple);
 }
 
 void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue,
@@ -624,8 +624,8 @@ void Channel::BasicPublish(const std::string &exchange_name,
   m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
-bool Channel::BasicGet(std::shared_ptr<Envelope> &envelope,
-                       const std::string &queue, bool no_ack) {
+bool Channel::BasicGet(const std::string &queue,
+                       std::unique_ptr<Envelope> *envelope, bool no_ack) {
   const std::array<std::uint32_t, 2> GET_RESPONSES = {
       {AMQP_BASIC_GET_OK_METHOD, AMQP_BASIC_GET_EMPTY_METHOD}};
   m_impl->CheckIsConnected();
@@ -652,8 +652,8 @@ bool Channel::BasicGet(std::shared_ptr<Envelope> &envelope,
   std::string routing_key((char *)get_ok->routing_key.bytes,
                           get_ok->routing_key.len);
 
-  envelope = Envelope::Create(m_impl->ReadContent(channel), "", delivery_tag,
-                              exchange, redelivered, routing_key, channel);
+  envelope->reset(new Envelope(m_impl->ReadContent(channel), "", delivery_tag,
+                              exchange, redelivered, routing_key, channel));
 
   m_impl->ReturnChannel(channel);
   m_impl->MaybeReleaseBuffersOnChannel(channel);
@@ -770,28 +770,28 @@ void Channel::BasicCancel(const std::string &consumer_tag) {
   m_impl->MaybeReleaseBuffersOnChannel(channel);
 }
 
-std::shared_ptr<Envelope> Channel::BasicConsumeMessage(
+std::unique_ptr<Envelope> Channel::BasicConsumeMessage(
     const std::string &consumer_tag) {
-  std::shared_ptr<Envelope> returnval;
-  BasicConsumeMessage(consumer_tag, returnval);
+  std::unique_ptr<Envelope> returnval;
+  BasicConsumeMessage(consumer_tag, &returnval);
   return returnval;
 }
 
-std::shared_ptr<Envelope> Channel::BasicConsumeMessage(
+std::unique_ptr<Envelope> Channel::BasicConsumeMessage(
     const std::vector<std::string> &consumer_tags) {
-  std::shared_ptr<Envelope> returnval;
-  BasicConsumeMessage(consumer_tags, returnval);
+  std::unique_ptr<Envelope> returnval;
+  BasicConsumeMessage(consumer_tags, &returnval);
   return returnval;
 }
 
-std::shared_ptr<Envelope> Channel::BasicConsumeMessage() {
-  std::shared_ptr<Envelope> returnval;
-  BasicConsumeMessage(returnval);
+std::unique_ptr<Envelope> Channel::BasicConsumeMessage() {
+  std::unique_ptr<Envelope> returnval;
+  BasicConsumeMessage(&returnval);
   return returnval;
 }
 
 bool Channel::BasicConsumeMessage(const std::string &consumer_tag,
-                                  std::shared_ptr<Envelope> &envelope,
+                                  std::unique_ptr<Envelope> *envelope,
                                   int timeout) {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetConsumerChannel(consumer_tag);
@@ -802,7 +802,7 @@ bool Channel::BasicConsumeMessage(const std::string &consumer_tag,
 }
 
 bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
-                                  std::shared_ptr<Envelope> &envelope,
+                                  std::unique_ptr<Envelope> *envelope,
                                   int timeout) {
   m_impl->CheckIsConnected();
 
@@ -816,7 +816,7 @@ bool Channel::BasicConsumeMessage(const std::vector<std::string> &consumer_tags,
   return m_impl->ConsumeMessageOnChannel(channels, envelope, timeout);
 }
 
-bool Channel::BasicConsumeMessage(std::shared_ptr<Envelope> &envelope,
+bool Channel::BasicConsumeMessage(std::unique_ptr<Envelope> *envelope,
                                   int timeout) {
   m_impl->CheckIsConnected();
 

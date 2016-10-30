@@ -71,8 +71,8 @@ TEST_F(connected_test, basic_consume_message) {
   std::string consumer = channel->BasicConsume(queue);
   channel->BasicPublish("", queue, message);
 
-  std::shared_ptr<Envelope> delivered;
-  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, delivered, -1));
+  std::unique_ptr<Envelope> delivered;
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, &delivered, -1));
   EXPECT_EQ(consumer, delivered->ConsumerTag());
   EXPECT_EQ("", delivered->Exchange());
   EXPECT_EQ(queue, delivered->RoutingKey());
@@ -95,13 +95,13 @@ TEST_F(connected_test, basic_consume_inital_qos) {
   channel->BasicPublish("", queue, message3, true);
 
   std::string consumer = channel->BasicConsume(queue, "", true, false);
-  std::shared_ptr<Envelope> received1, received2;
-  ASSERT_TRUE(channel->BasicConsumeMessage(consumer, received1, 100));
+  std::unique_ptr<Envelope> received1, received2;
+  ASSERT_TRUE(channel->BasicConsumeMessage(consumer, &received1, 100));
 
-  EXPECT_FALSE(channel->BasicConsumeMessage(consumer, received2, 100));
-  channel->BasicAck(received1);
+  EXPECT_FALSE(channel->BasicConsumeMessage(consumer, &received2, 100));
+  channel->BasicAck(*received1);
 
-  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, received2, 100));
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, &received2, 100));
 }
 
 TEST_F(connected_test, basic_consume_2consumers) {
@@ -120,16 +120,16 @@ TEST_F(connected_test, basic_consume_2consumers) {
   std::string consumer1 = channel->BasicConsume(queue1, "", true, false);
   std::string consumer2 = channel->BasicConsume(queue2, "", true, false);
 
-  std::shared_ptr<Envelope> envelope1;
-  std::shared_ptr<Envelope> envelope2;
-  std::shared_ptr<Envelope> envelope3;
+  std::unique_ptr<Envelope> envelope1;
+  std::unique_ptr<Envelope> envelope2;
+  std::unique_ptr<Envelope> envelope3;
 
-  channel->BasicConsumeMessage(consumer1, envelope1);
-  channel->BasicAck(envelope1);
-  channel->BasicConsumeMessage(consumer2, envelope2);
-  channel->BasicAck(envelope2);
-  channel->BasicGet(envelope3, queue3);
-  channel->BasicAck(envelope3);
+  channel->BasicConsumeMessage(consumer1, &envelope1);
+  channel->BasicAck(*envelope1);
+  channel->BasicConsumeMessage(consumer2, &envelope2);
+  channel->BasicAck(*envelope2);
+  channel->BasicGet(queue3, &envelope3);
+  channel->BasicAck(*envelope3);
 }
 
 TEST_F(connected_test, basic_consume_1000messages) {
@@ -138,11 +138,11 @@ TEST_F(connected_test, basic_consume_1000messages) {
   std::string queue = channel->DeclareQueue("");
   std::string consumer = channel->BasicConsume(queue, "");
 
-  std::shared_ptr<Envelope> msg;
+  std::unique_ptr<Envelope> msg;
   for (int i = 0; i < 1000; ++i) {
     message1.Timestamp(i);
     channel->BasicPublish("", queue, message1, true);
-    channel->BasicConsumeMessage(consumer, msg);
+    channel->BasicConsumeMessage(consumer, &msg);
   }
 }
 
@@ -153,12 +153,12 @@ TEST_F(connected_test, basic_recover) {
   std::string consumer = channel->BasicConsume(queue, "", true, false);
   channel->BasicPublish("", queue, message);
 
-  std::shared_ptr<Envelope> message1;
-  std::shared_ptr<Envelope> message2;
+  std::unique_ptr<Envelope> message1;
+  std::unique_ptr<Envelope> message2;
 
-  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, message1));
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, &message1));
   channel->BasicRecover(consumer);
-  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, message2));
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, &message2));
 
   channel->DeleteQueue(queue);
 }
@@ -174,12 +174,12 @@ TEST_F(connected_test, basic_qos) {
   channel->BasicPublish("", queue, BasicMessage("Message1"));
   channel->BasicPublish("", queue, BasicMessage("Message2"));
 
-  std::shared_ptr<Envelope> incoming;
-  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, incoming, 100));
-  EXPECT_FALSE(channel->BasicConsumeMessage(consumer, incoming, 100));
+  std::unique_ptr<Envelope> incoming;
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, &incoming, 100));
+  EXPECT_FALSE(channel->BasicConsumeMessage(consumer, &incoming, 100));
 
   channel->BasicQos(consumer, 2);
-  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, incoming, 100));
+  EXPECT_TRUE(channel->BasicConsumeMessage(consumer, &incoming, 100));
 
   channel->DeleteQueue(queue);
 }
@@ -221,7 +221,7 @@ TEST_F(connected_test, consume_multiple) {
   channel->BasicConsume(queue1);
   channel->BasicConsume(queue2);
 
-  std::shared_ptr<Envelope> env = channel->BasicConsumeMessage();
+  std::unique_ptr<Envelope> env = channel->BasicConsumeMessage();
 
   EXPECT_EQ(Body, env->Message().Body());
 }
