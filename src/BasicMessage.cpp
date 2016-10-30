@@ -431,7 +431,7 @@ std::string BasicMessage::ClusterId() const {
     return std::string();
 }
 void BasicMessage::ClusterId(const std::string &cluster_id) {
-  if (AppIdIsSet()) amqp_bytes_free(m_impl->m_properties.cluster_id);
+  if (ClusterIdIsSet()) amqp_bytes_free(m_impl->m_properties.cluster_id);
   m_impl->m_properties.cluster_id =
       amqp_bytes_malloc_dup(amqp_cstring_bytes(cluster_id.c_str()));
   m_impl->m_properties._flags |= AMQP_BASIC_CLUSTER_ID_FLAG;
