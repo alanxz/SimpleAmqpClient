@@ -28,14 +28,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#ifdef WIN32
-#ifdef SimpleAmqpClient_EXPORTS
-#define SIMPLEAMQPCLIENT_EXPORT __declspec(dllexport)
-#else
-#define SIMPLEAMQPCLIENT_EXPORT __declspec(dllimport)
-#endif
-#else
-#define SIMPLEAMQPCLIENT_EXPORT
-#endif
+#include <SimpleAmqpClient_export.h>
 
 #endif  // SIMPLEAMQPCLIENT_UTIL_H
