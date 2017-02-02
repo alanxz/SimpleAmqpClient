@@ -70,12 +70,6 @@ endif ()
 
 option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
 
-include(GenerateExportHeader)
-
-generate_export_header(${PROJECT_NAME}
-  EXPORT_MACRO_NAME SIMPLEAMQPCLIENT_EXPORT
-  )
-
 SET(SAC_LIB_SRCS
     src/SimpleAmqpClient/SimpleAmqpClient.h
 
@@ -126,6 +120,12 @@ if (WIN32)
 else ()
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} SOVERSION ${SAC_SOVERSION})
 endif ()
+
+include(GenerateExportHeader)
+
+generate_export_header(${PROJECT_NAME}
+  EXPORT_MACRO_NAME SIMPLEAMQPCLIENT_EXPORT
+  )
 
 # Some smoke tests:
 
