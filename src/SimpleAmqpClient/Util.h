@@ -28,6 +28,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <SimpleAmqpClient_export.h>
+#include <SimpleAmqpClient/SimpleAmqpClient_export.h>
 
 #endif  // SIMPLEAMQPCLIENT_UTIL_H

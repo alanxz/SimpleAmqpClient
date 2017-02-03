@@ -86,7 +86,7 @@ SET(SAC_LIB_SRCS
     src/BasicMessage.cpp
 
     src/SimpleAmqpClient/Util.h
-    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h
+    ${PROJECT_BINARY_DIR}/SimpleAmqpClient/${PROJECT_NAME}_export.h
 
     src/SimpleAmqpClient/AmqpLibraryException.h
     src/AmqpLibraryException.cpp
@@ -125,6 +125,7 @@ include(GenerateExportHeader)
 
 generate_export_header(${PROJECT_NAME}
   EXPORT_MACRO_NAME SIMPLEAMQPCLIENT_EXPORT
+  EXPORT_FILE_NAME SimpleAmqpClient/SimpleAmqpClient_export.h
   )
 
 # Some smoke tests:
@@ -181,7 +182,7 @@ INSTALL(FILES
     src/SimpleAmqpClient/Table.h
     src/SimpleAmqpClient/Util.h
     src/SimpleAmqpClient/Version.h
-    ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_export.h
+    ${PROJECT_BINARY_DIR}/SimpleAmqpClient/${PROJECT_NAME}_export.h
     DESTINATION include/SimpleAmqpClient
     )
 
