@@ -69,6 +69,16 @@ if (WIN32)
 endif ()
 
 option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
+option(STATIC_RUNTIME "Select static runtime" OFF)
+
+include(ucm)
+
+if(STATIC_RUNTIME)
+  ucm_set_runtime(STATIC)
+else()
+  ucm_set_runtime(DYNAMIC)
+endif()
+
 
 SET(SAC_LIB_SRCS
     src/SimpleAmqpClient/SimpleAmqpClient.h
