@@ -66,10 +66,26 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
+    const boost::uint8_t value) const {
+  amqp_field_value_t v;
+  v.kind = AMQP_FIELD_KIND_U8;
+  v.value.u8 = value;
+  return v;
+}
+
+amqp_field_value_t TableValueImpl::generate_field_value::operator()(
     const boost::int8_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I8;
   v.value.i8 = value;
+  return v;
+}
+
+amqp_field_value_t TableValueImpl::generate_field_value::operator()(
+    const boost::uint16_t value) const {
+  amqp_field_value_t v;
+  v.kind = AMQP_FIELD_KIND_U16;
+  v.value.u16 = value;
   return v;
 }
 
@@ -82,10 +98,26 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
+    const boost::uint32_t value) const {
+  amqp_field_value_t v;
+  v.kind = AMQP_FIELD_KIND_U32;
+  v.value.u32 = value;
+  return v;
+}
+
+amqp_field_value_t TableValueImpl::generate_field_value::operator()(
     const boost::int32_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I32;
   v.value.i32 = value;
+  return v;
+}
+
+amqp_field_value_t TableValueImpl::generate_field_value::operator()(
+    const boost::uint64_t value) const {
+  amqp_field_value_t v;
+  v.kind = AMQP_FIELD_KIND_U64;
+  v.value.u64 = value;
   return v;
 }
 
@@ -217,12 +249,20 @@ TableValue TableValueImpl::CreateTableValue(const amqp_field_value_t &entry) {
       return TableValue();
     case AMQP_FIELD_KIND_BOOLEAN:
       return TableValue((bool)entry.value.boolean);
+    case AMQP_FIELD_KIND_U8:
+      return TableValue(entry.value.u8);
     case AMQP_FIELD_KIND_I8:
       return TableValue(entry.value.i8);
+    case AMQP_FIELD_KIND_U16:
+      return TableValue(entry.value.u16);
     case AMQP_FIELD_KIND_I16:
       return TableValue(entry.value.i16);
+    case AMQP_FIELD_KIND_U32:
+      return TableValue(entry.value.u32);
     case AMQP_FIELD_KIND_I32:
       return TableValue(entry.value.i32);
+    case AMQP_FIELD_KIND_U64:
+      return TableValue(entry.value.u64);
     case AMQP_FIELD_KIND_I64:
     case AMQP_FIELD_KIND_TIMESTAMP:
       return TableValue(entry.value.i64);
