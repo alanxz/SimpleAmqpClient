@@ -41,13 +41,25 @@ TableValue::TableValue()
 TableValue::TableValue(bool value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
+TableValue::TableValue(boost::uint8_t value)
+    : m_impl(new Detail::TableValueImpl(value)) {}
+
 TableValue::TableValue(boost::int8_t value)
+    : m_impl(new Detail::TableValueImpl(value)) {}
+
+TableValue::TableValue(boost::uint16_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
 TableValue::TableValue(boost::int16_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
+TableValue::TableValue(boost::uint32_t value)
+    : m_impl(new Detail::TableValueImpl(value)) {}
+
 TableValue::TableValue(boost::int32_t value)
+    : m_impl(new Detail::TableValueImpl(value)) {}
+
+TableValue::TableValue(boost::uint64_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
 TableValue::TableValue(boost::int64_t value)
@@ -120,18 +132,37 @@ TableValue::ValueType TableValue::GetType() const {
   return static_cast<ValueType>(m_impl->m_value.which());
 }
 
-bool TableValue::GetBool() const { return boost::get<bool>(m_impl->m_value); }
+bool TableValue::GetBool() const {
+  return boost::get<bool>(m_impl->m_value);
+}
+
+
+boost::uint8_t TableValue::GetUint8() const {
+  return boost::get<boost::uint8_t>(m_impl->m_value);
+}
 
 boost::int8_t TableValue::GetInt8() const {
   return boost::get<boost::int8_t>(m_impl->m_value);
+}
+
+boost::uint16_t TableValue::GetUint16() const {
+  return boost::get<boost::uint16_t>(m_impl->m_value);
 }
 
 boost::int16_t TableValue::GetInt16() const {
   return boost::get<boost::int16_t>(m_impl->m_value);
 }
 
+boost::uint32_t TableValue::GetUint32() const {
+  return boost::get<boost::uint32_t>(m_impl->m_value);
+}
+
 boost::int32_t TableValue::GetInt32() const {
   return boost::get<boost::int32_t>(m_impl->m_value);
+}
+
+boost::uint64_t TableValue::GetUint64() const {
+  return boost::get<boost::uint64_t>(m_impl->m_value);
 }
 
 boost::int64_t TableValue::GetInt64() const {
@@ -140,12 +171,20 @@ boost::int64_t TableValue::GetInt64() const {
 
 boost::int64_t TableValue::GetInteger() const {
   switch (m_impl->m_value.which()) {
+    case VT_uint8:
+      return GetUint8();
     case VT_int8:
       return GetInt8();
+    case VT_uint16:
+      return GetUint16();
     case VT_int16:
       return GetInt16();
+    case VT_uint32:
+      return GetUint32();
     case VT_int32:
       return GetInt32();
+    case VT_uint64:
+      return GetUint64();
     case VT_int64:
       return GetInt64();
     default:
@@ -188,11 +227,19 @@ void TableValue::Set() { m_impl->m_value = Detail::void_t(); }
 
 void TableValue::Set(bool value) { m_impl->m_value = value; }
 
+void TableValue::Set(boost::uint8_t value) { m_impl->m_value = value; }
+
 void TableValue::Set(boost::int8_t value) { m_impl->m_value = value; }
+
+void TableValue::Set(boost::uint16_t value) { m_impl->m_value = value; }
 
 void TableValue::Set(boost::int16_t value) { m_impl->m_value = value; }
 
+void TableValue::Set(boost::uint32_t value) { m_impl->m_value = value; }
+
 void TableValue::Set(boost::int32_t value) { m_impl->m_value = value; }
+
+void TableValue::Set(boost::uint64_t value) { m_impl->m_value = value; }
 
 void TableValue::Set(boost::int64_t value) { m_impl->m_value = value; }
 
