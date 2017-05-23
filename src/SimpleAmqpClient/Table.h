@@ -305,6 +305,10 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
   /**
    * Get an integral number
    *
+   * Works for uint64 up to std::numeric_limits<int64_t>::max(),
+   * will throw a std::overflow_error otherwise. If the entire range
+   * of uint64_t is possible, please use GetUint64()
+   *
    * @returns an integer number if the ValueType is VT_uint8, VT_int8,
    * VT_uint16, VT_int16, VT_uint32, VT_int32, VT_uint64
    * or VT_int64 type, 0 otherwise

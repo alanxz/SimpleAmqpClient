@@ -436,6 +436,52 @@ TEST(table_value, uint64_value) {
   EXPECT_THROW(value.GetTable(), boost::bad_get);
 }
 
+TEST(table_value, uint64_value_larger_than_int64_max) {
+  const boost::uint64_t maxInt64 = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+  boost::uint64_t v1 = maxInt64 + 1;
+  boost::uint64_t v2 = maxInt64 + 2;
+
+  TableValue value(v1);
+  EXPECT_EQ(TableValue::VT_uint64, value.GetType());
+  EXPECT_EQ(v1, value.GetUint64());
+
+  EXPECT_THROW(value.GetBool(), boost::bad_get);
+  EXPECT_THROW(value.GetUint8(), boost::bad_get);
+  EXPECT_THROW(value.GetInt8(), boost::bad_get);
+  EXPECT_THROW(value.GetUint16(), boost::bad_get);
+  EXPECT_THROW(value.GetInt16(), boost::bad_get);
+  EXPECT_THROW(value.GetUint32(), boost::bad_get);
+  EXPECT_THROW(value.GetInt32(), boost::bad_get);
+  EXPECT_THROW(value.GetInt64(), boost::bad_get);
+  EXPECT_THROW(value.GetInteger(), std::overflow_error);
+  EXPECT_THROW(value.GetFloat(), boost::bad_get);
+  EXPECT_THROW(value.GetDouble(), boost::bad_get);
+  EXPECT_THROW(value.GetReal(), boost::bad_get);
+  EXPECT_THROW(value.GetString(), boost::bad_get);
+  EXPECT_THROW(value.GetArray(), boost::bad_get);
+  EXPECT_THROW(value.GetTable(), boost::bad_get);
+
+  value.Set(v2);
+  EXPECT_EQ(TableValue::VT_uint64, value.GetType());
+  EXPECT_EQ(v2, value.GetUint64());
+
+  EXPECT_THROW(value.GetBool(), boost::bad_get);
+  EXPECT_THROW(value.GetUint8(), boost::bad_get);
+  EXPECT_THROW(value.GetInt8(), boost::bad_get);
+  EXPECT_THROW(value.GetUint16(), boost::bad_get);
+  EXPECT_THROW(value.GetInt16(), boost::bad_get);
+  EXPECT_THROW(value.GetUint32(), boost::bad_get);
+  EXPECT_THROW(value.GetInt32(), boost::bad_get);
+  EXPECT_THROW(value.GetInt64(), boost::bad_get);
+  EXPECT_THROW(value.GetInteger(), std::overflow_error);
+  EXPECT_THROW(value.GetFloat(), boost::bad_get);
+  EXPECT_THROW(value.GetDouble(), boost::bad_get);
+  EXPECT_THROW(value.GetReal(), boost::bad_get);
+  EXPECT_THROW(value.GetString(), boost::bad_get);
+  EXPECT_THROW(value.GetArray(), boost::bad_get);
+  EXPECT_THROW(value.GetTable(), boost::bad_get);
+}
+
 TEST(table_value, int64_value) {
   boost::int64_t v1 = 1;
   boost::int64_t v2 = 2;
