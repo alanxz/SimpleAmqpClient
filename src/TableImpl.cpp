@@ -262,9 +262,9 @@ TableValue TableValueImpl::CreateTableValue(const amqp_field_value_t &entry) {
     case AMQP_FIELD_KIND_I32:
       return TableValue(entry.value.i32);
     case AMQP_FIELD_KIND_U64:
+    case AMQP_FIELD_KIND_TIMESTAMP:
       return TableValue(entry.value.u64);
     case AMQP_FIELD_KIND_I64:
-    case AMQP_FIELD_KIND_TIMESTAMP:
       return TableValue(entry.value.i64);
     case AMQP_FIELD_KIND_F32:
       return TableValue(entry.value.f32);
