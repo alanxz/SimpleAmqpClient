@@ -65,30 +65,36 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   static const std::string EXCHANGE_TYPE_TOPIC;
 
   /**
-    * Creates a new channel object
-    * Creates a new connection to an AMQP broker using the supplied parameters
+   * Creates a new channel object
+   * Creates a new connection to an AMQP broker using the supplied parameters
    * and opens
-    * a single channel for use
-    * @param host The hostname or IP address of the AMQP broker
-    * @param port The port to connect to the AMQP broker on
-    * @param username The username used to authenticate with the AMQP broker
-    * @param password The password corresponding to the username used to
+   * a single channel for use
+   * @param host The hostname or IP address of the AMQP broker
+   * @param port The port to connect to the AMQP broker on
+   * @param username The username used to authenticate with the AMQP broker
+   * @param password The password corresponding to the username used to
    * authenticate with the AMQP broker
-    * @param vhost The virtual host on the AMQP we should connect to
-    * @param channel_max Request that the server limit the number of channels
+   * @param vhost The virtual host on the AMQP we should connect to
+   * @param channel_max Request that the server limit the number of channels
    * for
-    * this connection to the specified parameter, a value of zero will use the
+   * this connection to the specified parameter, a value of zero will use the
    * broker-supplied value
-    * @param frame_max Request that the server limit the maximum size of any
+   * @param frame_max Request that the server limit the maximum size of any
    * frame to this value
-    * @return a new Channel object pointer
-    */
+   * @param heartbeat The number of seconds between heartbeat frames to
+   * request of the broker. A value of 0 disables heartbeats.
+   * Note that dependency, rabbitmq-c, only has partial support for heartbeats, as of
+   * v0.4.0.
+   * @return a new Channel object pointer
+   */
   static ptr_t Create(const std::string &host = "127.0.0.1", int port = 5672,
                       const std::string &username = "guest",
                       const std::string &password = "guest",
-                      const std::string &vhost = "/", int frame_max = 131072) {
+                      const std::string &vhost = "/",
+                      int frame_max = 131072,
+                      int heartbeat = 0) {
     return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max);
+                                       frame_max, heartbeat);
   }
 
  protected:
@@ -101,28 +107,31 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
 
  public:
   /**
-  * Creates a new channel object
-  * Creates a new connection to an AMQP broker using the supplied parameters and
-  * opens
-  * a single channel for use
-  * @param path_to_ca_cert Path to ca certificate file
-  * @param host The hostname or IP address of the AMQP broker
-  * @param path_to_client_key Path to client key file
-  * @param path_to_client_cert Path to client certificate file
-  * @param port The port to connect to the AMQP broker on
-  * @param username The username used to authenticate with the AMQP broker
-  * @param password The password corresponding to the username used to
-  * authenticate with the AMQP broker
-  * @param vhost The virtual host on the AMQP we should connect to
-  * @param channel_max Request that the server limit the number of channels for
-  * this connection to the specified parameter, a value of zero will use the
-  * broker-supplied value
-  * @param frame_max Request that the server limit the maximum size of any frame
-  * to this value
-  * @param verify_host Verify the hostname against the certificate when
-  * opening the SSL connection.
-  *
-  * @return a new Channel object pointer
+   * Creates a new channel object
+   * Creates a new connection to an AMQP broker using the supplied parameters and
+   * opens
+   * a single channel for use
+   * @param path_to_ca_cert Path to ca certificate file
+   * @param host The hostname or IP address of the AMQP broker
+   * @param path_to_client_key Path to client key file
+   * @param path_to_client_cert Path to client certificate file
+   * @param port The port to connect to the AMQP broker on
+   * @param username The username used to authenticate with the AMQP broker
+   * @param password The password corresponding to the username used to
+   * authenticate with the AMQP broker
+   * @param vhost The virtual host on the AMQP we should connect to
+   * @param channel_max Request that the server limit the number of channels for
+   * this connection to the specified parameter, a value of zero will use the
+   * broker-supplied value
+   * @param frame_max Request that the server limit the maximum size of any frame
+   * to this value
+   * @param verify_host Verify the hostname against the certificate when
+   * opening the SSL connection.
+   * @param heartbeat The number of seconds between heartbeat frames to
+   * request of the broker. A value of 0 disables heartbeats.
+   * Note that dependency, rabbitmq-c, only has partial support for heartbeats, as of
+   * v0.4.0.
+   * @return a new Channel object pointer
   */
 
   static ptr_t CreateSecure(const std::string &path_to_ca_cert = "",
@@ -134,7 +143,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                             const std::string &password = "guest",
                             const std::string &vhost = "/",
                             int frame_max = 131072,
-                            bool verify_hostname = true) {
+                            bool verify_hostname = true,
+                            int heartbeat = 0) {
     SSLConnectionParams ssl_params;
     ssl_params.path_to_ca_cert = path_to_ca_cert;
     ssl_params.path_to_client_key = path_to_client_key;
@@ -142,7 +152,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     ssl_params.verify_hostname = verify_hostname;
 
     return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max, ssl_params);
+                                       frame_max, heartbeat, ssl_params);
   }
 
   /**
@@ -152,9 +162,11 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * amqp://[username:password@]{HOSTNAME}[:PORT][/VHOST]
    * @param frame_max [in] requests that the broker limit the maximum size of
    * any frame to this value
+   * @param heartbeat [in] The number of seconds between heartbeat frames to
+   * request of the broker. Default value disables heartbeats.
    * @returns a new Channel object
    */
-  static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
+  static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072, int heartbeat = 0);
 
   /**
    * Create a new Channel object from an AMQP URI, secured with SSL.
@@ -170,6 +182,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * opening the SSL connection.
    * @param frame_max [in] requests that the broker limit the maximum size of
    * any frame to this value
+   * @param heartbeat [in] The number of seconds between heartbeat frames to
+   * request of the broker. Default value disables heartbeats.
    * @returns a new Channel object
    */
   static ptr_t CreateSecureFromUri(const std::string &uri,
@@ -177,15 +191,16 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                    const std::string &path_to_client_key = "",
                                    const std::string &path_to_client_cert = "",
                                    bool verify_hostname = true,
-                                   int frame_max = 131072);
+                                   int frame_max = 131072,
+                                   int heartbeat = 0);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
-                   const std::string &vhost, int frame_max);
+                   const std::string &vhost, int frame_max, int heartbeat);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
-                   const std::string &vhost, int frame_max,
+                   const std::string &vhost, int frame_max, int heartbeat,
                    const SSLConnectionParams &ssl_params);
 
  public:
@@ -196,20 +211,20 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     * Creates an exchange on the AMQP broker if it does not already exist
     * @param exchange_name the name of the exchange
     * @param exchange_type the type of exchange to be declared. Defaults to
-   * direct
+    * direct
     *  other types that could be used: fanout and topic
     * @param passive Indicates how the broker should react if the exchange does
-   * not exist.
+    * not exist.
     *  If passive is true and the exhange does not exist the broker will respond
-   * with an error and
+    * with an error and
     *  not create the exchange, exchange is created otherwise. Defaults to false
-   * (exchange is created
+    * (exchange is created
     *  if it does not already exist)
     * @param durable Indicates whether the exchange is durable - e.g., will it
-   * survive a broker restart
+    * survive a broker restart
     *  Defaults to false
     * @param auto_delete Indicates whether the exchange will automatically be
-   * removed when no queues are
+    * removed when no queues are
     *  bound to it. Defaults to false
     */
   void DeclareExchange(
@@ -222,20 +237,20 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     * Creates an exchange on the AMQP broker if it does not already exist
     * @param exchange_name the name of the exchange
     * @param exchange_type the type of exchange to be declared. Defaults to
-  * direct
+    * direct
     *  other types that could be used: fanout and topic
     * @param passive Indicates how the broker should react if the exchange does
-  * not exist.
+    * not exist.
     *  If passive is true and the exchange does not exist the broker will
-  * respond with an error and
+    * respond with an error and
     *  not create the exchange, exchange is created otherwise.
     * @param durable Indicates whether the exchange is durable - e.g., will it
-  * survive a broker restart
+    * survive a broker restart
     * @param auto_delete Indicates whether the exchange will automatically be
-  * removed when no queues are
+    * removed when no queues are
     *  bound to it.
-  * @param arguments A table of additional arguments used when creating the
-  * exchange
+    * @param arguments A table of additional arguments used when creating the
+    * exchange
     */
   void DeclareExchange(const std::string &exchange_name,
                        const std::string &exchange_type, bool passive,

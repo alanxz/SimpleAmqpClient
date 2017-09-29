@@ -68,7 +68,7 @@ const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
-Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
+Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max, int heartbeat) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
@@ -80,14 +80,14 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
   }
 
   return Create(std::string(info.host), info.port, std::string(info.user),
-                std::string(info.password), std::string(info.vhost), frame_max);
+                std::string(info.password), std::string(info.vhost), frame_max, heartbeat);
 }
 
 Channel::ptr_t Channel::CreateSecureFromUri(
     const std::string &uri, const std::string &path_to_ca_cert,
     const std::string &path_to_client_key,
     const std::string &path_to_client_cert, bool verify_hostname,
-    int frame_max) {
+    int frame_max, int heartbeat) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
@@ -102,7 +102,7 @@ Channel::ptr_t Channel::CreateSecureFromUri(
     return CreateSecure(path_to_ca_cert, std::string(info.host),
                         path_to_client_key, path_to_client_cert, info.port,
                         std::string(info.user), std::string(info.password),
-                        std::string(info.vhost), frame_max, verify_hostname);
+                        std::string(info.vhost), frame_max, verify_hostname, heartbeat);
   } else {
     throw std::runtime_error(
         "CreateSecureFromUri only supports SSL-enabled URIs.");
@@ -111,7 +111,7 @@ Channel::ptr_t Channel::CreateSecureFromUri(
 
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
-                 int frame_max)
+                 int frame_max, int heartbeat)
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
 
@@ -124,7 +124,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
     int sock = amqp_socket_open(socket, host.c_str(), port);
     m_impl->CheckForError(sock);
 
-    m_impl->DoLogin(username, password, vhost, frame_max);
+    m_impl->DoLogin(username, password, vhost, frame_max, heartbeat);
   } catch (...) {
     amqp_destroy_connection(m_impl->m_connection);
     throw;
@@ -136,7 +136,8 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
 #ifdef SAC_SSL_SUPPORT_ENABLED
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
-                 int frame_max, const SSLConnectionParams &ssl_params)
+                 int frame_max, int heartbeat,
+                 const SSLConnectionParams &ssl_params)
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
   if (NULL == m_impl->m_connection) {
@@ -179,7 +180,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
           status, "Error setting client certificate for socket");
     }
 
-    m_impl->DoLogin(username, password, vhost, frame_max);
+    m_impl->DoLogin(username, password, vhost, frame_max, heartbeat);
   } catch (...) {
     amqp_destroy_connection(m_impl->m_connection);
     throw;
@@ -189,7 +190,8 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
 }
 #else
 Channel::Channel(const std::string &, int, const std::string &,
-                 const std::string &, const std::string &, int,
+                 const std::string &, const std::string &,
+                 int, int,
                  const SSLConnectionParams &) {
   throw std::logic_error(
       "SSL support has not been compiled into SimpleAmqpClient");
