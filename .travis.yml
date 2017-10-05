@@ -3,6 +3,9 @@
 
 language: cpp
 
+dist: trusty
+sudo: true
+
 compiler:
   - gcc
   - clang
@@ -26,7 +29,7 @@ addons:
 # install pre-reqs
 install:
   - sudo apt-get update
-  - sudo apt-get install libboost1.48-dev libboost-chrono1.48-dev libboost-system1.48-dev
+  - sudo apt-get install libboost1.55-dev libboost-chrono1.55-dev libboost-system1.55-dev
   - mkdir -p _prereqs
   - pushd _prereqs
   - git clone https://github.com/alanxz/rabbitmq-c
