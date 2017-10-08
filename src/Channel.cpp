@@ -103,10 +103,9 @@ Channel::ptr_t Channel::CreateSecureFromUri(
                         path_to_client_key, path_to_client_cert, info.port,
                         std::string(info.user), std::string(info.password),
                         std::string(info.vhost), frame_max, verify_hostname);
-  } else {
-    throw std::runtime_error(
-        "CreateSecureFromUri only supports SSL-enabled URIs.");
   }
+  throw std::runtime_error(
+      "CreateSecureFromUri only supports SSL-enabled URIs.");
 }
 
 Channel::Channel(const std::string &host, int port, const std::string &username,
