@@ -89,12 +89,9 @@ TableValue::TableValue(const TableValue &l)
     : m_impl(new Detail::TableValueImpl(l.m_impl->m_value)) {}
 
 TableValue &TableValue::operator=(const TableValue &l) {
-  if (this == &l) {
-    return *this;
+  if (this != &l) {
+    m_impl->m_value = l.m_impl->m_value;
   }
-
-  m_impl->m_value = l.m_impl->m_value;
-
   return *this;
 }
 
