@@ -523,9 +523,23 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * overload
    * doesn't require the Envelope object to Acknowledge
    * @param delivery_info
+   */
+  void BasicAck(const Envelope::DeliveryInfo &info);
+
+  /**
+   * Acknowledges a Basic message
+   * Acknowledges a message delivered using BasicGet or BasicConsume, this
+   * overload
+   * doesn't require the Envelope object to Acknowledge
+   *
+   * Note that ack'ing multiple message is scoped messages delivered on a given AMQP channel.
+   * SimpleAmqpClient uses one channel per consumer, so multiple ack means all un-ack'd messages
+   * up to and including the current message id for a given consumer.
+   *
+   * @param delivery_info
    * @param multiple if true, ack all messages up to this delivery tag, if false ack only this delivery tag
    */
-  void BasicAck(const Envelope::DeliveryInfo &info, bool multiple = false);
+  void BasicAck(const Envelope::DeliveryInfo &info, bool multiple);
 
   /**
     * Reject a Basic message
