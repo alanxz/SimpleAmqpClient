@@ -458,6 +458,10 @@ void Channel::BasicAck(const Envelope::ptr_t &message) {
   BasicAck(message->GetDeliveryInfo());
 }
 
+void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
+  BasicAck(info, false);
+}
+
 void Channel::BasicAck(const Envelope::DeliveryInfo &info, bool multiple) {
   m_impl->CheckIsConnected();
   // Delivery tag is local to the channel, so its important to use
