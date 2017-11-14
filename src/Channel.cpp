@@ -458,7 +458,7 @@ void Channel::BasicAck(const Envelope::ptr_t &message) {
   BasicAck(message->GetDeliveryInfo());
 }
 
-void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
+void Channel::BasicAck(const Envelope::DeliveryInfo &info, bool multiple) {
   m_impl->CheckIsConnected();
   // Delivery tag is local to the channel, so its important to use
   // that channel, sadly this can cause the channel to throw an exception
@@ -471,7 +471,7 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info) {
   }
 
   m_impl->CheckForError(
-      amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, false));
+      amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, multiple));
 }
 
 void Channel::BasicReject(const Envelope::ptr_t &message, bool requeue,

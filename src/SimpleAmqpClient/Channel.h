@@ -523,8 +523,9 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * overload
    * doesn't require the Envelope object to Acknowledge
    * @param delivery_info
+   * @param multiple if true, ack all messages up to this delivery tag, if false ack only this delivery tag
    */
-  void BasicAck(const Envelope::DeliveryInfo &info);
+  void BasicAck(const Envelope::DeliveryInfo &info, bool multiple = false);
 
   /**
     * Reject a Basic message
