@@ -36,7 +36,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 FIND_PACKAGE(Rabbitmqc REQUIRED)
 INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
 
-option(ENABLE_TESTING "Enable tests" ON)
+option(ENABLE_TESTING "Enable tests" OFF)
 option(ENABLE_DOC "Enable doxygen docs" OFF)
 option(ENABLE_SSL_SUPPORT "Enable SSL support." ${Rabbitmqc_SSL_ENABLED})
 option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
@@ -63,8 +63,6 @@ endif ()
 if (WIN32)
     set(SOCKET_LIBRARY ws2_32)
 endif ()
-
-option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
 
 if (WIN32 AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "The SimpleAmqpClient library cannot be built as a static library on Win32. Set BUILD_SHARED_LIBS=ON to get around this.")
@@ -110,11 +108,8 @@ SET(SAC_LIB_SRCS
     src/TableImpl.cpp
     )
 
-
 ADD_LIBRARY(SimpleAmqpClient STATIC ${SAC_LIB_SRCS})
-TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY})
-
-#TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
+TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
         CXX_STANDARD 17
@@ -129,10 +124,6 @@ if(WIN32)
 else ()
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} SOVERSION ${SAC_SOVERSION})
 endif ()
-
-# Some smoke tests:
-
-option(ENABLE_TESTING "Enable smoke tests" OFF)
 
 if(ENABLE_TESTING)
     enable_testing()
