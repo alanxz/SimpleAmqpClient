@@ -30,7 +30,6 @@
 
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
 #include <stdexcept>
 #include <string>
 

@@ -29,11 +29,11 @@
 #include "connected_test.h"
 
 #include <SimpleAmqpClient/SimpleAmqpClient.h>
-#include <gtest/gtest.h>
 
-TEST_F(connected_test, declare_exchange_defaults) {
-  channel->DeclareExchange("declare_defaults");
-  channel->DeleteExchange("declare_defaults");
+TEST_F(connected_test, declare_exchange_defaults)
+{
+    channel->DeclareExchange("declare_defaults");
+    channel->DeleteExchange("declare_defaults");
 }
 
 TEST_F(connected_test, declare_exchange_direct) {

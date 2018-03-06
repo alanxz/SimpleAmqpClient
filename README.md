@@ -1,6 +1,8 @@
 SimpleAmqpClient
 ==================
 
+**We forked the original repository and replaced the boost dependencies with C++17 features**.
+
 [SimpleAmqpClient](https://github.com/alanxz/SimpleAmqpClient) is an easy-to-use C++
 wrapper around the [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) C library.
 It derives inspiration from the [puka](http://majek.github.com/puka/puka.html) AMQP library 
@@ -16,7 +18,6 @@ Known to work in the following environments:
 - Mac OS X (10.7, 10.6, gcc-4.2, 32 and 64-bit). Likely to work on older version, but has not been tested
 
 ### Pre-requisites
-+  [boost-1.47.0](http://www.boost.org/) or newer (uses chrono, system internally in addition to other header based libraries such as sharedptr and noncopyable)
 +  [rabbitmq-c](http://github.com/alanxz/rabbitmq-c) you'll need version 0.5.1 or better.
 +  [cmake 2.8+](http://www.cmake.org/) what is needed for the build system
 +  [Doxygen](http://www.stack.nl/~dimitri/doxygen/) OPTIONAL only necessary to generate API documentation
@@ -24,7 +25,7 @@ Known to work in the following environments:
 ### Build procedure
 This is a typical cmake project, it should work like most typical cmake projects:
 
-In a sibiling directory to where you extracted the source code:
+Within the directory where you extracted the source code:
 
     mkdir simpleamqpclient-build
     cd simpleamqpclient-build
@@ -55,9 +56,9 @@ instance of this class.
 
     AmqpClient::Channel::ptr_t connection = AmqpClient::Channel::Create("localhost");
 
-All classes have a typedef ptr_t which is equivalent to boost::shared_ptr<> of the 
+All classes have a typedef ptr_t which is equivalent to std::shared_ptr<> of the
 containing class.  All classes also have a Create() method does the job creating a new
-ptr_t using boost::make_shared<>(). It is recommended that you use these methods
+ptr_t using std::make_shared<>(). It is recommended that you use these methods
 to construct objects in the library.
 
 Commands dealing with declaring/binding/unbinding/deleting exchanges and queues are

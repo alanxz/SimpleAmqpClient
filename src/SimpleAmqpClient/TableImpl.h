@@ -30,19 +30,17 @@
 
 #include "SimpleAmqpClient/Table.h"
 
-#include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/variant/variant.hpp>
-
 #include <string>
 #include <vector>
+#include <memory>
+#include <variant>
 
 #include <amqp.h>
 
 namespace AmqpClient {
 namespace Detail {
 
-typedef boost::shared_ptr<amqp_pool_t> amqp_pool_ptr_t;
+typedef std::shared_ptr<amqp_pool_t> amqp_pool_ptr_t;
 
 struct void_t {};
 
@@ -50,11 +48,19 @@ inline bool operator==(const void_t &, const void_t &) { return true; }
 
 typedef std::vector<TableValue> array_t;
 
-typedef boost::variant<void_t, bool, boost::int8_t, boost::int16_t,
-                       boost::int32_t, boost::int64_t, float, double,
-                       std::string, array_t, Table, boost::uint8_t,
-                       boost::uint16_t, boost::uint32_t, boost::uint64_t>
-    value_t;
+typedef std::variant<
+void_t,
+bool,
+int8_t,
+int16_t,
+int32_t,
+int64_t,
+float,
+double,
+std::string,
+array_t,Table, uint8_t,
+uint16_t, uint32_t, uint64_t>
+ value_t;
 
 class TableValueImpl {
  public:
@@ -80,23 +86,24 @@ class TableValueImpl {
   static amqp_field_value_t CopyValue(const amqp_field_value_t value,
                                       amqp_pool_t &pool);
 
- public:
-  class generate_field_value
-      : public boost::static_visitor<amqp_field_value_t> {
-   public:
-    explicit generate_field_value(amqp_pool_t &p) : pool(p) {}
-    virtual ~generate_field_value() {}
+public:
+
+    class generate_field_value
+    {
+    public:
+        explicit generate_field_value(amqp_pool_t &p) : pool(p) {}
+        virtual ~generate_field_value() {}
 
     amqp_field_value_t operator()(const void_t) const;
     amqp_field_value_t operator()(const bool value) const;
-    amqp_field_value_t operator()(const boost::uint8_t value) const;
-    amqp_field_value_t operator()(const boost::int8_t value) const;
-    amqp_field_value_t operator()(const boost::uint16_t value) const;
-    amqp_field_value_t operator()(const boost::int16_t value) const;
-    amqp_field_value_t operator()(const boost::uint32_t value) const;
-    amqp_field_value_t operator()(const boost::int32_t value) const;
-    amqp_field_value_t operator()(const boost::uint64_t value) const;
-    amqp_field_value_t operator()(const boost::int64_t value) const;
+    amqp_field_value_t operator()(const uint8_t value) const;
+    amqp_field_value_t operator()(const int8_t value) const;
+    amqp_field_value_t operator()(const uint16_t value) const;
+    amqp_field_value_t operator()(const int16_t value) const;
+    amqp_field_value_t operator()(const uint32_t value) const;
+    amqp_field_value_t operator()(const int32_t value) const;
+    amqp_field_value_t operator()(const uint64_t value) const;
+    amqp_field_value_t operator()(const int64_t value) const;
     amqp_field_value_t operator()(const float value) const;
     amqp_field_value_t operator()(const double value) const;
     amqp_field_value_t operator()(const std::string &value) const;

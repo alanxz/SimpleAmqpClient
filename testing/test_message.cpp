@@ -30,8 +30,6 @@
 
 #include <amqp.h>
 
-#include <boost/array.hpp>
-
 #include <algorithm>
 #include <iostream>
 
@@ -104,7 +102,7 @@ TEST(basic_message, initial_message_replace2) {
 }
 
 TEST(basic_message, embedded_nulls) {
-  const boost::array<char, 7> message_data = {
+  const std::array<char, 7> message_data = {
       {'a', 'b', 'c', 0, '1', '2', '3'}};
   const std::string body(message_data.data(), message_data.size());
   BasicMessage::ptr_t message = BasicMessage::Create(body);
@@ -115,7 +113,7 @@ TEST(basic_message, embedded_nulls) {
   EXPECT_TRUE(std::equal(message_data.begin(), message_data.end(),
                          reinterpret_cast<char *>(amqp_body.bytes)));
 
-  const boost::array<char, 7> message_data2 = {
+  const std::array<char, 7> message_data2 = {
       {'1', '2', '3', 0, 'a', 'b', 'c'}};
   const std::string body2(message_data2.data(), message_data2.size());
   message->Body(body2);

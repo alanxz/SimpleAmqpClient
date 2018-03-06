@@ -44,7 +44,7 @@ class connected_test : public ::testing::Test {
     if (NULL != host) {
       return std::string(host);
     }
-    return std::string("");
+    return std::string("localhost");
   }
 };
 

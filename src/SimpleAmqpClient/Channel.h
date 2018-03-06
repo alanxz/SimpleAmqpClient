@@ -33,11 +33,6 @@
 #include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 #include <string>
 #include <vector>
 
@@ -56,9 +51,9 @@ class ChannelImpl;
   * A single channel
   * Represents a logical AMQP channel over a connection
   */
-class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
- public:
-  typedef boost::shared_ptr<Channel> ptr_t;
+class SIMPLEAMQPCLIENT_EXPORT Channel : Noncopyable {
+public:
+    typedef std::shared_ptr<Channel> ptr_t;
 
   static const std::string EXCHANGE_TYPE_DIRECT;
   static const std::string EXCHANGE_TYPE_FANOUT;
@@ -87,7 +82,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                       const std::string &username = "guest",
                       const std::string &password = "guest",
                       const std::string &vhost = "/", int frame_max = 131072) {
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
+    return std::make_shared<Channel>(host, port, username, password, vhost,
                                        frame_max);
   }
 
@@ -141,7 +136,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     ssl_params.path_to_client_cert = path_to_client_cert;
     ssl_params.verify_hostname = verify_hostname;
 
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
+    return std::make_shared<Channel>(host, port, username, password, vhost,
                                        frame_max, ssl_params);
   }
 
@@ -354,86 +349,67 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                            bool durable, bool exclusive, bool auto_delete,
                            const Table &arguments);
 
-  /**
-    * Declares a queue and returns current message- and consumer counts
-    * Creates a queue on the AMQP broker if it does not already exist
-    * @param queue_name the desired name of the queue. If this is a zero-length
-   * string the broker
-    *  will generate a queue name and it will be returned as a result from this
-   * method
-    * @param message_count Reference to an unsigned int which will receive the
-   * current
-    *  number of messages in the declared queue, if any.
-    * @param consumer_count Reference to an unsigned int which will receive the
-   * current
-    *  number of consumers of the declared queue, if any.
-    * @param passive Indicated how the broker should react if the queue does not
-   * exist.
-    *  If passive is true and the queue does not exist the broker will respond
-   * with an error and
-    *  not create the queue, the queue is created otherwise. Defaults to false
-   * (queue is created if it
-    *  does not already exist)
-    * @param durable Indicates whether the exchange is durable - e.g., will it
-   * survive a broker restart
-    *  Defaults to false
-    * @param exclusive Indicates that only client can use the queue. Defaults to
-   * true. An
-    *  exclusive queue is deleted when the connection is closed
-    * @param auto_delete the queue will be deleted after at least one exchange
-   * has been bound to it,
-    *  then has been unbound
-    * @returns the name of the queue created on the broker. Used mostly when the
-   * broker is asked to
-    *  create a unique queue by not providing a queue name
-    */
-  std::string DeclareQueueWithCounts(const std::string &queue_name,
-                                     boost::uint32_t &message_count,
-                                     boost::uint32_t &consumer_count,
-                                     bool passive = false, bool durable = false,
-                                     bool exclusive = true,
-                                     bool auto_delete = true);
+    /**
+      * Declares a queue and returns current message- and consumer counts
+      * Creates a queue on the AMQP broker if it does not already exist
+      * @param queue_name the desired name of the queue. If this is a zero-length* string the broker
+      *  will generate a queue name and it will be returned as a result from this* method
+      * @param message_count Reference to an unsigned int which will receive the* current
+      *  number of messages in the declared queue, if any.
+      * @param consumer_count Reference to an unsigned int which will receive the* current
+      *  number of consumers of the declared queue, if any.
+      * @param passive Indicated how the broker should react if the queue does not* exist.
+      *  If passive is true and the queue does not exist the broker will respond* with an error and
+      *  not create the queue, the queue is created otherwise. Defaults to false* (queue is created if it
+      *  does not already exist)
+      * @param durable Indicates whether the exchange is durable - e.g., will it* survive a broker restart
+      *  Defaults to false
+      * @param exclusive Indicates that only client can use the queue. Defaults to* true. An
+      *  exclusive queue is deleted when the connection is closed
+      * @param auto_delete the queue will be deleted after at least one exchange* has been bound to it,
+      *  then has been unbound
+      * @returns the name of the queue created on the broker. Used mostly when the* broker is asked to
+      *  create a unique queue by not providing a queue name
+      */
+    std::string DeclareQueueWithCounts(const std::string &queue_name,
+                                       uint32_t &message_count,
+                                       uint32_t &consumer_count,
+                                       bool passive = false,
+                                       bool durable = false,
+                                       bool exclusive = true,
+                                       bool auto_delete = true);
 
-  /**
-    * Declares a queue and returns current message- and consumer counts
-    * Creates a queue on the AMQP broker if it does not already exist
-    * @param queue_name the desired name of the queue. If this is a zero-length
-   * string the broker
-    *  will generate a queue name and it will be returned as a result from this
-   * method
-    * @param message_count Reference to an unsigned int which will receive the
-   * current
-    *  number of messages in the declared queue, if any.
-    * @param consumer_count Reference to an unsigned int which will receive the
-   * current
-    *  number of consumers of the declared queue, if any.
-    * @param passive Indicated how the broker should react if the queue does not
-   * exist.
-    *  If passive is true and the queue does not exist the broker will respond
-   * with an error and
-    *  not create the queue, the queue is created otherwise. Defaults to false
-   * (queue is created if it
-    *  does not already exist)
-    * @param durable Indicates whether the exchange is durable - e.g., will it
-   * survive a broker restart
-    *  Defaults to false
-    * @param exclusive Indicates that only client can use the queue. Defaults to
-   * true. An
-    *  exclusive queue is deleted when the connection is closed
-    * @param auto_delete the queue will be deleted after at least one exchange
-   * has been bound to it,
-    *  then has been unbound
-    * @param arguments A table of additional arguments used when declaring a
-   * queue
-    * @returns the name of the queue created on the broker. Used mostly when the
-   * broker is asked to
-    *  create a unique queue by not providing a queue name
-    */
-  std::string DeclareQueueWithCounts(const std::string &queue_name,
-                                     boost::uint32_t &message_count,
-                                     boost::uint32_t &consumer_count,
-                                     bool passive, bool durable, bool exclusive,
-                                     bool auto_delete, const Table &arguments);
+    /**
+      * Declares a queue and returns current message- and consumer counts
+      * Creates a queue on the AMQP broker if it does not already exist
+      * @param queue_name the desired name of the queue. If this is a zero-length* string the broker
+      *  will generate a queue name and it will be returned as a result from this* method
+      * @param message_count Reference to an unsigned int which will receive the* current
+      *  number of messages in the declared queue, if any.
+      * @param consumer_count Reference to an unsigned int which will receive the* current
+      *  number of consumers of the declared queue, if any.
+      * @param passive Indicated how the broker should react if the queue does not* exist.
+      *  If passive is true and the queue does not exist the broker will respond* with an error and
+      *  not create the queue, the queue is created otherwise. Defaults to false* (queue is created if it
+      *  does not already exist)
+      * @param durable Indicates whether the exchange is durable - e.g., will it* survive a broker restart
+      *  Defaults to false
+      * @param exclusive Indicates that only client can use the queue. Defaults to* true. An
+      *  exclusive queue is deleted when the connection is closed
+      * @param auto_delete the queue will be deleted after at least one exchange* has been bound to it,
+      *  then has been unbound
+      * @param arguments A table of additional arguments used when declaring a* queue
+      * @returns the name of the queue created on the broker. Used mostly when the* broker is asked to
+      *  create a unique queue by not providing a queue name
+      */
+    std::string DeclareQueueWithCounts(const std::string &queue_name,
+                                       uint32_t &message_count,
+                                       uint32_t &consumer_count,
+                                       bool passive,
+                                       bool durable,
+                                       bool exclusive,
+                                       bool auto_delete,
+                                       const Table &arguments);
 
   /**
     * Deletes a queue
@@ -609,81 +585,65 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     */
   void BasicRecover(const std::string &consumer);
 
-  /**
-    * Starts consuming Basic messages on a queue
-    * Subscribes as a consumer to a queue, so all future messages on a queue
-  * will be Basic.Delivered
-    * Note: due to a limitation to how things are done, it is only possible to
-  * reliably have a single
-    *  consumer per channel, calling this more than once per channel may result
-  * in undefined results
-    *  from BasicConsumeMessage
-    * @param queue the name of the queue to subscribe to
-    * @param consumer_tag the name of the consumer. This is used to do
-  * operations with a consumer
-    * @param no_local Defaults to true
-    * @param no_ack If true, ack'ing the message is automatically done when the
-  * message is delivered.
-    *  Defaults to true (message does not have to be ack'ed)
-    * @param exclusive means only this consumer can access the queue. Defaults
-  * to true
-  * @param message_prefetch_count number of unacked messages the broker will
-  * deliver. Setting this to
-  *  more than 1 will allow the broker to deliver messages while a current
-  * message is being processed
-  *  for example. A value of 0 means no limit. This option is ignored if no_ack
-  * = true
-  * @returns the consumer tag
-    */
-  std::string BasicConsume(const std::string &queue,
-                           const std::string &consumer_tag = "",
-                           bool no_local = true, bool no_ack = true,
-                           bool exclusive = true,
-                           boost::uint16_t message_prefetch_count = 1);
+    /**
+      * Starts consuming Basic messages on a queue
+      * Subscribes as a consumer to a queue, so all future messages on a queue* will be Basic.Delivered
+      * Note: due to a limitation to how things are done, it is only possible to* reliably have a single
+      *  consumer per channel, calling this more than once per channel may result* in undefined results
+      *  from BasicConsumeMessage
+      * @param queue the name of the queue to subscribe to
+      * @param consumer_tag the name of the consumer. This is used to do* operations with a consumer
+      * @param no_local Defaults to true
+      * @param no_ack If true, ack'ing the message is automatically done when the* message is delivered.
+      *  Defaults to true (message does not have to be ack'ed)
+      * @param exclusive means only this consumer can access the queue. Defaults* to true
+    * @param message_prefetch_count number of unacked messages the broker will* deliver. Setting this to
+    *  more than 1 will allow the broker to deliver messages while a current* message is being processed
+    *  for example. A value of 0 means no limit. This option is ignored if no_ack* = true
+    * @returns the consumer tag
+      */
+    std::string BasicConsume(const std::string &queue,
+                             const std::string &consumer_tag = "",
+                             bool no_local = true,
+                             bool no_ack = true,
+                             bool exclusive = true,
+                             uint16_t message_prefetch_count = 1);
 
-  /**
-    * Starts consuming Basic messages on a queue
-    * Subscribes as a consumer to a queue, so all future messages on a queue
-  * will be Basic.Delivered
-    * Note: due to a limitation to how things are done, it is only possible to
-  * reliably have a single
-    *  consumer per channel, calling this more than once per channel may result
-  * in undefined results
-    *  from BasicConsumeMessage
-    * @param queue the name of the queue to subscribe to
-    * @param consumer_tag the name of the consumer. This is used to do
-  * operations with a consumer
-    * @param no_local Defaults to true
-    * @param no_ack If true, ack'ing the message is automatically done when the
-  * message is delivered.
-    *  Defaults to true (message does not have to be ack'ed)
-    * @param exclusive means only this consumer can access the queue. Defaults
-  * to true
-  * @param message_prefetch_count number of unacked messages the broker will
-  * deliver. Setting this to
-  *  more than 1 will allow the broker to deliver messages while a current
-  * message is being processed
-  *  for example. A value of 0 means no limit. This option is ignored if no_ack
-  * = true
-  * @param arguments A table of additional arguments when creating the consumer
-  * @returns the consumer tag
-    */
-  std::string BasicConsume(const std::string &queue,
-                           const std::string &consumer_tag, bool no_local,
-                           bool no_ack, bool exclusive,
-                           boost::uint16_t message_prefetch_count,
-                           const Table &arguments);
+    /**
+      * Starts consuming Basic messages on a queue
+      * Subscribes as a consumer to a queue, so all future messages on a queue* will be Basic.Delivered
+      * Note: due to a limitation to how things are done, it is only possible to* reliably have a single
+      *  consumer per channel, calling this more than once per channel may result* in undefined results
+      *  from BasicConsumeMessage
+      * @param queue the name of the queue to subscribe to
+      * @param consumer_tag the name of the consumer. This is used to do* operations with a consumer
+      * @param no_local Defaults to true
+      * @param no_ack If true, ack'ing the message is automatically done when the* message is delivered.
+      *  Defaults to true (message does not have to be ack'ed)
+      * @param exclusive means only this consumer can access the queue. Defaults* to true
+    * @param message_prefetch_count number of unacked messages the broker will* deliver. Setting this to
+    *  more than 1 will allow the broker to deliver messages while a current* message is being processed
+    *  for example. A value of 0 means no limit. This option is ignored if no_ack* = true
+    * @param arguments A table of additional arguments when creating the consumer
+    * @returns the consumer tag
+      */
+    std::string BasicConsume(const std::string &queue,
+                             const std::string &consumer_tag,
+                             bool no_local,
+                             bool no_ack,
+                             bool exclusive,
+                             uint16_t message_prefetch_count,
+                             const Table &arguments);
 
-  /**
-    * Sets the number of unacknowledged messages that will be delivered
-    * by the broker to a consumer. Note this effectively has no effect
-    * for consumer with no_ack set
-    * @param consumer_tag the conumser tag to adjust the prefect
-    * @param message_prefetch_count the number of unacknowledged message the
-    *  broker will deliver. A value of 0 means no limit.
-    */
-  void BasicQos(const std::string &consumer_tag,
-                boost::uint16_t message_prefetch_count);
+    /**
+      * Sets the number of unacknowledged messages that will be delivered
+      * by the broker to a consumer. Note this effectively has no effect
+      * for consumer with no_ack set
+      * @param consumer_tag the conumser tag to adjust the prefect
+      * @param message_prefetch_count the number of unacknowledged message the
+      *  broker will deliver. A value of 0 means no limit.
+      */
+    void BasicQos(const std::string &consumer_tag, uint16_t message_prefetch_count);
 
   /**
     * Cancels a previously created Consumer
@@ -782,8 +742,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    */
   bool BasicConsumeMessage(Envelope::ptr_t &envelope, int timeout = -1);
 
- protected:
-  boost::scoped_ptr<Detail::ChannelImpl> m_impl;
+protected:
+    std::unique_ptr<Detail::ChannelImpl> m_impl;
 };
 
 }  // namespace AmqpClient

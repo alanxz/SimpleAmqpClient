@@ -27,6 +27,5 @@ find_file(_Rabbitmqc_SSL_HEADER
 string(COMPARE NOTEQUAL "${_Rabbitmqc_SSL_HEADER}"
   "_Rabbitmqc_SSL_HEADER-NOTFOUND" _rmqc_ssl_enabled)
 
-set(Rabbitmqc_SSL_ENABLED ${_rmqc_ssl_enabled} CACHE BOOL
-  "Rabbitmqc is SSL Enabled" FORCE)
+set(Rabbitmqc_SSL_ENABLED ${_rmqc_ssl_enabled} CACHE BOOL "Rabbitmqc is SSL Enabled" FORCE)
 mark_as_advanced(_Rabbitmqc_SSL_HEADER Rabbitmqc_SSL_ENABLED)

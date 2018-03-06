@@ -1,5 +1,4 @@
-include_directories(BEFORE SYSTEM ${gtest_SOURCE_DIR}/include)
-include_directories(../src)
+project(test_api)
 
 add_executable(test_api
     connected_test.h
@@ -14,6 +13,12 @@ add_executable(test_api
     test_table.cpp
     test_ack.cpp
     test_nack.cpp
+    main.cpp
     )
-target_link_libraries(test_api SimpleAmqpClient gtest gtest_main)
+target_link_libraries(test_api SimpleAmqpClient gtest)
+set_target_properties(test_api PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        )
 add_test(test_api test_api)

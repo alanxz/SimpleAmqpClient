@@ -32,22 +32,21 @@ string(REGEX MATCH "[0-9]+" _API_VERSION_PATCH ${_API_VERSION_PATCH})
 
 set(SAC_APIVERSION ${_API_VERSION_MAJOR}.${_API_VERSION_MINOR}.${_API_VERSION_PATCH})
 
-FIND_PACKAGE(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
-INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIRS})
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 FIND_PACKAGE(Rabbitmqc REQUIRED)
 INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
 
+option(ENABLE_TESTING "Enable tests" ON)
+option(ENABLE_DOC "Enable doxygen docs" OFF)
 option(ENABLE_SSL_SUPPORT "Enable SSL support." ${Rabbitmqc_SSL_ENABLED})
+option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
+message(STATUS "SSL is " ${ENABLE_SSL_SUPPORT})
 
 if (ENABLE_SSL_SUPPORT)
   add_definitions(-DSAC_SSL_SUPPORT_ENABLED)
 endif()
 
-if (CMAKE_GENERATOR MATCHES ".*(Make|Ninja).*"
-    AND NOT CMAKE_BUILD_TYPE)
+if (CMAKE_GENERATOR MATCHES ".*(Make|Ninja).*" AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel" FORCE)
   message(STATUS "CMAKE_BUILD_TYPE not specified. Using ${CMAKE_BUILD_TYPE} build")
 endif ()
@@ -60,9 +59,6 @@ if (CMAKE_CXX_FLAGS STREQUAL ""
   endif ()
   set(SAC_CXX_FLAGS_SET TRUE CACHE INTERNAL "Have the SAC default compiler flags been set?")
 endif ()
-
-INCLUDE_DIRECTORIES(BEFORE src
-    ${CMAKE_CURRENT_BINARY_DIR})
 
 if (WIN32)
     set(SOCKET_LIBRARY ws2_32)
@@ -115,10 +111,20 @@ SET(SAC_LIB_SRCS
     )
 
 
-ADD_LIBRARY(SimpleAmqpClient ${SAC_LIB_SRCS})
-TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${Boost_LIBRARIES} ${SOCKET_LIBRARY})
+ADD_LIBRARY(SimpleAmqpClient STATIC ${SAC_LIB_SRCS})
+TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY})
 
-if (WIN32)
+#TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        )
+
+target_include_directories(SimpleAmqpClient PUBLIC src)
+
+if(WIN32)
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
 else ()
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} SOVERSION ${SAC_SOVERSION})
@@ -128,7 +134,7 @@ endif ()
 
 option(ENABLE_TESTING "Enable smoke tests" OFF)
 
-if (ENABLE_TESTING)
+if(ENABLE_TESTING)
     enable_testing()
 
     set(BUILD_GTEST ON)
@@ -148,13 +154,14 @@ if (ENABLE_TESTING)
 
     add_subdirectory(third-party/googletest)
     add_subdirectory(testing)
-endif (ENABLE_TESTING)
-
+endif()
 
 # Documentation generation
-SET(DOXYFILE_LATEX "NO")
-SET(PROJECT_VERSION ${SAC_VERSION})
-INCLUDE(UseDoxygen)
+if(ENABLE_DOC)
+    SET(DOXYFILE_LATEX "NO")
+    SET(PROJECT_VERSION ${SAC_VERSION})
+    INCLUDE(UseDoxygen)
+endif()
 
 INSTALL(TARGETS SimpleAmqpClient
     RUNTIME DESTINATION bin
@@ -185,19 +192,6 @@ set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}")
 set(libdir "\${exec_prefix}/lib")
 set(includedir "\${prefix}/include")
-
-foreach(_lib ${Boost_LIBRARIES})
-    get_filename_component(_LIBPATH ${_lib} PATH)
-    if (NOT _LIBPATH STREQUAL _LASTLIBPATH)
-        set(libs_private "${libs_private} -L${_LIBPATH}")
-        set(_LASTLIBPATH ${_LIBPATH})
-    endif()
-
-    get_filename_component(_LIBNAME ${_lib} NAME_WE)
-    string(REGEX REPLACE "^lib" "" _LIBNAME ${_LIBNAME})
-    set(_LIBNAME "-l${_LIBNAME}")
-    set(libs_private "${libs_private} ${_LIBNAME}")
-endforeach()
 
 configure_file(libSimpleAmqpClient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAmqpClient.pc @ONLY)
 

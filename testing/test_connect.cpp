@@ -26,7 +26,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <gtest/gtest.h>
 #include "SimpleAmqpClient/SimpleAmqpClient.h"
 
 #include "connected_test.h"

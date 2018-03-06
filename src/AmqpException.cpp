@@ -31,37 +31,36 @@
 
 #include "SimpleAmqpClient/AmqpException.h"
 
-#include <boost/lexical_cast.hpp>
-
 #include <assert.h>
+#include <sstream>
 
 namespace AmqpClient {
 
-const boost::uint16_t ContentTooLargeException::REPLY_CODE =
+const uint16_t ContentTooLargeException::REPLY_CODE =
     AMQP_CONTENT_TOO_LARGE;
-const boost::uint16_t NoRouteException::REPLY_CODE = AMQP_NO_ROUTE;
-const boost::uint16_t NoConsumersException::REPLY_CODE = AMQP_NO_CONSUMERS;
-const boost::uint16_t AccessRefusedException::REPLY_CODE = AMQP_ACCESS_REFUSED;
-const boost::uint16_t NotFoundException::REPLY_CODE = AMQP_NOT_FOUND;
-const boost::uint16_t ResourceLockedException::REPLY_CODE =
+const uint16_t NoRouteException::REPLY_CODE = AMQP_NO_ROUTE;
+const uint16_t NoConsumersException::REPLY_CODE = AMQP_NO_CONSUMERS;
+const uint16_t AccessRefusedException::REPLY_CODE = AMQP_ACCESS_REFUSED;
+const uint16_t NotFoundException::REPLY_CODE = AMQP_NOT_FOUND;
+const uint16_t ResourceLockedException::REPLY_CODE =
     AMQP_RESOURCE_LOCKED;
-const boost::uint16_t PreconditionFailedException::REPLY_CODE =
+const uint16_t PreconditionFailedException::REPLY_CODE =
     AMQP_PRECONDITION_FAILED;
-const boost::uint16_t ConnectionForcedException::REPLY_CODE =
+const uint16_t ConnectionForcedException::REPLY_CODE =
     AMQP_CONNECTION_FORCED;
-const boost::uint16_t InvalidPathException::REPLY_CODE = AMQP_INVALID_PATH;
-const boost::uint16_t FrameErrorException::REPLY_CODE = AMQP_FRAME_ERROR;
-const boost::uint16_t SyntaxErrorException::REPLY_CODE = AMQP_SYNTAX_ERROR;
-const boost::uint16_t CommandInvalidException::REPLY_CODE =
+const uint16_t InvalidPathException::REPLY_CODE = AMQP_INVALID_PATH;
+const uint16_t FrameErrorException::REPLY_CODE = AMQP_FRAME_ERROR;
+const uint16_t SyntaxErrorException::REPLY_CODE = AMQP_SYNTAX_ERROR;
+const uint16_t CommandInvalidException::REPLY_CODE =
     AMQP_COMMAND_INVALID;
-const boost::uint16_t ChannelErrorException::REPLY_CODE = AMQP_CHANNEL_ERROR;
-const boost::uint16_t UnexpectedFrameException::REPLY_CODE =
+const uint16_t ChannelErrorException::REPLY_CODE = AMQP_CHANNEL_ERROR;
+const uint16_t UnexpectedFrameException::REPLY_CODE =
     AMQP_UNEXPECTED_FRAME;
-const boost::uint16_t ResourceErrorException::REPLY_CODE = AMQP_RESOURCE_ERROR;
-const boost::uint16_t NotAllowedException::REPLY_CODE = AMQP_NOT_ALLOWED;
-const boost::uint16_t NotImplementedException::REPLY_CODE =
+const uint16_t ResourceErrorException::REPLY_CODE = AMQP_RESOURCE_ERROR;
+const uint16_t NotAllowedException::REPLY_CODE = AMQP_NOT_ALLOWED;
+const uint16_t NotImplementedException::REPLY_CODE =
     AMQP_NOT_IMPLEMENTED;
-const boost::uint16_t InternalErrorException::REPLY_CODE = AMQP_INTERNAL_ERROR;
+const uint16_t InternalErrorException::REPLY_CODE = AMQP_INTERNAL_ERROR;
 
 void AmqpException::Throw(const amqp_rpc_reply_t &reply) {
   assert(reply.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION);
@@ -78,7 +77,7 @@ void AmqpException::Throw(const amqp_rpc_reply_t &reply) {
       throw std::logic_error(
           std::string(
               "Programming error: unknown server exception class/method")
-              .append(boost::lexical_cast<std::string>(reply.reply.id)));
+              .append(std::to_string(reply.reply.id)));
   }
 }
 
@@ -125,7 +124,7 @@ void AmqpException::Throw(const amqp_channel_close_t &reply) {
     default:
       throw std::logic_error(
           std::string("Programming error: unknown channel reply code: ")
-              .append(boost::lexical_cast<std::string>(reply.reply_code)));
+              .append(std::to_string(reply.reply_code)));
   }
 }
 
@@ -187,16 +186,14 @@ void AmqpException::Throw(const amqp_connection_close_t &reply) {
     default:
       throw std::logic_error(
           std::string("Programming error: unknown connection reply code: ")
-              .append(boost::lexical_cast<std::string>(reply.reply_code)));
+              .append(std::to_string(reply.reply_code)));
   }
 }
 
-AmqpException::AmqpException(const std::string &what,
-                             const std::string &reply_text,
-                             boost::uint16_t class_id,
-                             boost::uint16_t method_id) throw()
-    : std::runtime_error(what),
-      m_reply_text(reply_text),
-      m_class_id(class_id),
-      m_method_id(method_id) {}
+AmqpException::AmqpException(const std::string &what, const std::string &reply_text, uint16_t class_id, uint16_t method_id) throw()
+    :std::runtime_error(what),
+    m_reply_text(reply_text),
+    m_class_id(class_id),
+    m_method_id(method_id)
+{}
 }

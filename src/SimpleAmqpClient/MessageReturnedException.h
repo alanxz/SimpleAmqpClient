@@ -30,8 +30,6 @@
 
 #include "SimpleAmqpClient/BasicMessage.h"
 
-#include <boost/cstdint.hpp>
-
 #include <stdexcept>
 
 #ifdef _MSC_VER
@@ -41,30 +39,42 @@
 
 namespace AmqpClient {
 
-class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
-    : public std::runtime_error {
- public:
-  explicit MessageReturnedException(BasicMessage::ptr_t message,
-                                    boost::uint32_t reply_code,
-                                    const std::string &reply_text,
-                                    const std::string &exchange,
-                                    const std::string &routing_key) throw();
+class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException : public std::runtime_error{
+
+public:
+    explicit MessageReturnedException(BasicMessage::ptr_t message, uint32_t reply_code, const std::string &reply_text,
+                                      const std::string &exchange, const std::string &routing_key) throw();
 
   virtual ~MessageReturnedException() throw() {}
 
-  BasicMessage::ptr_t message() const throw() { return m_message; }
-  boost::uint32_t reply_code() const throw() { return m_reply_code; }
-  std::string reply_text() const throw() { return m_reply_text; }
-  std::string exchange() const throw() { return m_exchange; }
-  std::string routing_key() const throw() { return m_routing_key; }
+    BasicMessage::ptr_t message() const throw()
+    {
+        return m_message;
+    }
+    uint32_t reply_code() const throw()
+    {
+        return m_reply_code;
+    }
+    std::string reply_text() const throw()
+    {
+        return m_reply_text;}
 
- private:
-  BasicMessage::ptr_t m_message;
-  boost::uint32_t m_reply_code;
-  std::string m_reply_text;
-  std::string m_exchange;
-  std::string m_routing_key;
-  mutable std::string m_what;
+    std::string exchange() const throw()
+    {
+        return m_exchange;}
+
+    std::string routing_key() const throw()
+    {
+        return m_routing_key;
+    }
+
+private:
+    BasicMessage::ptr_t m_message;
+    uint32_t m_reply_code;
+    std::string m_reply_text;
+    std::string m_exchange;
+    std::string m_routing_key;
+    mutable std::string m_what;
 };
 
 }  // namespace AmqpClient

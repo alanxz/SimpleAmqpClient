@@ -28,9 +28,8 @@
 
 #include "connected_test.h"
 
-#include <boost/variant/get.hpp>
-
 #include <algorithm>
+#include <variant>
 
 using namespace AmqpClient;
 
@@ -38,42 +37,42 @@ TEST(table_value, void_value) {
   TableValue value;
   EXPECT_EQ(TableValue::VT_void, value.GetType());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set();
   EXPECT_EQ(TableValue::VT_void, value.GetType());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, bool_value) {
@@ -84,447 +83,447 @@ TEST(table_value, bool_value) {
   EXPECT_EQ(TableValue::VT_bool, value.GetType());
 
   EXPECT_EQ(v1, value.GetBool());
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_bool, value.GetType());
 
   EXPECT_EQ(v2, value.GetBool());
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, uint8_value) {
-  boost::uint8_t v1 = 1;
-  boost::uint8_t v2 = 2;
+  uint8_t v1 = 1;
+  uint8_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint8, value.GetType());
   EXPECT_EQ(v1, value.GetUint8());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_uint8, value.GetType());
   EXPECT_EQ(v2, value.GetUint8());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, int8_value) {
-  boost::int8_t v1 = 1;
-  boost::int8_t v2 = 2;
+  int8_t v1 = 1;
+  int8_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int8, value.GetType());
   EXPECT_EQ(v1, value.GetInt8());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_int8, value.GetType());
   EXPECT_EQ(v2, value.GetInt8());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, uint16_value) {
-  boost::uint16_t v1 = 1;
-  boost::uint16_t v2 = 2;
+  uint16_t v1 = 1;
+  uint16_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint16, value.GetType());
   EXPECT_EQ(v1, value.GetUint16());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_uint16, value.GetType());
   EXPECT_EQ(v2, value.GetUint16());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, int16_value) {
-  boost::int16_t v1 = 1;
-  boost::int16_t v2 = 2;
+  int16_t v1 = 1;
+  int16_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int16, value.GetType());
   EXPECT_EQ(v1, value.GetInt16());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_int16, value.GetType());
   EXPECT_EQ(v2, value.GetInt16());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, uint32_value) {
-  boost::uint32_t v1 = 1;
-  boost::uint32_t v2 = 2;
+  uint32_t v1 = 1;
+  uint32_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint32, value.GetType());
   EXPECT_EQ(v1, value.GetUint32());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_uint32, value.GetType());
   EXPECT_EQ(v2, value.GetUint32());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, int32_value) {
-  boost::int32_t v1 = 1;
-  boost::int32_t v2 = 2;
+  int32_t v1 = 1;
+  int32_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int32, value.GetType());
   EXPECT_EQ(v1, value.GetInt32());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_int32, value.GetType());
   EXPECT_EQ(v2, value.GetInt32());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, uint64_value) {
-  boost::uint64_t v1 = 1;
-  boost::uint64_t v2 = 2;
+  uint64_t v1 = 1;
+  uint64_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint64, value.GetType());
   EXPECT_EQ(v1, value.GetUint64());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_uint64, value.GetType());
   EXPECT_EQ(v2, value.GetUint64());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, uint64_value_larger_than_int64_max) {
-  const boost::uint64_t maxInt64 = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
-  boost::uint64_t v1 = maxInt64 + 1;
-  boost::uint64_t v2 = maxInt64 + 2;
+  const uint64_t maxInt64 = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+  uint64_t v1 = maxInt64 + 1;
+  uint64_t v2 = maxInt64 + 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint64, value.GetType());
   EXPECT_EQ(v1, value.GetUint64());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
   EXPECT_THROW(value.GetInteger(), std::overflow_error);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_uint64, value.GetType());
   EXPECT_EQ(v2, value.GetUint64());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
   EXPECT_THROW(value.GetInteger(), std::overflow_error);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, int64_value) {
-  boost::int64_t v1 = 1;
-  boost::int64_t v2 = 2;
+  int64_t v1 = 1;
+  int64_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int64, value.GetType());
   EXPECT_EQ(v1, value.GetInt64());
   EXPECT_EQ(v1, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_int64, value.GetType());
   EXPECT_EQ(v2, value.GetInt64());
   EXPECT_EQ(v2, value.GetInteger());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, float_value) {
@@ -536,40 +535,40 @@ TEST(table_value, float_value) {
   EXPECT_EQ(v1, value.GetFloat());
   EXPECT_EQ(v1, value.GetReal());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_float, value.GetType());
   EXPECT_EQ(v2, value.GetFloat());
   EXPECT_EQ(v2, value.GetReal());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, double_value) {
@@ -581,40 +580,40 @@ TEST(table_value, double_value) {
   EXPECT_EQ(v1, value.GetDouble());
   EXPECT_EQ(v1, value.GetReal());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_double, value.GetType());
   EXPECT_EQ(v2, value.GetDouble());
   EXPECT_EQ(v2, value.GetReal());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, string_value) {
@@ -625,41 +624,41 @@ TEST(table_value, string_value) {
   EXPECT_EQ(TableValue::VT_string, value.GetType());
   EXPECT_EQ(v1, value.GetString());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_string, value.GetType());
   EXPECT_EQ(v2, value.GetString());
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, array_value) {
@@ -675,21 +674,21 @@ TEST(table_value, array_value) {
   EXPECT_TRUE(v1.size() == v1a.size());
   EXPECT_TRUE(std::equal(v1.begin(), v1.end(), v1a.begin()));
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_array, value.GetType());
@@ -697,21 +696,21 @@ TEST(table_value, array_value) {
   EXPECT_TRUE(v2.size() == v2a.size());
   EXPECT_TRUE(std::equal(v2.begin(), v2.end(), v2a.begin()));
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetTable(), std::bad_variant_access);
 }
 
 TEST(table_value, table_value) {
@@ -727,21 +726,21 @@ TEST(table_value, table_value) {
   EXPECT_TRUE(v1.size() == v1a.size());
   EXPECT_TRUE(std::equal(v1.begin(), v1.end(), v1a.begin()));
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
 
   value.Set(v2);
   EXPECT_EQ(TableValue::VT_table, value.GetType());
@@ -749,21 +748,21 @@ TEST(table_value, table_value) {
   EXPECT_TRUE(v2.size() == v2a.size());
   EXPECT_TRUE(std::equal(v2.begin(), v2.end(), v2a.begin()));
 
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
+  EXPECT_THROW(value.GetBool(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt8(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt16(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt32(), std::bad_variant_access);
+  EXPECT_THROW(value.GetUint64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInt64(), std::bad_variant_access);
+  EXPECT_THROW(value.GetInteger(), std::bad_variant_access);
+  EXPECT_THROW(value.GetFloat(), std::bad_variant_access);
+  EXPECT_THROW(value.GetDouble(), std::bad_variant_access);
+  EXPECT_THROW(value.GetReal(), std::bad_variant_access);
+  EXPECT_THROW(value.GetString(), std::bad_variant_access);
+  EXPECT_THROW(value.GetArray(), std::bad_variant_access);
 }
 
 TEST(table_value, equality) {

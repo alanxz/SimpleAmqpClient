@@ -31,12 +31,8 @@
 #include "SimpleAmqpClient/Table.h"
 #include "SimpleAmqpClient/Util.h"
 
-#include <boost/cstdint.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
 #include <string>
+#include <memory>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -52,16 +48,16 @@ namespace Detail {
 class BasicMessageImpl;
 }
 
-class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
- public:
-  typedef boost::shared_ptr<BasicMessage> ptr_t;
+class SIMPLEAMQPCLIENT_EXPORT BasicMessage : Noncopyable {
+public:
+    typedef std::shared_ptr<BasicMessage> ptr_t;
 
   enum delivery_mode_t { dm_nonpersistent = 1, dm_persistent = 2 };
 
   /**
     * Create a new empty BasicMessage object
     */
-  static ptr_t Create() { return boost::make_shared<BasicMessage>(); }
+  static ptr_t Create() { return std::make_shared<BasicMessage>(); }
 
   /**
     * Create a new BasicMessage object
@@ -70,7 +66,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     * @returns a new BasicMessage object
     */
   static ptr_t Create(const std::string &body) {
-    return boost::make_shared<BasicMessage>(body);
+    return std::make_shared<BasicMessage>(body);
   }
 
   /**
@@ -85,7 +81,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     */
   static ptr_t Create(amqp_bytes_t_ &body,
                       amqp_basic_properties_t_ *properties) {
-    return boost::make_shared<BasicMessage>(body, properties);
+    return std::make_shared<BasicMessage>(body, properties);
   }
 
   BasicMessage();
@@ -177,22 +173,22 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     */
   void DeliveryModeClear();
 
-  /**
-    * Gets the priority property
-    */
-  boost::uint8_t Priority() const;
-  /**
-    * Sets the priority property
-    */
-  void Priority(boost::uint8_t priority);
-  /**
-    * Determines whether the priority property is set
-    */
-  bool PriorityIsSet() const;
-  /**
-    * Unsets the priority property if it is set
-    */
-  void PriorityClear();
+    /**
+      * Gets the priority property
+      */
+    uint8_t Priority() const;
+    /**
+      * Sets the priority property
+      */
+    void Priority(uint8_t priority);
+    /**
+      * Determines whether the priority property is set
+      */
+    bool PriorityIsSet() const;
+    /**
+      * Unsets the priority property if it is set
+      */
+    void PriorityClear();
 
   /**
     * Gets the correlation id property
@@ -262,22 +258,22 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     */
   void MessageIdClear();
 
-  /**
-    * Gets the timestamp property
-    */
-  boost::uint64_t Timestamp() const;
-  /**
-    * Sets the timestamp property
-    */
-  void Timestamp(boost::uint64_t timestamp);
-  /**
-    * Determines whether the timestamp property is set
-    */
-  bool TimestampIsSet() const;
-  /**
-    * Unsets the timestamp property
-    */
-  void TimestampClear();
+    /**
+      * Gets the timestamp property
+      */
+    uint64_t Timestamp() const;
+    /**
+      * Sets the timestamp property
+      */
+    void Timestamp(uint64_t timestamp);
+    /**
+      * Determines whether the timestamp property is set
+      */
+    bool TimestampIsSet() const;
+    /**
+      * Unsets the timestamp property
+      */
+    void TimestampClear();
 
   /**
     * Gets the type property
@@ -364,8 +360,9 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     */
   void HeaderTableClear();
 
- protected:
-  boost::scoped_ptr<Detail::BasicMessageImpl> m_impl;
+
+protected:
+    std::unique_ptr<Detail::BasicMessageImpl> m_impl;
 };
 
 }  // namespace AmqpClient
