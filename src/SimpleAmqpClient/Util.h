@@ -38,14 +38,6 @@ private:
     Noncopyable& operator=(const Noncopyable&) = delete;
 };
 
-#ifdef WIN32
-#ifdef SimpleAmqpClient_EXPORTS
-#define SIMPLEAMQPCLIENT_EXPORT __declspec(dllexport)
-#else
-#define SIMPLEAMQPCLIENT_EXPORT __declspec(dllimport)
-#endif
-#else
 #define SIMPLEAMQPCLIENT_EXPORT
-#endif
 
 #endif  // SIMPLEAMQPCLIENT_UTIL_H

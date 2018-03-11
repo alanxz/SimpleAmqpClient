@@ -152,7 +152,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
     const array_t &value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_ARRAY;
-  v.value.array.num_entries = value.size();
+  v.value.array.num_entries = static_cast<int>(value.size());
   v.value.array.entries = (amqp_field_value_t *)amqp_pool_alloc(
       &pool, sizeof(amqp_field_value_t) * value.size());
   if (NULL == v.value.array.entries) {
@@ -197,7 +197,7 @@ amqp_table_t TableValueImpl::CreateAmqpTableInner(const Table &table,
                                                   amqp_pool_t &pool) {
   amqp_table_t new_table;
 
-  new_table.num_entries = table.size();
+  new_table.num_entries = static_cast<int>(table.size());
 
   new_table.entries = (amqp_table_entry_t *)amqp_pool_alloc(
       &pool, sizeof(amqp_table_entry_t) * table.size());

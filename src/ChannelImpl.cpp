@@ -48,6 +48,7 @@
 #include <chrono>
 #include <cassert>
 #include <sstream>
+#include <array>
 
 #define BROKER_HEARTBEAT 0
 
@@ -106,7 +107,7 @@ amqp_channel_t ChannelImpl::GetNextChannelId() {
     unused_channel = m_channels.end() - 1;
   }
 
-  return unused_channel - m_channels.begin();
+  return static_cast<amqp_channel_t>(unused_channel - m_channels.begin());
 }
 
 amqp_channel_t ChannelImpl::CreateNewChannel() {
@@ -145,7 +146,7 @@ amqp_channel_t ChannelImpl::GetChannel() {
   }
 
   *it = CS_Used;
-  return it - m_channels.begin();
+  return static_cast<amqp_channel_t>(it - m_channels.begin());
 }
 
 void ChannelImpl::ReturnChannel(amqp_channel_t channel) {

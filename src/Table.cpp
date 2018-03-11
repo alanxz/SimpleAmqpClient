@@ -183,7 +183,7 @@ int64_t TableValue::GetInteger() const {
     case VT_uint64:
     {
       const uint64_t value = GetUint64();
-      if (value > std::numeric_limits<int64_t>::max())
+      if (value > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
         throw std::overflow_error(
           "Result of GetUint64() is out of range.");
       return value;
