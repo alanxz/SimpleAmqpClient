@@ -67,7 +67,12 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
-    std::shared_ptr<char> uri_dup = std::shared_ptr<char>(_strdup(uri.c_str()), free);
+    std::shared_ptr<char> uri_dup;
+#if defined(WIN32)
+    uri_dup = std::shared_ptr<char>(_strdup(uri.c_str()), free);
+#else
+    uri_dup = std::shared_ptr<char>(strdup(uri.c_str()), free);
+#endif
 
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();
@@ -85,9 +90,13 @@ Channel::ptr_t Channel::CreateSecureFromUri(
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
-  std::shared_ptr<char> uri_dup =
-      std::shared_ptr<char>(_strdup(uri.c_str()), free);
-
+    std::shared_ptr<char> uri_dup;
+#if defined(WIN32)
+    uri_dup = std::shared_ptr<char>(_strdup(uri.c_str()), free);
+#else
+    uri_dup = std::shared_ptr<char>(strdup(uri.c_str()), free);
+#endif
+    
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();
   }
