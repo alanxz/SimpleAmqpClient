@@ -193,7 +193,7 @@ amqp_table_t TableValueImpl::CreateAmqpTable(const Table &table,
     return AMQP_EMPTY_TABLE;
   }
 
-  pool = boost::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
+  pool = std::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
   init_amqp_pool(pool.get(), 1024);
 
   return CreateAmqpTableInner(table, *pool.get());
@@ -298,7 +298,7 @@ amqp_table_t TableValueImpl::CopyTable(const amqp_table_t &table,
     return AMQP_EMPTY_TABLE;
   }
 
-  pool = boost::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
+  pool = std::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
   init_amqp_pool(pool.get(), 1024);
 
   return CopyTableInner(table, *pool.get());

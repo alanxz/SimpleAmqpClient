@@ -34,10 +34,10 @@
 #include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -58,7 +58,7 @@ class ChannelImpl;
   */
 class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
  public:
-  typedef boost::shared_ptr<Channel> ptr_t;
+  typedef std::shared_ptr<Channel> ptr_t;
 
   static const std::string EXCHANGE_TYPE_DIRECT;
   static const std::string EXCHANGE_TYPE_FANOUT;
@@ -87,8 +87,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                       const std::string &username = "guest",
                       const std::string &password = "guest",
                       const std::string &vhost = "/", int frame_max = 131072) {
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max);
+    return std::make_shared<Channel>(host, port, username, password, vhost,
+                                     frame_max);
   }
 
  protected:
@@ -141,8 +141,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     ssl_params.path_to_client_cert = path_to_client_cert;
     ssl_params.verify_hostname = verify_hostname;
 
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max, ssl_params);
+    return std::make_shared<Channel>(host, port, username, password, vhost,
+                                     frame_max, ssl_params);
   }
 
   /**
@@ -532,12 +532,15 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * overload
    * doesn't require the Envelope object to Acknowledge
    *
-   * Note that ack'ing multiple message is scoped messages delivered on a given AMQP channel.
-   * SimpleAmqpClient uses one channel per consumer, so multiple ack means all un-ack'd messages
+   * Note that ack'ing multiple message is scoped messages delivered on a given
+   * AMQP channel.
+   * SimpleAmqpClient uses one channel per consumer, so multiple ack means all
+   * un-ack'd messages
    * up to and including the current message id for a given consumer.
    *
    * @param delivery_info
-   * @param multiple if true, ack all messages up to this delivery tag, if false ack only this delivery tag
+   * @param multiple if true, ack all messages up to this delivery tag, if false
+   * ack only this delivery tag
    */
   void BasicAck(const Envelope::DeliveryInfo &info, bool multiple);
 

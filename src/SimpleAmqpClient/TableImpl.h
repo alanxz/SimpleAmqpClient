@@ -31,9 +31,9 @@
 #include "SimpleAmqpClient/Table.h"
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/variant/variant.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -42,7 +42,7 @@
 namespace AmqpClient {
 namespace Detail {
 
-typedef boost::shared_ptr<amqp_pool_t> amqp_pool_ptr_t;
+typedef std::shared_ptr<amqp_pool_t> amqp_pool_ptr_t;
 
 struct void_t {};
 

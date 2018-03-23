@@ -55,9 +55,9 @@ instance of this class.
 
     AmqpClient::Channel::ptr_t connection = AmqpClient::Channel::Create("localhost");
 
-All classes have a typedef ptr_t which is equivalent to boost::shared_ptr<> of the 
+All classes have a typedef ptr_t which is equivalent to std::shared_ptr<> of the
 containing class.  All classes also have a Create() method does the job creating a new
-ptr_t using boost::make_shared<>(). It is recommended that you use these methods
+ptr_t using std::make_shared<>(). It is recommended that you use these methods
 to construct objects in the library.
 
 Commands dealing with declaring/binding/unbinding/deleting exchanges and queues are

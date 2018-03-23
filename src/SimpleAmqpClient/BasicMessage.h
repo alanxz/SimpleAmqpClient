@@ -32,10 +32,10 @@
 #include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+
+#include <memory>
 #include <string>
 
 #ifdef _MSC_VER
@@ -54,14 +54,14 @@ class BasicMessageImpl;
 
 class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
  public:
-  typedef boost::shared_ptr<BasicMessage> ptr_t;
+  typedef std::shared_ptr<BasicMessage> ptr_t;
 
   enum delivery_mode_t { dm_nonpersistent = 1, dm_persistent = 2 };
 
   /**
     * Create a new empty BasicMessage object
     */
-  static ptr_t Create() { return boost::make_shared<BasicMessage>(); }
+  static ptr_t Create() { return std::make_shared<BasicMessage>(); }
 
   /**
     * Create a new BasicMessage object
@@ -70,7 +70,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     * @returns a new BasicMessage object
     */
   static ptr_t Create(const std::string &body) {
-    return boost::make_shared<BasicMessage>(body);
+    return std::make_shared<BasicMessage>(body);
   }
 
   /**
@@ -85,7 +85,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     */
   static ptr_t Create(amqp_bytes_t_ &body,
                       amqp_basic_properties_t_ *properties) {
-    return boost::make_shared<BasicMessage>(body, properties);
+    return std::make_shared<BasicMessage>(body, properties);
   }
 
   BasicMessage();
