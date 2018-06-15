@@ -192,6 +192,12 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   virtual ~Channel();
 
   /**
+    * Exposes the underlying socket handle
+    * @returns file descriptor number associated with the connection socket
+    */
+  int GetSocketFD() const;
+
+  /**
     * Declares an exchange
     * Creates an exchange on the AMQP broker if it does not already exist
     * @param exchange_name the name of the exchange
