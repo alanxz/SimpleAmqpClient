@@ -200,7 +200,7 @@ Channel::~Channel() {
   amqp_destroy_connection(m_impl->m_connection);
 }
 
-int Channel::GetSocketFD() {
+int Channel::GetSocketFD() const {
   return amqp_get_sockfd(m_impl->m_connection);
 }
 
