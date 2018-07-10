@@ -200,6 +200,10 @@ Channel::~Channel() {
   amqp_destroy_connection(m_impl->m_connection);
 }
 
+int Channel::GetSocketFD() const {
+  return amqp_get_sockfd(m_impl->m_connection);
+}
+
 void Channel::DeclareExchange(const std::string &exchange_name,
                               const std::string &exchange_type, bool passive,
                               bool durable, bool auto_delete) {

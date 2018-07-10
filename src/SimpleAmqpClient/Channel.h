@@ -192,6 +192,19 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   virtual ~Channel();
 
   /**
+    * Exposes the underlying socket handle
+    * @returns file descriptor number associated with the connection socket
+    *
+    * @warning This function exposes an internal implementation detail
+    * of SimpleAmqpClient. Manipulating the socket descriptor will result in
+    * undefined behavior of the library. Additionally SimpleAmqpClient's use of
+    * the socket will change depending on what version of rabbitmq-c and
+    * SimpleAmqpClient are used. Test carefully before depending on any specific
+    * behavior.
+    */
+  int GetSocketFD() const;
+
+  /**
     * Declares an exchange
     * Creates an exchange on the AMQP broker if it does not already exist
     * @param exchange_name the name of the exchange
