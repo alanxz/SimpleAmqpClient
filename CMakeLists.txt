@@ -69,10 +69,16 @@ if (WIN32)
 endif ()
 
 option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
+option(STATIC_RUNTIME "Select static runtime" OFF)
 
-if (WIN32 AND NOT BUILD_SHARED_LIBS)
-  message(FATAL_ERROR "The SimpleAmqpClient library cannot be built as a static library on Win32. Set BUILD_SHARED_LIBS=ON to get around this.")
+include(ucm)
+
+if(STATIC_RUNTIME)
+  ucm_set_runtime(STATIC)
+else()
+  ucm_set_runtime(DYNAMIC)
 endif()
+
 
 SET(SAC_LIB_SRCS
     src/SimpleAmqpClient/SimpleAmqpClient.h
@@ -90,6 +96,7 @@ SET(SAC_LIB_SRCS
     src/BasicMessage.cpp
 
     src/SimpleAmqpClient/Util.h
+    ${PROJECT_BINARY_DIR}/SimpleAmqpClient/${PROJECT_NAME}_export.h
 
     src/SimpleAmqpClient/AmqpLibraryException.h
     src/AmqpLibraryException.cpp
@@ -123,6 +130,13 @@ if (WIN32)
 else ()
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} SOVERSION ${SAC_SOVERSION})
 endif ()
+
+include(GenerateExportHeader)
+
+generate_export_header(${PROJECT_NAME}
+  EXPORT_MACRO_NAME SIMPLEAMQPCLIENT_EXPORT
+  EXPORT_FILE_NAME SimpleAmqpClient/SimpleAmqpClient_export.h
+  )
 
 # Some smoke tests:
 
@@ -178,6 +192,7 @@ INSTALL(FILES
     src/SimpleAmqpClient/Table.h
     src/SimpleAmqpClient/Util.h
     src/SimpleAmqpClient/Version.h
+    ${PROJECT_BINARY_DIR}/SimpleAmqpClient/${PROJECT_NAME}_export.h
     DESTINATION include/SimpleAmqpClient
     )
 
