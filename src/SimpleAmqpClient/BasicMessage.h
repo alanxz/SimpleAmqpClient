@@ -43,6 +43,9 @@
 #pragma warning(disable : 4275 4251)
 #endif
 
+/// @file SimpleAmqpClient/BasicMessage.h
+/// The AmqpClient::BasicMessage class is defined in this header file.
+
 struct amqp_bytes_t_;
 struct amqp_basic_properties_t_;
 
@@ -52,10 +55,15 @@ namespace Detail {
 class BasicMessageImpl;
 }
 
+/**
+ * An AMQP BasicMessage
+ */
 class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
  public:
+  /// A shared pointer to BasicMessage
   typedef boost::shared_ptr<BasicMessage> ptr_t;
 
+  /// With durable queues, messages can be requested to persist or not
   enum delivery_mode_t { dm_nonpersistent = 1, dm_persistent = 2 };
 
   /**
@@ -64,8 +72,8 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
   static ptr_t Create() { return boost::make_shared<BasicMessage>(); }
 
   /**
-   * Create a new BasicMessage object
-   * Creates a new BasicMessage object with a given body
+   * Create a new BasicMessage object with given body
+   *
    * @param body the message body.
    * @returns a new BasicMessage object
    */
@@ -74,13 +82,13 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
   }
 
   /**
-   * Create a new BasicMessage object
-   * Creates a new BasicMessage object with a given body, properties
-   * @param body the message body. The message body is NOT duplicated.
+   * Create a new BasicMessage object with given body and properties
+   *
+   * @param body The message body. The message body is NOT copied.
    * Passed in message body is deallocated when: body is set or message is
    * destructed.
-   * @properties the amqp_basic_properties_t struct. Note this makes a deep
-   * copy of the properties struct
+   * @param properties The `amqp_basic_properties_t struct`. Note this makes a deep
+   * copy of the properties struct.
    * @returns a new BasicMessage object
    */
   static ptr_t Create(amqp_bytes_t_ &body,
@@ -88,8 +96,11 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
     return boost::make_shared<BasicMessage>(body, properties);
   }
 
+  /// Construct empty BasicMessage
   BasicMessage();
+  /// Construct BasicMessage with given body
   BasicMessage(const std::string &body);
+  /// Construct BasicMessage with given body and properties
   BasicMessage(const amqp_bytes_t_ &body,
                const amqp_basic_properties_t_ *properties);
 
@@ -108,6 +119,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
    * @returns the amqp_basic_properties_t* struct
    */
   const amqp_basic_properties_t_ *getAmqpProperties() const;
+
   /**
    * INTERNAL INTERFACE: Gets the amqp_bytes_t representation of the message
    * body
@@ -348,11 +360,11 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
   void ClusterIdClear();
 
   /**
-   * Gets the cluster id property
+   * Gets the header table property
    */
   Table HeaderTable() const;
   /**
-   * Sets the custer id property
+   * Sets the header table property
    */
   void HeaderTable(const Table &header_table);
   /**
@@ -360,11 +372,12 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
    */
   bool HeaderTableIsSet() const;
   /**
-   * Unsets the cluster id property
+   * Unsets the header table property
    */
   void HeaderTableClear();
 
  protected:
+  /// PIMPL idiom
   boost::scoped_ptr<Detail::BasicMessageImpl> m_impl;
 };
 

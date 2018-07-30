@@ -37,13 +37,23 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
+/// @file SimpleAmqpClient/ConsumerTagNotFoundException.h
+/// Defines AmqpClient::ConsumerTagNotFoundException
+
 namespace AmqpClient {
 
+/**
+ * "Consumer tag not found" exception
+ *
+ * @see BasicConsume
+ */
 class SIMPLEAMQPCLIENT_EXPORT ConsumerTagNotFoundException
     : public std::runtime_error {
  public:
+  /// Constructor
   ConsumerTagNotFoundException() throw()
       : std::runtime_error("The specified consumer tag is unknown") {}
+  /// Destructor
   virtual ~ConsumerTagNotFoundException() throw() {}
 };
 
