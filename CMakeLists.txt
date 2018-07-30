@@ -169,11 +169,24 @@ endif (ENABLE_TESTING)
 
 
 # Documentation generation
-set(DOXYFILE_LATEX "NO")
-set(PROJECT_VERSION ${SAC_VERSION})
-include(UseDoxygen)
+find_package(Doxygen COMPONENTS dot)
+option(BUILD_API_DOCS "Build Doxygen API docs" ${DOXYGEN_FOUND})
 
-include(GNUInstallDirs)
+if (BUILD_API_DOCS)
+  if (NOT DOXYGEN_FOUND)
+    message(FATAL_ERROR "Doxygen is required to build the API documentation")
+  endif ()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/docs/Doxyfile @ONLY)
+
+  add_custom_target(docs ALL
+    COMMAND ${DOXYGEN_EXECUTABLE}
+    VERBATIM
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs
+    DEPENDS SimpleAmqpClient
+    COMMENT "Generating API documentation"
+    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+    )
+endif ()
 
 install(TARGETS SimpleAmqpClient
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

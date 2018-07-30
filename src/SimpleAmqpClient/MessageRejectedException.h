@@ -39,8 +39,12 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
+/// @file SimpleAmqpClient/MessageReturnedException.h
+/// Defines AmqpClient::MessageReturnedException
+
 namespace AmqpClient {
 
+/// "Message rejected" exception
 class SIMPLEAMQPCLIENT_EXPORT MessageRejectedException
     : public std::runtime_error {
  public:
@@ -50,6 +54,7 @@ class SIMPLEAMQPCLIENT_EXPORT MessageRejectedException
                 .append(boost::lexical_cast<std::string>(delivery_tag))),
         m_delivery_tag(delivery_tag) {}
 
+  /// `delivery_tag` getter
   uint64_t GetDeliverTag() { return m_delivery_tag; }
 
  private:

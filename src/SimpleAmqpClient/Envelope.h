@@ -42,10 +42,17 @@
 #pragma warning(disable : 4275 4251)
 #endif  // _MSC_VER
 
+/// @file SimpleAmqpClient/Envelope.h
+/// The AmqpClient::Envelope class is defined in this header file.
+
 namespace AmqpClient {
 
+/**
+ * A "message envelope" object containing the message body and delivery metadata
+ */
 class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
  public:
+  /// a `shared_ptr` pointer to Envelope
   typedef boost::shared_ptr<Envelope> ptr_t;
 
   /**
@@ -58,6 +65,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
    * @param redelivered a flag indicating whether the message consumed as a
    * result of a redelivery
    * @param routing_key the routing key that the message was published with
+   * @param delivery_channel channel ID of the delivery (see DeliveryInfo)
    * @returns a boost::shared_ptr to an envelope object
    */
   static ptr_t Create(const BasicMessage::ptr_t message,
@@ -71,6 +79,18 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
                                         delivery_channel);
   }
 
+  /**
+   * Construct a new Envelope object
+   * @param message the payload
+   * @param consumer_tag the consumer tag the message was delivered to
+   * @param delivery_tag the delivery tag that the broker assigned to the
+   * message
+   * @param exchange the name of the exchange that the message was published to
+   * @param redelivered a flag indicating whether the message consumed as a
+   * result of a redelivery
+   * @param routing_key the routing key that the message was published with
+   * @param delivery_channel channel ID of the delivery (see DeliveryInfo)
+   */
   explicit Envelope(const BasicMessage::ptr_t message,
                     const std::string &consumer_tag,
                     const boost::uint64_t delivery_tag,
@@ -136,13 +156,33 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
    */
   inline std::string RoutingKey() const { return m_routingKey; }
 
+  /**
+   * Get the delivery channel
+   */
   inline boost::uint16_t DeliveryChannel() const { return m_deliveryChannel; }
 
+  /**
+   * A POD carrier of delivery-tag
+   *
+   * This is server-assigned and channel-specific.
+   *
+   * The delivery tag is valid only within the channel from which the message
+   * was received. I.e. a client MUST NOT receive a message on one channel and
+   * then acknowledge it on another.
+   *
+   * The server MUST NOT use a zero value for delivery tags. Zero is reserved
+   * for client use, meaning "all messages so far received".
+   */
   struct DeliveryInfo {
+    /// A delivery tag, assigned by the broker to identify this delivery within a channel
     boost::uint64_t delivery_tag;
+    /// An ID of the delivery channel
     boost::uint16_t delivery_channel;
   };
 
+  /**
+   * Getter of the delivery-tag
+   */
   inline DeliveryInfo GetDeliveryInfo() const {
     DeliveryInfo info;
     info.delivery_tag = m_deliveryTag;
