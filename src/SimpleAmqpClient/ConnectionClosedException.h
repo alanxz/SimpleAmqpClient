@@ -30,10 +30,17 @@
 
 #include <stdexcept>
 
+/// @file SimpleAmqpClient/ConnectionClosedException.h
+/// Defines AmqpClient::ConnectionClosedException
+
 namespace AmqpClient {
 
+/**
+ * "Connection is closed" exception
+ */
 class ConnectionClosedException : public std::runtime_error {
  public:
+  /// Constructor
   explicit ConnectionClosedException()
       : std::runtime_error("Connection is closed") {}
 };

@@ -43,24 +43,32 @@
 #pragma warning(disable : 4275 4251)
 #endif  // _MSC_VER
 
+/// @file SimpleAmqpClient/Envelope.h
+/// The AmqpClient::Envelope class is defined in this header file.
+
 namespace AmqpClient {
 
+/**
+ * A "message envelope" object containing the message body and delivery metadata
+ */
 class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
  public:
+  /// a `shared_ptr` pointer to Envelope
   typedef boost::shared_ptr<Envelope> ptr_t;
 
   /**
-    * Creates an new envelope object
-    * @param message the payload
-    * @param consumer_tag the consumer tag the message was delivered to
-    * @param delivery_tag the delivery tag that the broker assigned to the
+   * Creates an new envelope object
+   * @param message the payload
+   * @param consumer_tag the consumer tag the message was delivered to
+   * @param delivery_tag the delivery tag that the broker assigned to the
    * message
-    * @param exchange the name of the exchange that the message was published to
-    * @param redelivered a flag indicating whether the message consumed as a
+   * @param exchange the name of the exchange that the message was published to
+   * @param redelivered a flag indicating whether the message consumed as a
    * result of a redelivery
-    * @param routing_key the routing key that the message was published with
-    * @returns a boost::shared_ptr to an envelope object
-    */
+   * @param routing_key the routing key that the message was published with
+   * @param delivery_channel channel ID of the delivery (see DeliveryInfo)
+   * @returns a boost::shared_ptr to an envelope object
+   */
   static ptr_t Create(const BasicMessage::ptr_t message,
                       const std::string &consumer_tag,
                       const boost::uint64_t delivery_tag,
@@ -72,6 +80,18 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
                                         delivery_channel);
   }
 
+  /**
+   * Construct a new Envelope object
+   * @param message the payload
+   * @param consumer_tag the consumer tag the message was delivered to
+   * @param delivery_tag the delivery tag that the broker assigned to the
+   * message
+   * @param exchange the name of the exchange that the message was published to
+   * @param redelivered a flag indicating whether the message consumed as a
+   * result of a redelivery
+   * @param routing_key the routing key that the message was published with
+   * @param delivery_channel channel ID of the delivery (see DeliveryInfo)
+   */
   explicit Envelope(const BasicMessage::ptr_t message,
                     const std::string &consumer_tag,
                     const boost::uint64_t delivery_tag,
@@ -81,69 +101,89 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
 
  public:
   /**
-    * destructor
-    */
+   * destructor
+   */
   virtual ~Envelope();
 
   /**
-    * Get the payload of the envelope
-    *
-    * @returns the message
-    */
+   * Get the payload of the envelope
+   *
+   * @returns the message
+   */
   inline BasicMessage::ptr_t Message() const { return m_message; }
 
   /**
-    * Get the consumer tag for the consumer that delivered the message
-    *
-    * @returns the consumer that delivered the message
-    */
+   * Get the consumer tag for the consumer that delivered the message
+   *
+   * @returns the consumer that delivered the message
+   */
   inline std::string ConsumerTag() const { return m_consumerTag; }
 
   /**
-    * Get the delivery tag for the message.
-    *
-    * The delivery tag is a unique tag for a given message assigned by the
+   * Get the delivery tag for the message.
+   *
+   * The delivery tag is a unique tag for a given message assigned by the
    * broker
-    * This tag is used when Ack'ing a message
-    *
-    * @returns the delivery tag for a message
-    */
+   * This tag is used when Ack'ing a message
+   *
+   * @returns the delivery tag for a message
+   */
   inline boost::uint64_t DeliveryTag() const { return m_deliveryTag; }
 
   /**
-    * Get the name of the exchange that the message was published to
-    *
-    * @returns the name of the exchange the message was published to
-    */
+   * Get the name of the exchange that the message was published to
+   *
+   * @returns the name of the exchange the message was published to
+   */
   inline std::string Exchange() const { return m_exchange; }
 
   /**
-    * Get the flag that indicates whether the message was redelivered
-    *
-    * A flag that indicates whether the message was redelievered means
-    * the broker tried to deliver the message and the client did not Ack
-    * the message, so the message was requeued, or the client asked the broker
-    * to Recover which forced all non-Acked messages to be redelivered
-    *
-    * @return a boolean flag indicating whether the message was redelivered
-    */
+   * Get the flag that indicates whether the message was redelivered
+   *
+   * A flag that indicates whether the message was redelievered means
+   * the broker tried to deliver the message and the client did not Ack
+   * the message, so the message was requeued, or the client asked the broker
+   * to Recover which forced all non-Acked messages to be redelivered
+   *
+   * @return a boolean flag indicating whether the message was redelivered
+   */
   inline bool Redelivered() const { return m_redelivered; }
 
   /**
-    * Get the routing key that the message was published with
-    *
-    * @returns a string containing the routing key the message was published
+   * Get the routing key that the message was published with
+   *
+   * @returns a string containing the routing key the message was published
    * with
-    */
+   */
   inline std::string RoutingKey() const { return m_routingKey; }
 
+  /**
+   * Get the delivery channel
+   */
   inline boost::uint16_t DeliveryChannel() const { return m_deliveryChannel; }
 
+  /**
+   * A POD carrier of delivery-tag
+   *
+   * This is server-assigned and channel-specific.
+   *
+   * The delivery tag is valid only within the channel from which the message
+   * was received. I.e. a client MUST NOT receive a message on one channel and
+   * then acknowledge it on another.
+   *
+   * The server MUST NOT use a zero value for delivery tags. Zero is reserved
+   * for client use, meaning "all messages so far received".
+   */
   struct DeliveryInfo {
+    /// A delivery tag, assigned by the broker to identify this delivery within a channel
     boost::uint64_t delivery_tag;
+    /// An ID of the delivery channel
     boost::uint16_t delivery_channel;
   };
 
+  /**
+   * Getter of the delivery-tag
+   */
   inline DeliveryInfo GetDeliveryInfo() const {
     DeliveryInfo info;
     info.delivery_tag = m_deliveryTag;

@@ -31,17 +31,30 @@
 #include <stdexcept>
 #include <string>
 
+/// @file SimpleAmqpClient/ConsumerCancelledException.h
+/// Defines AmqpClient::ConsumerCancelledException
+
 namespace AmqpClient {
 
+/**
+ * "Consumer was cancelled" exception
+ *
+ * Happens when the server ends a consumer subscription, e.g. when the
+ * subscribed queue is being deleted, or when a client issues basic.cancel
+ * request.
+ */
 class ConsumerCancelledException : public std::runtime_error {
  public:
+  /// Constructor
   explicit ConsumerCancelledException(const std::string &consumer_tag) throw()
       : std::runtime_error(
             std::string("Consumer was cancelled: ").append(consumer_tag)),
         m_consumer_tag(consumer_tag) {}
 
+  /// Destructor
   virtual ~ConsumerCancelledException() throw() {}
 
+  /// Getter of the consumer tag
   std::string GetConsumerTag() const { return m_consumer_tag; }
 
  private:

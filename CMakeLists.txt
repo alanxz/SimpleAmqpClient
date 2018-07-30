@@ -1,5 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+CMAKE_POLICY(SET CMP0057 NEW) #-- enables IF(.. IN_LIST ..)
+
 PROJECT(SimpleAmqpClient)
 
 # Follow all steps below in order to calculate new ABI version when updating the library
@@ -152,9 +154,24 @@ endif (ENABLE_TESTING)
 
 
 # Documentation generation
-SET(DOXYFILE_LATEX "NO")
-SET(PROJECT_VERSION ${SAC_VERSION})
-INCLUDE(UseDoxygen)
+find_package(Doxygen REQUIRED dot)
+option(BUILD_API_DOCS "Build Doxygen API docs" ${DOXYGEN_FOUND})
+
+if (BUILD_API_DOCS)
+  if (NOT DOXYGEN_FOUND)
+    message(FATAL_ERROR "Doxygen is required to build the API documentation")
+  endif ()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/docs/Doxyfile @ONLY)
+
+  add_custom_target(docs ALL
+    COMMAND ${DOXYGEN_EXECUTABLE}
+    VERBATIM
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs
+    DEPENDS SimpleAmqpClient
+    COMMENT "Generating API documentation"
+    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+    )
+endif ()
 
 INSTALL(TARGETS SimpleAmqpClient
     RUNTIME DESTINATION bin

@@ -39,11 +39,16 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
+/// @file SimpleAmqpClient/MessageReturnedException.h
+/// Defines AmqpClient::MessageReturnedException
+
 namespace AmqpClient {
 
+/// "Message returned" exception.
 class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
     : public std::runtime_error {
  public:
+  /// Constructor.
   explicit MessageReturnedException(BasicMessage::ptr_t message,
                                     boost::uint32_t reply_code,
                                     const std::string &reply_text,
@@ -52,10 +57,15 @@ class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
 
   virtual ~MessageReturnedException() throw() {}
 
+  /// `message` getter
   BasicMessage::ptr_t message() const throw() { return m_message; }
+  /// `reply_code` getter
   boost::uint32_t reply_code() const throw() { return m_reply_code; }
+  /// `reply_text` getter
   std::string reply_text() const throw() { return m_reply_text; }
+  /// Exchange name getter
   std::string exchange() const throw() { return m_exchange; }
+  /// Routing key getter
   std::string routing_key() const throw() { return m_routing_key; }
 
  private:
