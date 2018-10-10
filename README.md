@@ -24,7 +24,7 @@ Known to work in the following environments:
 ### Build procedure
 This is a typical cmake project, it should work like most typical cmake projects:
 
-In a sibiling directory to where you extracted the source code:
+In a sibling directory to where you extracted the source code:
 
     mkdir simpleamqpclient-build
     cd simpleamqpclient-build
@@ -50,7 +50,7 @@ Will include all the headers necessary to use the library.
 The corresponding library is SimpleAmqpClient
 
 The main interface to the library is the AmqpClient::Channel class.  It represents
-a connection to an AMQP broker, the connection is established on contruction of an
+a connection to an AMQP broker, the connection is established on construction of an
 instance of this class.
 
     AmqpClient::Channel::ptr_t connection = AmqpClient::Channel::Create("localhost");
