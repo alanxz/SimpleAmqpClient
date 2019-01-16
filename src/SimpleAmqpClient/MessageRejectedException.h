@@ -1,5 +1,5 @@
-#ifndef SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
-#define SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
+#ifndef SIMPLEAMQPCLIENT_MESSAGEREJECTEDEXCEPTION_H
+#define SIMPLEAMQPCLIENT_MESSAGEREJECTEDEXCEPTION_H
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT
@@ -28,16 +28,38 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/AmqpException.h"
-#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
-#include "SimpleAmqpClient/BasicMessage.h"
-#include "SimpleAmqpClient/Channel.h"
-#include "SimpleAmqpClient/ConnectionClosedException.h"
-#include "SimpleAmqpClient/ConsumerCancelledException.h"
-#include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
-#include "SimpleAmqpClient/Envelope.h"
-#include "SimpleAmqpClient/MessageReturnedException.h"
-#include "SimpleAmqpClient/MessageRejectedException.h"
-#include "SimpleAmqpClient/Version.h"
+#include <boost/cstdint.hpp>
+#include <boost/lexical_cast.hpp>
+#include <stdexcept>
 
-#endif  // SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H
+#include "SimpleAmqpClient/BasicMessage.h"
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251 4275)
+#endif
+
+namespace AmqpClient {
+
+class SIMPLEAMQPCLIENT_EXPORT MessageRejectedException
+    : public std::runtime_error {
+ public:
+  MessageRejectedException(uint64_t delivery_tag)
+      : std::runtime_error(
+            std::string("Message rejected: ")
+                .append(boost::lexical_cast<std::string>(delivery_tag))),
+        m_delivery_tag(delivery_tag) {}
+
+  uint64_t GetDeliverTag() { return m_delivery_tag; }
+
+ private:
+  uint64_t m_delivery_tag;
+};
+
+}  // namespace AmqpClient
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#endif  // SIMPLEAMQPCLIENT_MESSAGEREJECTEDEXCEPTION_H
