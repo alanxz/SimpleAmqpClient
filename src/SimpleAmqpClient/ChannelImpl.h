@@ -72,7 +72,7 @@ public:
     bool GetNextFrameFromBroker(amqp_frame_t &frame, boost::chrono::microseconds timeout);
 
     bool CheckForQueuedMessageOnChannel(amqp_channel_t message_on_channel) const;
-    void AddToFrameQueue(const amqp_frame_t &frame);
+    void AddToFrameQueue(const amqp_frame_t &frame, boost::chrono::microseconds timeout);
 
     template <class ChannelListType>
     bool GetNextFrameFromBrokerOnChannel(const ChannelListType channels, amqp_frame_t &frame_out,
@@ -106,7 +106,7 @@ public:
             }
             else
             {
-                AddToFrameQueue(frame);
+                AddToFrameQueue(frame, timeout_left);
             }
 
             if (timeout != boost::chrono::microseconds::max())

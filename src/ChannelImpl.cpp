@@ -371,7 +371,7 @@ bool ChannelImpl::CheckForQueuedMessageOnChannel(amqp_channel_t channel) const
     return true;
 }
 
-void ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame)
+void ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame, boost::chrono::microseconds timeout)
 {
     m_frame_queue.push_back(frame);
 
@@ -379,7 +379,7 @@ void ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame)
     {
         boost::array<amqp_channel_t, 1> channel = {{frame.channel}};
         Envelope::ptr_t envelope;
-        if (!ConsumeMessageOnChannelInner(channel, envelope, -1))
+        if (!ConsumeMessageOnChannelInner(channel, envelope, boost::chrono::duration_cast<boost::chrono::milliseconds>(timeout).count()))
         {
             throw std::logic_error("ConsumeMessageOnChannelInner returned false unexpectedly");
         }
