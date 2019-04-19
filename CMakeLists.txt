@@ -156,10 +156,12 @@ SET(DOXYFILE_LATEX "NO")
 SET(PROJECT_VERSION ${SAC_VERSION})
 INCLUDE(UseDoxygen)
 
+INCLUDE(GNUInstallDirs)
+
 INSTALL(TARGETS SimpleAmqpClient
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
 INSTALL(FILES
@@ -183,7 +185,7 @@ INSTALL(FILES
 
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}")
-set(libdir "\${exec_prefix}/lib")
+set(libdir ${CMAKE_INSTALL_LIBDIR})
 set(includedir "\${prefix}/include")
 
 foreach(_lib ${Boost_LIBRARIES})
@@ -203,5 +205,5 @@ configure_file(libSimpleAmqpClient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAm
 
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAmqpClient.pc
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
     )
