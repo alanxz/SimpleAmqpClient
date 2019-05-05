@@ -32,10 +32,9 @@
 #include "SimpleAmqpClient/Util.h"
 
 #include <boost/cstdint.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 
+#include <memory>
 #include <string>
 
 #ifdef _MSC_VER
@@ -47,7 +46,7 @@ namespace AmqpClient {
 
 class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
  public:
-  typedef boost::shared_ptr<Envelope> ptr_t;
+  typedef std::shared_ptr<Envelope> ptr_t;
 
   /**
     * Creates an new envelope object
@@ -59,7 +58,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
     * @param redelivered a flag indicating whether the message consumed as a
    * result of a redelivery
     * @param routing_key the routing key that the message was published with
-    * @returns a boost::shared_ptr to an envelope object
+    * @returns a std::shared_ptr to an envelope object
     */
   static ptr_t Create(const BasicMessage::ptr_t message,
                       const std::string &consumer_tag,
@@ -67,9 +66,9 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
                       const std::string &exchange, bool redelivered,
                       const std::string &routing_key,
                       const boost::uint16_t delivery_channel) {
-    return boost::make_shared<Envelope>(message, consumer_tag, delivery_tag,
-                                        exchange, redelivered, routing_key,
-                                        delivery_channel);
+    return std::make_shared<Envelope>(message, consumer_tag, delivery_tag,
+                                      exchange, redelivered, routing_key,
+                                      delivery_channel);
   }
 
   explicit Envelope(const BasicMessage::ptr_t message,
