@@ -108,7 +108,7 @@ SET(SAC_LIB_SRCS
     src/TableImpl.cpp
     )
 
-ADD_LIBRARY(SimpleAmqpClient STATIC ${SAC_LIB_SRCS})
+ADD_LIBRARY(SimpleAmqpClient SHARED ${SAC_LIB_SRCS})
 TARGET_LINK_LIBRARIES(SimpleAmqpClient CONAN_PKG::rabbitmq-c ${SOCKET_LIBRARY})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
