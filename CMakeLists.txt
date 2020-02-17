@@ -32,7 +32,7 @@ string(REGEX MATCH "[0-9]+" _API_VERSION_PATCH ${_API_VERSION_PATCH})
 
 set(SAC_APIVERSION ${_API_VERSION_MAJOR}.${_API_VERSION_MINOR}.${_API_VERSION_PATCH})
 
-option(Boost_Dynamic_Linking_ENABLED "Enable boost dynamic linking" ${Boost_Dynamic_Linking_ENABLED})
+option(Boost_Dynamic_Linking_ENABLED "Enable boost dynamic linking" OFF)
 
 if(Boost_Dynamic_Linking_ENABLED)
   set(Boost_USE_STATIC_LIBS OFF)
