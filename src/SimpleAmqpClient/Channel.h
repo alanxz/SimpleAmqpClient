@@ -97,6 +97,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     std::string path_to_client_key;
     std::string path_to_client_cert;
     bool verify_hostname;
+    bool verify_peer;
   };
 
  public:
@@ -121,6 +122,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   * to this value
   * @param verify_host Verify the hostname against the certificate when
   * opening the SSL connection.
+  * @param verify_peer Verify the certificate chain that is sent by the broker
+  * when opening the SSL connection.
   *
   * @return a new Channel object pointer
   */
@@ -134,12 +137,14 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                             const std::string &password = "guest",
                             const std::string &vhost = "/",
                             int frame_max = 131072,
-                            bool verify_hostname = true) {
+                            bool verify_hostname = true,
+                            bool verify_peer = true) {
     SSLConnectionParams ssl_params;
     ssl_params.path_to_ca_cert = path_to_ca_cert;
     ssl_params.path_to_client_key = path_to_client_key;
     ssl_params.path_to_client_cert = path_to_client_cert;
     ssl_params.verify_hostname = verify_hostname;
+    ssl_params.verify_peer = verify_peer;
 
     return boost::make_shared<Channel>(host, port, username, password, vhost,
                                        frame_max, ssl_params);

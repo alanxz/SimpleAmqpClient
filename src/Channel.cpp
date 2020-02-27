@@ -147,7 +147,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
     throw std::bad_alloc();
   }
 #if AMQP_VERSION >= 0x00080001
-  amqp_ssl_socket_set_verify_peer(socket, ssl_params.verify_hostname);
+  amqp_ssl_socket_set_verify_peer(socket, ssl_params.verify_peer);
   amqp_ssl_socket_set_verify_hostname(socket, ssl_params.verify_hostname);
 #else
   amqp_ssl_socket_set_verify(socket, ssl_params.verify_hostname);
