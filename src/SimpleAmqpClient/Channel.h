@@ -86,9 +86,10 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   static ptr_t Create(const std::string &host = "127.0.0.1", int port = 5672,
                       const std::string &username = "guest",
                       const std::string &password = "guest",
-                      const std::string &vhost = "/", int frame_max = 131072) {
+                      const std::string &vhost = "/", int frame_max = 131072,
+                      int broker_heartbeat = 0) {
     return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max);
+                                       frame_max, broker_heartbeat);
   }
 
  protected:
@@ -134,7 +135,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                             const std::string &password = "guest",
                             const std::string &vhost = "/",
                             int frame_max = 131072,
-                            bool verify_hostname = true) {
+                            bool verify_hostname = true,
+                            int broker_heartbeat = 0) {
     SSLConnectionParams ssl_params;
     ssl_params.path_to_ca_cert = path_to_ca_cert;
     ssl_params.path_to_client_key = path_to_client_key;
@@ -142,7 +144,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     ssl_params.verify_hostname = verify_hostname;
 
     return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max, ssl_params);
+                                       frame_max, ssl_params, broker_heartbeat);
   }
 
   /**
@@ -154,7 +156,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * any frame to this value
    * @returns a new Channel object
    */
-  static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
+  static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072, int broker_heartbeat = 0);
 
   /**
    * Create a new Channel object from an AMQP URI, secured with SSL.
@@ -177,16 +179,19 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                    const std::string &path_to_client_key = "",
                                    const std::string &path_to_client_cert = "",
                                    bool verify_hostname = true,
-                                   int frame_max = 131072);
-
-  explicit Channel(const std::string &host, int port,
-                   const std::string &username, const std::string &password,
-                   const std::string &vhost, int frame_max);
+                                   int frame_max = 131072,
+                                   int broker_heartbeat = 0);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
                    const std::string &vhost, int frame_max,
-                   const SSLConnectionParams &ssl_params);
+                   int broker_heartbeat);
+
+  explicit Channel(const std::string &host, int port,
+                   const std::string &username, const std::string &password,
+                   const std::string &vhost, int frame_max,
+                   const SSLConnectionParams &ssl_params,
+                   int broker_heartbeat);
 
  public:
   virtual ~Channel();
