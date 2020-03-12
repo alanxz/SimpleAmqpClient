@@ -97,14 +97,14 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     std::string path_to_client_key;
     std::string path_to_client_cert;
     bool verify_hostname;
+    bool verify_peer;
   };
 
  public:
   /**
   * Creates a new channel object
-  * Creates a new connection to an AMQP broker using the supplied parameters and
-  * opens
-  * a single channel for use
+  * Creates a new connection to an AMQP broker using the supplied parameters
+  * and opens a single channel for use
   * @param path_to_ca_cert Path to ca certificate file
   * @param host The hostname or IP address of the AMQP broker
   * @param path_to_client_key Path to client key file
@@ -117,14 +117,14 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   * @param channel_max Request that the server limit the number of channels for
   * this connection to the specified parameter, a value of zero will use the
   * broker-supplied value
-  * @param frame_max Request that the server limit the maximum size of any frame
-  * to this value
-  * @param verify_host Verify the hostname against the certificate when
-  * opening the SSL connection.
+  * @param frame_max Request that the server limit the maximum size of any
+  * frame to this value
+  * @param verify_hostname_and_peer Verify the hostname against the certificate
+  * and the certificate chain that is sent by the broker when opening the SSL
+  * connection.
   *
   * @return a new Channel object pointer
   */
-
   static ptr_t CreateSecure(const std::string &path_to_ca_cert = "",
                             const std::string &host = "127.0.0.1",
                             const std::string &path_to_client_key = "",
@@ -134,12 +134,52 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                             const std::string &password = "guest",
                             const std::string &vhost = "/",
                             int frame_max = 131072,
-                            bool verify_hostname = true) {
+                            bool verify_hostname_and_peer = true) {
+    return CreateSecure(path_to_ca_cert, host, path_to_client_key,
+                        path_to_client_cert, port, username, password, vhost,
+                        frame_max, verify_hostname_and_peer,
+                        verify_hostname_and_peer);
+  }
+
+  /**
+  * Creates a new channel object
+  * Creates a new connection to an AMQP broker using the supplied parameters
+  * and opens a single channel for use
+  * @param path_to_ca_cert Path to ca certificate file
+  * @param host The hostname or IP address of the AMQP broker
+  * @param path_to_client_key Path to client key file
+  * @param path_to_client_cert Path to client certificate file
+  * @param port The port to connect to the AMQP broker on
+  * @param username The username used to authenticate with the AMQP broker
+  * @param password The password corresponding to the username used to
+  * authenticate with the AMQP broker
+  * @param vhost The virtual host on the AMQP we should connect to
+  * @param channel_max Request that the server limit the number of channels for
+  * this connection to the specified parameter, a value of zero will use the
+  * broker-supplied value
+  * @param frame_max Request that the server limit the maximum size of any
+  * frame to this value
+  * @param verify_host Verify the hostname against the certificate when
+  * opening the SSL connection.
+  * @param verify_peer Verify the certificate chain that is sent by the broker
+  * when opening the SSL connection.
+  *
+  * @return a new Channel object pointer
+  */
+  static ptr_t CreateSecure(const std::string &path_to_ca_cert,
+                            const std::string &host,
+                            const std::string &path_to_client_key,
+                            const std::string &path_to_client_cert, int port,
+                            const std::string &username,
+                            const std::string &password,
+                            const std::string &vhost, int frame_max,
+                            bool verify_hostname, bool verify_peer) {
     SSLConnectionParams ssl_params;
     ssl_params.path_to_ca_cert = path_to_ca_cert;
     ssl_params.path_to_client_key = path_to_client_key;
     ssl_params.path_to_client_cert = path_to_client_cert;
     ssl_params.verify_hostname = verify_hostname;
+    ssl_params.verify_peer = verify_peer;
 
     return boost::make_shared<Channel>(host, port, username, password, vhost,
                                        frame_max, ssl_params);
