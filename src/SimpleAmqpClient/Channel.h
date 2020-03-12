@@ -398,8 +398,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * @param auto_delete the queue will be deleted after at least one exchange
    * has been bound to it,
    *  then has been unbound
-   * @param arguments A table of additional arguments used when declaring a
-   * queue
+  * @param arguments A table of additional arguments used when declaring a queue
    * @returns the name of the queue created on the broker. Used mostly when the
    * broker is asked to
    *  create a unique queue by not providing a queue name
@@ -524,8 +523,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * @param routing_key only messages sent to the exchange with this routing
    * key will be delivered to
    *  the queue. Defaults to "" which means all messages will be delivered
-   * @param arguments A table of additional arguments used when binding the
-   * queue
+  * @param arguments A table of additional arguments used when binding the queue
    */
   void BindQueue(const std::string &queue_name,
                  const std::string &exchange_name,
@@ -551,8 +549,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * @param exchange_name the name of the exchange to unbind
    * @param routing_key this must match the routing_key used when creating the
    * binding
-   * @param arguments A table of additional arguments used when unbinding a
-   * queue
+  * @param arguments A table of additional arguments used when unbinding a queue
    * @see BindQueue
    */
   void UnbindQueue(const std::string &queue_name,
@@ -588,14 +585,12 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * overload
    * doesn't require the Envelope object to Acknowledge
    *
-   * Note that ack'ing multiple message is scoped messages delivered on a given
-   * AMQP channel. SimpleAmqpClient uses one channel per consumer, so multiple
-   * ack means all un-ack'd messages up to and including the current message id
-   * for a given consumer.
+   * Note that ack'ing multiple message is scoped messages delivered on a given AMQP channel.
+   * SimpleAmqpClient uses one channel per consumer, so multiple ack means all un-ack'd messages
+   * up to and including the current message id for a given consumer.
    *
    * @param delivery_info
-   * @param multiple if true, ack all messages up to this delivery tag, if false
-   * ack only this delivery tag
+   * @param multiple if true, ack all messages up to this delivery tag, if false ack only this delivery tag
    */
   void BasicAck(const Envelope::DeliveryInfo &info, bool multiple);
 
@@ -794,8 +789,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * pointer
    * @param timeout the timeout for the first part of the message to be
    * delivered in ms
-   * @throws MessageReturnedException if a basic.return is received while
-   * waiting for a message
+  * @throws MessageReturnedException if a basic.return is received while waiting
+  * for a message
    * @returns true if a message was delivered before the timeout, false
    * otherwise
    */
