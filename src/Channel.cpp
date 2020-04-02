@@ -30,6 +30,8 @@
 #include <amqp.h>
 #include <amqp_framing.h>
 #include <amqp_tcp_socket.h>
+//#include <amqp_socket.h>
+#include <sys/time.h>
 #ifdef SAC_SSL_SUPPORT_ENABLED
 #include <amqp_ssl_socket.h>
 #endif
@@ -69,6 +71,20 @@ const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
 Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
+    amqp_connection_info info;
+    amqp_default_connection_info(&info);
+
+    boost::shared_ptr<char> uri_dup =
+            boost::shared_ptr<char>(strdup(uri.c_str()), free);
+
+        if (0 != amqp_parse_url(uri_dup.get(), &info)) {
+            throw BadUriException();
+        }
+        return Create(std::string(info.host), info.port, std::string(info.user),
+                      std::string(info.password), std::string(info.vhost), frame_max);
+    }
+
+Channel::ptr_t Channel::CreateFromUriTimeOut(const std::string &uri, struct timeval tv, int frame_max) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
@@ -78,9 +94,8 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();
   }
-
   return Create(std::string(info.host), info.port, std::string(info.user),
-                std::string(info.password), std::string(info.vhost), frame_max);
+                std::string(info.password), std::string(info.vhost), tv, frame_max);
 }
 
 Channel::ptr_t Channel::CreateSecureFromUri(
@@ -130,6 +145,30 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
   }
 
   m_impl->SetIsConnected(true);
+}
+
+Channel::Channel(const std::string &host, int port, const std::string &username,
+        const std::string &password, const std::string &vhost, struct timeval tv,
+                     int frame_max)
+        : m_impl(new Detail::ChannelImpl) {
+    m_impl->m_connection = amqp_new_connection();
+
+    if (NULL == m_impl->m_connection) {
+        throw std::bad_alloc();
+    }
+
+    try {
+        amqp_socket_t *socket = amqp_tcp_socket_new(m_impl->m_connection);
+        int sock = amqp_socket_open_noblock(socket, host.c_str(), port, &tv);
+        m_impl->CheckForError(sock);
+
+        m_impl->DoLogin(username, password, vhost, frame_max);
+    } catch (...) {
+        amqp_destroy_connection(m_impl->m_connection);
+        throw;
+    }
+
+    m_impl->SetIsConnected(true);
 }
 
 #ifdef SAC_SSL_SUPPORT_ENABLED
