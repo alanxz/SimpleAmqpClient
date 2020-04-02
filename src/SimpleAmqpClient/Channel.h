@@ -39,6 +39,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #include <string>
+#include <sys/time.h>
 #include <vector>
 
 #ifdef _MSC_VER
