@@ -30,8 +30,6 @@
 #include <amqp.h>
 #include <amqp_framing.h>
 #include <amqp_tcp_socket.h>
-//#include <amqp_socket.h>
-#include <sys/time.h>
 #ifdef SAC_SSL_SUPPORT_ENABLED
 #include <amqp_ssl_socket.h>
 #endif
