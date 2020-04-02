@@ -39,6 +39,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #include <string>
+#include <sys/time.h>
 #include <vector>
 
 #ifdef _MSC_VER
@@ -81,15 +82,45 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * broker-supplied value
     * @param frame_max Request that the server limit the maximum size of any
    * frame to this value
-    * @return a new Channel object pointer
+  * @return a new Channel object pointer
     */
   static ptr_t Create(const std::string &host = "127.0.0.1", int port = 5672,
                       const std::string &username = "guest",
                       const std::string &password = "guest",
                       const std::string &vhost = "/", int frame_max = 131072) {
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max);
+      return boost::make_shared<Channel>(host, port, username, password, vhost,
+                                         frame_max);
   }
+
+
+    /**
+      * Creates a new channel object
+      * Creates a new connection to an AMQP broker using the supplied parameters
+     * and opens
+      * a single channel for use. Will timeout if a connection cannot be made after a certain period of time.
+      * @param host The hostname or IP address of the AMQP broker
+      * @param port The port to connect to the AMQP broker on
+      * @param username The username used to authenticate with the AMQP broker
+      * @param password The password corresponding to the username used to
+     * authenticate with the AMQP broker
+      * @param vhost The virtual host on the AMQP we should connect to
+      * @param channel_max Request that the server limit the number of channels
+     * for
+      * this connection to the specified parameter, a value of zero will use the
+     * broker-supplied value
+      * @param tv The length of time to wait for a connection to be made before timing out
+      * @param frame_max Request that the server limit the maximum size of any
+     * frame to this value
+    * @return a new Channel object pointer
+      */
+    static ptr_t Create(const std::string &host = "127.0.0.1", int port = 5672,
+                        const std::string &username = "guest",
+                        const std::string &password = "guest",
+                        const std::string &vhost = "/", struct timeval tv = {3}, int frame_max = 131072) {
+        return boost::make_shared<Channel>(host, port, username, password, vhost, tv,
+                                           frame_max);
+    }
+
 
  protected:
   struct SSLConnectionParams {
@@ -196,6 +227,19 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    */
   static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
 
+
+  /**
+   * Create a new Channel object from an AMQP URI. Will time out after a certain amount of time
+   *
+   * @param uri [in] a URI of the form:
+   * amqp://[username:password@]{HOSTNAME}[:PORT][/VHOST]
+   * @param tv amount of time to wait for a connection to be made
+   * @param frame_max [in] requests that the broker limit the maximum size of
+   * any frame to this value
+   * @returns a new Channel object
+   */
+  static ptr_t CreateFromUriTimeOut(const std::string &uri, struct timeval tv = {3},int frame_max = 131072);
+
   /**
    * Create a new Channel object from an AMQP URI, secured with SSL.
    * If URI should start with amqps://
@@ -222,6 +266,10 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
                    const std::string &vhost, int frame_max);
+
+  explicit Channel(const std::string &host, int port,
+                   const std::string &username, const std::string &password,
+                   const std::string &vhost, struct timeval tv, int frame_max);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
