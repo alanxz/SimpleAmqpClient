@@ -110,7 +110,7 @@ Channel::ptr_t Channel::CreateSecureFromUri(
 
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
-                 int frame_max)
+                 int frame_max, bool sasl_external)
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
 
@@ -123,7 +123,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
     int sock = amqp_socket_open(socket, host.c_str(), port);
     m_impl->CheckForError(sock);
 
-    m_impl->DoLogin(username, password, vhost, frame_max);
+    m_impl->DoLogin(username, password, vhost, frame_max, sasl_external);
   } catch (...) {
     amqp_destroy_connection(m_impl->m_connection);
     throw;
@@ -135,7 +135,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
 #ifdef SAC_SSL_SUPPORT_ENABLED
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
-                 int frame_max, const SSLConnectionParams &ssl_params)
+                 int frame_max, const SSLConnectionParams &ssl_params, bool sasl_external)
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
   if (NULL == m_impl->m_connection) {
@@ -178,7 +178,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
           status, "Error setting client certificate for socket");
     }
 
-    m_impl->DoLogin(username, password, vhost, frame_max);
+    m_impl->DoLogin(username, password, vhost, frame_max, sasl_external);
   } catch (...) {
     amqp_destroy_connection(m_impl->m_connection);
     throw;

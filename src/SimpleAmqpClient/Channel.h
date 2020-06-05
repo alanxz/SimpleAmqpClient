@@ -88,7 +88,31 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                       const std::string &password = "guest",
                       const std::string &vhost = "/", int frame_max = 131072) {
     return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max);
+                                       frame_max, false);
+  }
+
+  /**
+    * Creates a new channel object
+    * Creates a new connection to an AMQP broker using the supplied parameters
+    * and opens a single channel for use
+    * This channel uses the EXTERNAL SASL method for authentication to the broker
+    * @param host The hostname or IP address of the AMQP broker
+    * @param port The port to connect to the AMQP broker on
+    * @param identity The identity used to authenticate with the AMQP broker
+    * @param vhost The virtual host on the AMQP we should connect to
+    * @param channel_max Request that the server limit the number of channels
+    * for
+    * this connection to the specified parameter, a value of zero will use the
+    * broker-supplied value
+    * @param frame_max Request that the server limit the maximum size of any
+    * frame to this value
+    * @return a new Channel object pointer
+    */
+  static ptr_t CreateSaslExternal(const std::string &host = "127.0.0.1", int port = 5672,
+                      const std::string &identity = "guest",
+                      const std::string &vhost = "/", int frame_max = 131072) {
+    return boost::make_shared<Channel>(host, port, identity, "", vhost,
+                                       frame_max, true);
   }
 
  protected:
@@ -182,7 +206,49 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     ssl_params.verify_peer = verify_peer;
 
     return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max, ssl_params);
+                                       frame_max, ssl_params, false);
+  }
+
+  /**
+  * Creates a new channel object
+  * Creates a new connection to an AMQP broker using the supplied parameters
+  * and opens a single channel for use
+  * This channel uses the EXTERNAL SASL method for authentication to the broker
+  * @param path_to_ca_cert Path to ca certificate file
+  * @param host The hostname or IP address of the AMQP broker
+  * @param path_to_client_key Path to client key file
+  * @param path_to_client_cert Path to client certificate file
+  * @param port The port to connect to the AMQP broker on
+  * @param identity The identity used to authenticate with the AMQP broker
+  * @param vhost The virtual host on the AMQP we should connect to
+  * @param channel_max Request that the server limit the number of channels for
+  * this connection to the specified parameter, a value of zero will use the
+  * broker-supplied value
+  * @param frame_max Request that the server limit the maximum size of any
+  * frame to this value
+  * @param verify_host Verify the hostname against the certificate when
+  * opening the SSL connection.
+  * @param verify_peer Verify the certificate chain that is sent by the broker
+  * when opening the SSL connection.
+  *
+  * @return a new Channel object pointer
+  */
+  static ptr_t CreateSecureSaslExternal(const std::string &path_to_ca_cert,
+                            const std::string &host,
+                            const std::string &path_to_client_key,
+                            const std::string &path_to_client_cert, int port,
+                            const std::string &identity,
+                            const std::string &vhost, int frame_max,
+                            bool verify_hostname, bool verify_peer) {
+    SSLConnectionParams ssl_params;
+    ssl_params.path_to_ca_cert = path_to_ca_cert;
+    ssl_params.path_to_client_key = path_to_client_key;
+    ssl_params.path_to_client_cert = path_to_client_cert;
+    ssl_params.verify_hostname = verify_hostname;
+    ssl_params.verify_peer = verify_peer;
+
+    return boost::make_shared<Channel>(host, port, identity, "", vhost,
+                                       frame_max, ssl_params, true);
   }
 
   /**
@@ -221,12 +287,12 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
-                   const std::string &vhost, int frame_max);
+                   const std::string &vhost, int frame_max, bool sasl_external);
 
   explicit Channel(const std::string &host, int port,
                    const std::string &username, const std::string &password,
                    const std::string &vhost, int frame_max,
-                   const SSLConnectionParams &ssl_params);
+                   const SSLConnectionParams &ssl_params, bool sasl_external);
 
  public:
   virtual ~Channel();
