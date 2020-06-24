@@ -47,6 +47,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/array.hpp>
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <string.h>

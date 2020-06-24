@@ -55,7 +55,6 @@
 #include <vector>
 
 #include <boost/array.hpp>
-#include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/limits.hpp>
