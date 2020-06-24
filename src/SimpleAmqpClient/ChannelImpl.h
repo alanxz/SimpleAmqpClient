@@ -39,6 +39,7 @@
 #include "SimpleAmqpClient/MessageReturnedException.h"
 
 #include <boost/array.hpp>
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 #include <boost/noncopyable.hpp>
