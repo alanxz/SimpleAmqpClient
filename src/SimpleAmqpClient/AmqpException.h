@@ -28,12 +28,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Util.h"
-
 #include <boost/cstdint.hpp>
-
 #include <stdexcept>
 #include <string>
+
+#include "Util.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)

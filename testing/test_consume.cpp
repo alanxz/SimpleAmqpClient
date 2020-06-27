@@ -27,6 +27,7 @@
  */
 
 #include <iostream>
+
 #include "connected_test.h"
 
 using namespace AmqpClient;

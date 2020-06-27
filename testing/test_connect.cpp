@@ -27,8 +27,8 @@
  */
 
 #include <gtest/gtest.h>
-#include "SimpleAmqpClient/SimpleAmqpClient.h"
 
+#include "SimpleAmqpClient/SimpleAmqpClient.h"
 #include "connected_test.h"
 
 using namespace AmqpClient;

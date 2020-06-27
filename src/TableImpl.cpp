@@ -32,15 +32,13 @@
 
 #include "SimpleAmqpClient/TableImpl.h"
 
-#include <boost/foreach.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/static_visitor.hpp>
-
 #include <amqp.h>
-
 #include <string.h>
 
 #include <algorithm>
+#include <boost/foreach.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/static_visitor.hpp>
 #include <new>
 
 #ifdef _MSC_VER
@@ -358,5 +356,5 @@ amqp_field_value_t TableValueImpl::CopyValue(const amqp_field_value_t value,
       return new_value;
   }
 }
-}
+}  // namespace Detail
 }  // namespace AmqpClient

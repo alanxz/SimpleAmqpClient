@@ -27,14 +27,14 @@
  */
 
 #include "SimpleAmqpClient/Table.h"
-#include "SimpleAmqpClient/TableImpl.h"
-
-#include <boost/variant/get.hpp>
 
 #include <algorithm>
+#include <boost/variant/get.hpp>
 #include <iterator>
 #include <limits>
 #include <stdexcept>
+
+#include "SimpleAmqpClient/TableImpl.h"
 
 namespace AmqpClient {
 TableValue::TableValue()
@@ -131,10 +131,7 @@ TableValue::ValueType TableValue::GetType() const {
   return static_cast<ValueType>(m_impl->m_value.which());
 }
 
-bool TableValue::GetBool() const {
-  return boost::get<bool>(m_impl->m_value);
-}
-
+bool TableValue::GetBool() const { return boost::get<bool>(m_impl->m_value); }
 
 boost::uint8_t TableValue::GetUint8() const {
   return boost::get<boost::uint8_t>(m_impl->m_value);
