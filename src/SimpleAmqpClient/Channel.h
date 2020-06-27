@@ -32,10 +32,10 @@
 #include <boost/make_shared.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/utility.hpp>
-#include <boost/utility/string_ref.hpp>
 #include <boost/variant.hpp>
-=======
+#include <boost/utility/string_ref.hpp>
+#include <memory>
+#include <string>
 #include <vector>
 
 #include "SimpleAmqpClient/BasicMessage.h"
@@ -58,7 +58,7 @@ namespace AmqpClient {
  *
  * Represents a logical AMQP channel multiplexed over a connection
  */
-class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
+class SIMPLEAMQPCLIENT_EXPORT Channel {
  public:
   /// a `shared_ptr` to Channel
   typedef boost::shared_ptr<Channel> ptr_t;
@@ -329,6 +329,10 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
 
  public:
   explicit Channel(ChannelImpl *impl);
+  // Non-copyable
+  Channel(const Channel &) = delete;
+  Channel &operator=(const Channel &) = delete;
+
   virtual ~Channel();
 
   /**
@@ -933,7 +937,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                         bool sasl_external);
 
   /// PIMPL idiom
-  std::unique_ptr<Detail::ChannelImpl> m_impl;
+  std::unique_ptr<ChannelImpl> m_impl;
 };
 
 }  // namespace AmqpClient
