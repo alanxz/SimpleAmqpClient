@@ -31,12 +31,11 @@
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/optional.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <boost/variant.hpp>
-#include <string>
+=======
 #include <vector>
 
 #include "SimpleAmqpClient/BasicMessage.h"
@@ -934,7 +933,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                         bool sasl_external);
 
   /// PIMPL idiom
-  boost::scoped_ptr<ChannelImpl> m_impl;
+  std::unique_ptr<Detail::ChannelImpl> m_impl;
 };
 
 }  // namespace AmqpClient
