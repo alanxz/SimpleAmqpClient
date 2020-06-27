@@ -42,16 +42,20 @@
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
-#include <boost/noncopyable.hpp>
 #include <map>
 #include <vector>
 
 namespace AmqpClient {
 namespace Detail {
 
-class ChannelImpl : boost::noncopyable {
+class ChannelImpl {
  public:
   ChannelImpl();
+
+  // Non-copyable
+  ChannelImpl(const ChannelImpl &) = delete;
+  ChannelImpl &operator=(const ChannelImpl &) = delete;
+
   virtual ~ChannelImpl();
 
   typedef std::vector<amqp_channel_t> channel_list_t;
