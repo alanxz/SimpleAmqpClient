@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(SimpleAmqpClient LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -66,15 +66,6 @@ if (CMAKE_GENERATOR MATCHES ".*(Make|Ninja).*"
     AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel" FORCE)
   message(STATUS "CMAKE_BUILD_TYPE not specified. Using ${CMAKE_BUILD_TYPE} build")
-endif ()
-
-if (CMAKE_CXX_FLAGS STREQUAL ""
-    AND NOT DEFINED SAC_CXX_FLAGS_SET)
-  if (CMAKE_COMPILER_IS_GNUCXX
-      OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    SET(CMAKE_CXX_FLAGS "-Wall -Wextra" CACHE STRING "Flags used by the compiler during all build types." FORCE)
-  endif ()
-  set(SAC_CXX_FLAGS_SET TRUE CACHE INTERNAL "Have the SAC default compiler flags been set?")
 endif ()
 
 include_directories(BEFORE src
