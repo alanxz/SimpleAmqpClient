@@ -182,12 +182,11 @@ boost::int64_t TableValue::GetInteger() const {
       return GetUint32();
     case VT_int32:
       return GetInt32();
-    case VT_uint64:
-    {
+    case VT_uint64: {
       const boost::uint64_t value = GetUint64();
-      if (value > std::numeric_limits<int64_t>::max())
-        throw std::overflow_error(
-          "Result of GetUint64() is out of range.");
+      if (value > static_cast<boost::uint64_t>(
+                      std::numeric_limits<boost::int64_t>::max()))
+        throw std::overflow_error("Result of GetUint64() is out of range.");
       return value;
     }
     case VT_int64:
