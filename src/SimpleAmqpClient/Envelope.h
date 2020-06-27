@@ -28,15 +28,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/BasicMessage.h"
-#include "SimpleAmqpClient/Util.h"
-
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-
 #include <string>
+
+#include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Util.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -50,17 +49,17 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
   typedef boost::shared_ptr<Envelope> ptr_t;
 
   /**
-    * Creates an new envelope object
-    * @param message the payload
-    * @param consumer_tag the consumer tag the message was delivered to
-    * @param delivery_tag the delivery tag that the broker assigned to the
+   * Creates an new envelope object
+   * @param message the payload
+   * @param consumer_tag the consumer tag the message was delivered to
+   * @param delivery_tag the delivery tag that the broker assigned to the
    * message
-    * @param exchange the name of the exchange that the message was published to
-    * @param redelivered a flag indicating whether the message consumed as a
+   * @param exchange the name of the exchange that the message was published to
+   * @param redelivered a flag indicating whether the message consumed as a
    * result of a redelivery
-    * @param routing_key the routing key that the message was published with
-    * @returns a boost::shared_ptr to an envelope object
-    */
+   * @param routing_key the routing key that the message was published with
+   * @returns a boost::shared_ptr to an envelope object
+   */
   static ptr_t Create(const BasicMessage::ptr_t message,
                       const std::string &consumer_tag,
                       const boost::uint64_t delivery_tag,
@@ -81,60 +80,60 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
 
  public:
   /**
-    * destructor
-    */
+   * destructor
+   */
   virtual ~Envelope();
 
   /**
-    * Get the payload of the envelope
-    *
-    * @returns the message
-    */
+   * Get the payload of the envelope
+   *
+   * @returns the message
+   */
   inline BasicMessage::ptr_t Message() const { return m_message; }
 
   /**
-    * Get the consumer tag for the consumer that delivered the message
-    *
-    * @returns the consumer that delivered the message
-    */
+   * Get the consumer tag for the consumer that delivered the message
+   *
+   * @returns the consumer that delivered the message
+   */
   inline std::string ConsumerTag() const { return m_consumerTag; }
 
   /**
-    * Get the delivery tag for the message.
-    *
-    * The delivery tag is a unique tag for a given message assigned by the
+   * Get the delivery tag for the message.
+   *
+   * The delivery tag is a unique tag for a given message assigned by the
    * broker
-    * This tag is used when Ack'ing a message
-    *
-    * @returns the delivery tag for a message
-    */
+   * This tag is used when Ack'ing a message
+   *
+   * @returns the delivery tag for a message
+   */
   inline boost::uint64_t DeliveryTag() const { return m_deliveryTag; }
 
   /**
-    * Get the name of the exchange that the message was published to
-    *
-    * @returns the name of the exchange the message was published to
-    */
+   * Get the name of the exchange that the message was published to
+   *
+   * @returns the name of the exchange the message was published to
+   */
   inline std::string Exchange() const { return m_exchange; }
 
   /**
-    * Get the flag that indicates whether the message was redelivered
-    *
-    * A flag that indicates whether the message was redelievered means
-    * the broker tried to deliver the message and the client did not Ack
-    * the message, so the message was requeued, or the client asked the broker
-    * to Recover which forced all non-Acked messages to be redelivered
-    *
-    * @return a boolean flag indicating whether the message was redelivered
-    */
+   * Get the flag that indicates whether the message was redelivered
+   *
+   * A flag that indicates whether the message was redelievered means
+   * the broker tried to deliver the message and the client did not Ack
+   * the message, so the message was requeued, or the client asked the broker
+   * to Recover which forced all non-Acked messages to be redelivered
+   *
+   * @return a boolean flag indicating whether the message was redelivered
+   */
   inline bool Redelivered() const { return m_redelivered; }
 
   /**
-    * Get the routing key that the message was published with
-    *
-    * @returns a string containing the routing key the message was published
+   * Get the routing key that the message was published with
+   *
+   * @returns a string containing the routing key the message was published
    * with
-    */
+   */
   inline std::string RoutingKey() const { return m_routingKey; }
 
   inline boost::uint16_t DeliveryChannel() const { return m_deliveryChannel; }

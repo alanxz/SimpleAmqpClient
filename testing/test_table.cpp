@@ -26,11 +26,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "connected_test.h"
-
+#include <algorithm>
 #include <boost/variant/get.hpp>
 
-#include <algorithm>
+#include "connected_test.h"
 
 using namespace AmqpClient;
 
@@ -437,7 +436,8 @@ TEST(table_value, uint64_value) {
 }
 
 TEST(table_value, uint64_value_larger_than_int64_max) {
-  const boost::uint64_t maxInt64 = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+  const boost::uint64_t maxInt64 =
+      static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
   boost::uint64_t v1 = maxInt64 + 1;
   boost::uint64_t v2 = maxInt64 + 2;
 

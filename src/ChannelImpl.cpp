@@ -37,21 +37,21 @@
 #include <sys/types.h>
 #endif
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/array.hpp>
+
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/AmqpLibraryException.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
-
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/array.hpp>
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <string.h>
+
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include <string.h>
 
 #define BROKER_HEARTBEAT 0
 
@@ -84,20 +84,17 @@ void ChannelImpl::DoLogin(const std::string &username,
   client_properties.num_entries = 1;
   client_properties.entries = &capability_entry;
 
-  if (sasl_external)
-  {
-      CheckRpcReply(
-              0, amqp_login_with_properties(m_connection, vhost.c_str(), 0, frame_max,
-                                            BROKER_HEARTBEAT, &client_properties,
-                                            AMQP_SASL_METHOD_EXTERNAL, username.c_str()));
-  }
-  else
-  {
-      CheckRpcReply(
-              0, amqp_login_with_properties(m_connection, vhost.c_str(), 0, frame_max,
-                                            BROKER_HEARTBEAT, &client_properties,
-                                            AMQP_SASL_METHOD_PLAIN, username.c_str(),
-                                            password.c_str()));
+  if (sasl_external) {
+    CheckRpcReply(0, amqp_login_with_properties(
+                         m_connection, vhost.c_str(), 0, frame_max,
+                         BROKER_HEARTBEAT, &client_properties,
+                         AMQP_SASL_METHOD_EXTERNAL, username.c_str()));
+  } else {
+    CheckRpcReply(
+        0, amqp_login_with_properties(m_connection, vhost.c_str(), 0, frame_max,
+                                      BROKER_HEARTBEAT, &client_properties,
+                                      AMQP_SASL_METHOD_PLAIN, username.c_str(),
+                                      password.c_str()));
   }
 
   m_brokerVersion = ComputeBrokerVersion(m_connection);
@@ -467,7 +464,7 @@ bool bytesEqual(amqp_bytes_t r, amqp_bytes_t l) {
   }
   return false;
 }
-}
+}  // namespace
 
 boost::uint32_t ChannelImpl::ComputeBrokerVersion(
     amqp_connection_state_t state) {

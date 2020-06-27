@@ -26,14 +26,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "connected_test.h"
-
 #include <amqp.h>
 
-#include <boost/array.hpp>
-
 #include <algorithm>
+#include <boost/array.hpp>
 #include <iostream>
+
+#include "connected_test.h"
 
 using namespace AmqpClient;
 

@@ -45,4 +45,4 @@ Envelope::Envelope(const BasicMessage::ptr_t message,
       m_deliveryChannel(delivery_channel) {}
 
 Envelope::~Envelope() {}
-}
+}  // namespace AmqpClient
