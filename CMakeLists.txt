@@ -1,6 +1,6 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-PROJECT(SimpleAmqpClient)
+project(SimpleAmqpClient)
 
 # Follow all steps below in order to calculate new ABI version when updating the library
 # NOTE: THIS IS UNRELATED to the actual project version
@@ -39,12 +39,12 @@ if(Boost_Dynamic_Linking_ENABLED)
   set(Boost_USE_STATIC_RUNTIME OFF)
 endif()
 
-FIND_PACKAGE(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
-INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIRS})
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 
-SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
-FIND_PACKAGE(Rabbitmqc REQUIRED)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
+find_package(Rabbitmqc REQUIRED)
 INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
 
 option(ENABLE_SSL_SUPPORT "Enable SSL support." ${Rabbitmqc_SSL_ENABLED})
@@ -68,7 +68,7 @@ if (CMAKE_CXX_FLAGS STREQUAL ""
   set(SAC_CXX_FLAGS_SET TRUE CACHE INTERNAL "Have the SAC default compiler flags been set?")
 endif ()
 
-INCLUDE_DIRECTORIES(BEFORE src
+include_directories(BEFORE src
     ${CMAKE_CURRENT_BINARY_DIR})
 
 if (WIN32)
@@ -81,7 +81,7 @@ if (WIN32 AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "The SimpleAmqpClient library cannot be built as a static library on Win32. Set BUILD_SHARED_LIBS=ON to get around this.")
 endif()
 
-SET(SAC_LIB_SRCS
+set(SAC_LIB_SRCS
     src/SimpleAmqpClient/SimpleAmqpClient.h
 
     src/SimpleAmqpClient/AmqpException.h
@@ -122,8 +122,8 @@ SET(SAC_LIB_SRCS
     )
 
 
-ADD_LIBRARY(SimpleAmqpClient ${SAC_LIB_SRCS})
-TARGET_LINK_LIBRARIES(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY} ${Boost_LIBRARIES} $<$<BOOL:${Boost_Dynamic_Linking_ENABLED}>:Boost::dynamic_linking>)
+add_library(SimpleAmqpClient ${SAC_LIB_SRCS})
+target_link_libraries(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY} ${Boost_LIBRARIES} $<$<BOOL:${Boost_Dynamic_Linking_ENABLED}>:Boost::dynamic_linking>)
 
 if (WIN32)
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
@@ -159,19 +159,19 @@ endif (ENABLE_TESTING)
 
 
 # Documentation generation
-SET(DOXYFILE_LATEX "NO")
-SET(PROJECT_VERSION ${SAC_VERSION})
-INCLUDE(UseDoxygen)
+set(DOXYFILE_LATEX "NO")
+set(PROJECT_VERSION ${SAC_VERSION})
+include(UseDoxygen)
 
-INCLUDE(GNUInstallDirs)
+include(GNUInstallDirs)
 
-INSTALL(TARGETS SimpleAmqpClient
+install(TARGETS SimpleAmqpClient
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
-INSTALL(FILES
+install(FILES
     src/SimpleAmqpClient/AmqpException.h
     src/SimpleAmqpClient/AmqpLibraryException.h
     src/SimpleAmqpClient/AmqpResponseLibraryException.h
