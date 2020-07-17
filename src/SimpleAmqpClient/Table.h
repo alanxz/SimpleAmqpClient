@@ -28,14 +28,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/Util.h"
-
 #include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
-
 #include <map>
 #include <string>
 #include <vector>
+
+#include "SimpleAmqpClient/Util.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -80,21 +79,21 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
 
   /** Types enumeration */
   enum ValueType {
-    VT_void = 0,    //< void type
-    VT_bool = 1,    //< boolean type
-    VT_int8 = 2,    //< 1-byte/char signed type
-    VT_int16 = 3,   //< 2-byte/short signed type
-    VT_int32 = 4,   //< 4-byte/int signed type
-    VT_int64 = 5,   //< 8-byte/long long int signed type
-    VT_float = 6,   //< single-precision floating point type
-    VT_double = 7,  //< double-precision floating point type
-    VT_string = 8,  //< string type
-    VT_array = 9,   //< array of TableValues type
-    VT_table = 10,  //< a table type
-    VT_uint8 = 11,  //< 1-byte/char unsigned type
-    VT_uint16 = 12, //< 2-byte/short unsigned type
-    VT_uint32 = 13, //< 4-byte/int unsigned type
-    VT_uint64 = 14  //< 8-byte/long long int unsigned type
+    VT_void = 0,     //< void type
+    VT_bool = 1,     //< boolean type
+    VT_int8 = 2,     //< 1-byte/char signed type
+    VT_int16 = 3,    //< 2-byte/short signed type
+    VT_int32 = 4,    //< 4-byte/int signed type
+    VT_int64 = 5,    //< 8-byte/long long int signed type
+    VT_float = 6,    //< single-precision floating point type
+    VT_double = 7,   //< double-precision floating point type
+    VT_string = 8,   //< string type
+    VT_array = 9,    //< array of TableValues type
+    VT_table = 10,   //< a table type
+    VT_uint8 = 11,   //< 1-byte/char unsigned type
+    VT_uint16 = 12,  //< 2-byte/short unsigned type
+    VT_uint32 = 13,  //< 4-byte/int unsigned type
+    VT_uint64 = 14   //< 8-byte/long long int unsigned type
   };
 
   /**

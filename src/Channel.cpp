@@ -34,18 +34,12 @@
 #include <amqp_ssl_socket.h>
 #endif
 
-#include "SimpleAmqpClient/Channel.h"
+#include <string.h>
 
-#include "SimpleAmqpClient/AmqpLibraryException.h"
-#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
-#include "SimpleAmqpClient/BadUriException.h"
-#include "SimpleAmqpClient/ChannelImpl.h"
-#include "SimpleAmqpClient/ConsumerCancelledException.h"
-#include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
-#include "SimpleAmqpClient/MessageReturnedException.h"
-#include "SimpleAmqpClient/TableImpl.h"
-#include "SimpleAmqpClient/Util.h"
-
+#include <boost/array.hpp>
+#include <boost/chrono.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/limits.hpp>
 #include <map>
 #include <new>
 #include <queue>
@@ -54,13 +48,16 @@
 #include <utility>
 #include <vector>
 
-#include <boost/array.hpp>
-#include <boost/bind.hpp>
-#include <boost/chrono.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/limits.hpp>
-
-#include <string.h>
+#include "SimpleAmqpClient/AmqpLibraryException.h"
+#include "SimpleAmqpClient/AmqpResponseLibraryException.h"
+#include "SimpleAmqpClient/BadUriException.h"
+#include "SimpleAmqpClient/Channel.h"
+#include "SimpleAmqpClient/ChannelImpl.h"
+#include "SimpleAmqpClient/ConsumerCancelledException.h"
+#include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
+#include "SimpleAmqpClient/MessageReturnedException.h"
+#include "SimpleAmqpClient/TableImpl.h"
+#include "SimpleAmqpClient/Util.h"
 
 namespace AmqpClient {
 
@@ -110,7 +107,7 @@ Channel::ptr_t Channel::CreateSecureFromUri(
 
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
-                 int frame_max)
+                 int frame_max, bool sasl_external)
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
 
@@ -123,7 +120,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
     int sock = amqp_socket_open(socket, host.c_str(), port);
     m_impl->CheckForError(sock);
 
-    m_impl->DoLogin(username, password, vhost, frame_max);
+    m_impl->DoLogin(username, password, vhost, frame_max, sasl_external);
   } catch (...) {
     amqp_destroy_connection(m_impl->m_connection);
     throw;
@@ -135,7 +132,8 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
 #ifdef SAC_SSL_SUPPORT_ENABLED
 Channel::Channel(const std::string &host, int port, const std::string &username,
                  const std::string &password, const std::string &vhost,
-                 int frame_max, const SSLConnectionParams &ssl_params)
+                 int frame_max, const SSLConnectionParams &ssl_params,
+                 bool sasl_external)
     : m_impl(new Detail::ChannelImpl) {
   m_impl->m_connection = amqp_new_connection();
   if (NULL == m_impl->m_connection) {
@@ -147,7 +145,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
     throw std::bad_alloc();
   }
 #if AMQP_VERSION >= 0x00080001
-  amqp_ssl_socket_set_verify_peer(socket, ssl_params.verify_hostname);
+  amqp_ssl_socket_set_verify_peer(socket, ssl_params.verify_peer);
   amqp_ssl_socket_set_verify_hostname(socket, ssl_params.verify_hostname);
 #else
   amqp_ssl_socket_set_verify(socket, ssl_params.verify_hostname);
@@ -178,7 +176,7 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
           status, "Error setting client certificate for socket");
     }
 
-    m_impl->DoLogin(username, password, vhost, frame_max);
+    m_impl->DoLogin(username, password, vhost, frame_max, sasl_external);
   } catch (...) {
     amqp_destroy_connection(m_impl->m_connection);
     throw;
@@ -478,8 +476,8 @@ void Channel::BasicAck(const Envelope::DeliveryInfo &info, bool multiple) {
         "The channel that the message was delivered on has been closed");
   }
 
-  m_impl->CheckForError(
-      amqp_basic_ack(m_impl->m_connection, channel, info.delivery_tag, multiple));
+  m_impl->CheckForError(amqp_basic_ack(m_impl->m_connection, channel,
+                                       info.delivery_tag, multiple));
 }
 
 void Channel::BasicReject(const Envelope::ptr_t &message, bool requeue,

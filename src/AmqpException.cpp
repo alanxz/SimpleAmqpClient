@@ -26,14 +26,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <amqp.h>
-#include <amqp_framing.h>
-
 #include "SimpleAmqpClient/AmqpException.h"
 
-#include <boost/lexical_cast.hpp>
-
+#include <amqp.h>
+#include <amqp_framing.h>
 #include <assert.h>
+
+#include <boost/lexical_cast.hpp>
 
 namespace AmqpClient {
 
@@ -199,4 +198,4 @@ AmqpException::AmqpException(const std::string &what,
       m_reply_text(reply_text),
       m_class_id(class_id),
       m_method_id(method_id) {}
-}
+}  // namespace AmqpClient

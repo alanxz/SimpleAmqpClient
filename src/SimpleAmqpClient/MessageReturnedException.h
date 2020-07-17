@@ -28,11 +28,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/BasicMessage.h"
-
 #include <boost/cstdint.hpp>
-
 #include <stdexcept>
+
+#include "SimpleAmqpClient/BasicMessage.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)

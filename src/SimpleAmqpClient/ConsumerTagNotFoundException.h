@@ -28,9 +28,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "Util.h"
-
 #include <stdexcept>
+
+#include "Util.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)

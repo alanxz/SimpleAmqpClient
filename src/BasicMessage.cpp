@@ -27,13 +27,14 @@
  */
 
 // Put these first to avoid warnings about INT#_C macro redefinition
+#include "SimpleAmqpClient/BasicMessage.h"
+
 #include <amqp.h>
 #include <amqp_framing.h>
 
-#include "SimpleAmqpClient/BasicMessage.h"
-#include "SimpleAmqpClient/TableImpl.h"
-
 #include <cstring>
+
+#include "SimpleAmqpClient/TableImpl.h"
 
 namespace AmqpClient {
 
@@ -46,7 +47,7 @@ class BasicMessageImpl {
   amqp_bytes_t m_body;
   amqp_pool_ptr_t m_table_pool;
 };
-}
+}  // namespace Detail
 
 BasicMessage::BasicMessage() : m_impl(new Detail::BasicMessageImpl) {
   m_impl->m_body.bytes = NULL;
@@ -123,8 +124,7 @@ const amqp_basic_properties_t *BasicMessage::getAmqpProperties() const {
 const amqp_bytes_t &BasicMessage::getAmqpBody() const { return m_impl->m_body; }
 
 std::string BasicMessage::Body() const {
-  if (m_impl->m_body.bytes == NULL)
-    return std::string();
+  if (m_impl->m_body.bytes == NULL) return std::string();
   return std::string((char *)m_impl->m_body.bytes, m_impl->m_body.len);
 }
 void BasicMessage::Body(const std::string &body) {
@@ -208,8 +208,7 @@ void BasicMessage::DeliveryModeClear() {
 }
 
 boost::uint8_t BasicMessage::Priority() const {
-  if (PriorityIsSet())
-    return m_impl->m_properties.priority;
+  if (PriorityIsSet()) return m_impl->m_properties.priority;
   return 0;
 }
 void BasicMessage::Priority(boost::uint8_t priority) {
@@ -322,8 +321,7 @@ void BasicMessage::MessageIdClear() {
 }
 
 boost::uint64_t BasicMessage::Timestamp() const {
-  if (TimestampIsSet())
-    return m_impl->m_properties.timestamp;
+  if (TimestampIsSet()) return m_impl->m_properties.timestamp;
   return 0;
 }
 void BasicMessage::Timestamp(boost::uint64_t timestamp) {

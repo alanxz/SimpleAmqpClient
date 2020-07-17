@@ -28,10 +28,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include "SimpleAmqpClient/Util.h"
-
 #include <stdexcept>
 #include <string>
+
+#include "SimpleAmqpClient/Util.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)
