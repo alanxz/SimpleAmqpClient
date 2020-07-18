@@ -3,7 +3,7 @@
 
 language: cpp
 
-dist: trusty
+dist: xenial
 sudo: true
 
 compiler:
@@ -17,6 +17,11 @@ env:
    - secure: "Fbs306tCqDrDZTEwTE4ZvQ9Jb1BRbGNMgdkDy4G+EY02tuuxHFOh0Dm9N5ylVEzOcMZUpYLogh5HDpXtvVB71hmkphfDodqdinNAmalsWzg/lOx4x414/WMyo6/vT7X+qxHmLpt/XuLVSSBP7u96hg3+/3QOhQ/x2cBMI4eAMqg="
 
 addons:
+  apt:
+    packages:
+      - libboost-dev
+      - libboost-chrono-dev
+      - libboost-system-dev
   coverity_scan:
     project:
       name: "alanxz/SimpleAmqpClient"
@@ -28,8 +33,6 @@ addons:
 
 # install pre-reqs
 install:
-  - sudo apt-get update
-  - sudo apt-get install libboost1.55-dev libboost-chrono1.55-dev libboost-system1.55-dev
   - mkdir -p _prereqs
   - pushd _prereqs
   - git clone https://github.com/alanxz/rabbitmq-c
