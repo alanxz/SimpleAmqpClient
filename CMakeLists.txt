@@ -1,6 +1,15 @@
-cmake_minimum_required(VERSION 2.8)
+# Most widely used distributions have cmake 3.5 or greater available as of March
+# 2019.  A notable exception is RHEL-7 (CentOS7).  You can install a current
+# version of CMake by first installing Extra Packages for Enterprise Linux
+# (https://fedoraproject.org/wiki/EPEL#Extra_Packages_for_Enterprise_Linux_.28EPEL.29)
+# and then issuing `yum install cmake3` on the command line.
+cmake_minimum_required(VERSION 3.5)
 
-project(SimpleAmqpClient)
+project(SimpleAmqpClient LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Follow all steps below in order to calculate new ABI version when updating the library
 # NOTE: THIS IS UNRELATED to the actual project version
