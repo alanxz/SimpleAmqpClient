@@ -32,8 +32,6 @@
 #include <amqp.h>
 #include <amqp_framing.h>
 
-#include <boost/array.hpp>
-
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Channel.h"
@@ -41,6 +39,7 @@
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <array>
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>
 #include <map>
@@ -221,7 +220,7 @@ class Channel::ChannelImpl {
     CheckForError(amqp_send_method(m_connection, channel, method_id, decoded));
 
     amqp_frame_t response;
-    boost::array<amqp_channel_t, 1> channels = {{channel}};
+    std::array<amqp_channel_t, 1> channels = {channel};
 
     GetMethodOnChannel(channels, response, expected_responses);
     return response;
@@ -264,8 +263,8 @@ class Channel::ChannelImpl {
   template <class ChannelListType>
   bool ConsumeMessageOnChannelInner(const ChannelListType channels,
                                     Envelope::ptr_t &message, int timeout) {
-    const boost::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
-        {AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD}};
+    const std::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
+        AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD};
 
     boost::chrono::microseconds real_timeout =
         (timeout >= 0 ? boost::chrono::milliseconds(timeout)

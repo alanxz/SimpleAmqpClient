@@ -39,7 +39,6 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/array.hpp>
 
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/AmqpLibraryException.h"
@@ -51,6 +50,7 @@
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <string.h>
 
+#include <array>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -179,16 +179,16 @@ amqp_channel_t Channel::ChannelImpl::GetNextChannelId() {
 amqp_channel_t Channel::ChannelImpl::CreateNewChannel() {
   amqp_channel_t new_channel = GetNextChannelId();
 
-  static const boost::array<std::uint32_t, 1> OPEN_OK = {
-      {AMQP_CHANNEL_OPEN_OK_METHOD}};
+  static const std::array<std::uint32_t, 1> OPEN_OK = {
+      AMQP_CHANNEL_OPEN_OK_METHOD};
   amqp_channel_open_t channel_open = {};
-  DoRpcOnChannel<boost::array<std::uint32_t, 1> >(
+  DoRpcOnChannel<std::array<std::uint32_t, 1> >(
       new_channel, AMQP_CHANNEL_OPEN_METHOD, &channel_open, OPEN_OK);
 
-  static const boost::array<std::uint32_t, 1> CONFIRM_OK = {
-      {AMQP_CONFIRM_SELECT_OK_METHOD}};
+  static const std::array<std::uint32_t, 1> CONFIRM_OK = {
+      AMQP_CONFIRM_SELECT_OK_METHOD};
   amqp_confirm_select_t confirm_select = {};
-  DoRpcOnChannel<boost::array<std::uint32_t, 1> >(
+  DoRpcOnChannel<std::array<std::uint32_t, 1> >(
       new_channel, AMQP_CONFIRM_SELECT_METHOD, &confirm_select, CONFIRM_OK);
 
   m_channels.at(new_channel) = CS_Open;
@@ -439,7 +439,7 @@ void Channel::ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame) {
   m_frame_queue.push_back(frame);
 
   if (CheckForQueuedMessageOnChannel(frame.channel)) {
-    boost::array<amqp_channel_t, 1> channel = {{frame.channel}};
+    std::array<amqp_channel_t, 1> channel = {frame.channel};
     Envelope::ptr_t envelope;
     if (!ConsumeMessageOnChannelInner(channel, envelope, -1)) {
       throw std::logic_error(
@@ -503,7 +503,7 @@ bool Channel::ChannelImpl::GetNextFrameOnChannel(
     return true;
   }
 
-  boost::array<amqp_channel_t, 1> channels = {{channel}};
+  std::array<amqp_channel_t, 1> channels = {channel};
   return GetNextFrameFromBrokerOnChannel(channels, frame, timeout);
 }
 
