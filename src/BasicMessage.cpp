@@ -33,6 +33,7 @@
 #include <amqp_framing.h>
 
 #include <boost/optional/optional.hpp>
+#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -45,12 +46,12 @@ struct BasicMessage::Impl {
   boost::optional<std::string> content_type;
   boost::optional<std::string> content_encoding;
   boost::optional<delivery_mode_t> delivery_mode;
-  boost::optional<boost::uint8_t> priority;
+  boost::optional<std::uint8_t> priority;
   boost::optional<std::string> correlation_id;
   boost::optional<std::string> reply_to;
   boost::optional<std::string> expiration;
   boost::optional<std::string> message_id;
-  boost::optional<boost::uint64_t> timestamp;
+  boost::optional<std::uint64_t> timestamp;
   boost::optional<std::string> type;
   boost::optional<std::string> user_id;
   boost::optional<std::string> app_id;
@@ -122,11 +123,11 @@ bool BasicMessage::DeliveryModeIsSet() const {
 
 void BasicMessage::DeliveryModeClear() { m_impl->delivery_mode.reset(); }
 
-boost::uint8_t BasicMessage::Priority() const {
+std::uint8_t BasicMessage::Priority() const {
   return m_impl->priority.value_or(0);
 }
 
-void BasicMessage::Priority(boost::uint8_t priority) {
+void BasicMessage::Priority(std::uint8_t priority) {
   m_impl->priority = priority;
 }
 
@@ -208,10 +209,11 @@ bool BasicMessage::MessageIdIsSet() const {
 
 void BasicMessage::MessageIdClear() { m_impl->message_id.reset(); }
 
-boost::uint64_t BasicMessage::Timestamp() const {
+std::uint64_t BasicMessage::Timestamp() const {
   return m_impl->timestamp.value_or(0);
 }
-void BasicMessage::Timestamp(boost::uint64_t timestamp) {
+
+void BasicMessage::Timestamp(std::uint64_t timestamp) {
   m_impl->timestamp = timestamp;
 }
 

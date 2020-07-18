@@ -215,7 +215,7 @@ class Channel::ChannelImpl {
   }
 
   template <class ResponseListType>
-  amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, boost::uint32_t method_id,
+  amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, std::uint32_t method_id,
                               void *decoded,
                               const ResponseListType &expected_responses) {
     CheckForError(amqp_send_method(m_connection, channel, method_id, decoded));
@@ -228,7 +228,7 @@ class Channel::ChannelImpl {
   }
 
   template <class ResponseListType>
-  amqp_frame_t DoRpc(boost::uint32_t method_id, void *decoded,
+  amqp_frame_t DoRpc(std::uint32_t method_id, void *decoded,
                      const ResponseListType &expected_responses) {
     amqp_channel_t channel = GetChannel();
     amqp_frame_t ret =
@@ -264,7 +264,7 @@ class Channel::ChannelImpl {
   template <class ChannelListType>
   bool ConsumeMessageOnChannelInner(const ChannelListType channels,
                                     Envelope::ptr_t &message, int timeout) {
-    const boost::array<boost::uint32_t, 2> DELIVER_OR_CANCEL = {
+    const boost::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
         {AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD}};
 
     boost::chrono::microseconds real_timeout =
@@ -302,7 +302,7 @@ class Channel::ChannelImpl {
     const std::string in_consumer_tag(
         (char *)deliver_method->consumer_tag.bytes,
         deliver_method->consumer_tag.len);
-    const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
+    const std::uint64_t delivery_tag = deliver_method->delivery_tag;
     const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
     MaybeReleaseBuffersOnChannel(deliver.channel);
 
@@ -347,7 +347,7 @@ class Channel::ChannelImpl {
   amqp_connection_state_t m_connection;
 
  private:
-  static boost::uint32_t ComputeBrokerVersion(
+  static std::uint32_t ComputeBrokerVersion(
       const amqp_connection_state_t state);
 
   frame_queue_t m_frame_queue;
@@ -362,7 +362,7 @@ class Channel::ChannelImpl {
   typedef std::vector<channel_state_t> channel_state_list_t;
 
   channel_state_list_t m_channels;
-  boost::uint32_t m_brokerVersion;
+  std::uint32_t m_brokerVersion;
   // A channel that is likely to be an CS_Open state
   amqp_channel_t m_last_used_channel;
 

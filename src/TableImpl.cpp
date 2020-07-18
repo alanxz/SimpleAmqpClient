@@ -64,7 +64,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint8_t value) const {
+    const std::uint8_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_U8;
   v.value.u8 = value;
@@ -72,7 +72,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int8_t value) const {
+    const std::int8_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I8;
   v.value.i8 = value;
@@ -80,7 +80,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint16_t value) const {
+    const std::uint16_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_U16;
   v.value.u16 = value;
@@ -88,7 +88,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int16_t value) const {
+    const std::int16_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I16;
   v.value.i16 = value;
@@ -96,7 +96,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint32_t value) const {
+    const std::uint32_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_U32;
   v.value.u32 = value;
@@ -104,7 +104,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int32_t value) const {
+    const std::int32_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I32;
   v.value.i32 = value;
@@ -112,7 +112,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint64_t value) const {
+    const std::uint64_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_TIMESTAMP;
   v.value.u64 = value;
@@ -120,7 +120,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int64_t value) const {
+    const std::int64_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I64;
   v.value.i64 = value;
