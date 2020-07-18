@@ -178,16 +178,16 @@ amqp_channel_t ChannelImpl::GetNextChannelId() {
 amqp_channel_t ChannelImpl::CreateNewChannel() {
   amqp_channel_t new_channel = GetNextChannelId();
 
-  static const boost::array<boost::uint32_t, 1> OPEN_OK = {
+  static const boost::array<std::uint32_t, 1> OPEN_OK = {
       {AMQP_CHANNEL_OPEN_OK_METHOD}};
   amqp_channel_open_t channel_open = {};
-  DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(
+  DoRpcOnChannel<boost::array<std::uint32_t, 1> >(
       new_channel, AMQP_CHANNEL_OPEN_METHOD, &channel_open, OPEN_OK);
 
-  static const boost::array<boost::uint32_t, 1> CONFIRM_OK = {
+  static const boost::array<std::uint32_t, 1> CONFIRM_OK = {
       {AMQP_CONFIRM_SELECT_OK_METHOD}};
   amqp_confirm_select_t confirm_select = {};
-  DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(
+  DoRpcOnChannel<boost::array<std::uint32_t, 1> >(
       new_channel, AMQP_CONFIRM_SELECT_METHOD, &confirm_select, CONFIRM_OK);
 
   m_channels.at(new_channel) = CS_Open;
@@ -451,7 +451,7 @@ bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame,
   memset(&tv_timeout, 0, sizeof(tv_timeout));
 
   if (timeout != boost::chrono::microseconds::max()) {
-    // boost::chrono::seconds.count() returns boost::int_atleast64_t,
+    // boost::chrono::seconds.count() returns std::int_atleast64_t,
     // long can be 32 or 64 bit depending on the platform/arch
     // unless the timeout is something absurd cast to long will be ok, but
     // lets guard against the case where someone does something silly
@@ -526,8 +526,7 @@ bool bytesEqual(amqp_bytes_t r, amqp_bytes_t l) {
 }
 }  // namespace
 
-boost::uint32_t ChannelImpl::ComputeBrokerVersion(
-    amqp_connection_state_t state) {
+std::uint32_t ChannelImpl::ComputeBrokerVersion(amqp_connection_state_t state) {
   const amqp_table_t *properties = amqp_get_server_properties(state);
   const amqp_bytes_t version = amqp_cstring_bytes("version");
   amqp_table_entry_t *version_entry = NULL;
@@ -550,12 +549,12 @@ boost::uint32_t ChannelImpl::ComputeBrokerVersion(
   if (version_components.size() != 3) {
     return 0;
   }
-  boost::uint32_t version_major =
-      boost::lexical_cast<boost::uint32_t>(version_components[0]);
-  boost::uint32_t version_minor =
-      boost::lexical_cast<boost::uint32_t>(version_components[1]);
-  boost::uint32_t version_patch =
-      boost::lexical_cast<boost::uint32_t>(version_components[2]);
+  std::uint32_t version_major =
+      boost::lexical_cast<std::uint32_t>(version_components[0]);
+  std::uint32_t version_minor =
+      boost::lexical_cast<std::uint32_t>(version_components[1]);
+  std::uint32_t version_patch =
+      boost::lexical_cast<std::uint32_t>(version_components[2]);
   return (version_major & 0xFF) << 16 | (version_minor & 0xFF) << 8 |
          (version_patch & 0xFF);
 }

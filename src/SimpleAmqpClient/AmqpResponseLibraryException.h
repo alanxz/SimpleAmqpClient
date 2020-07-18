@@ -28,7 +28,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/cstdint.hpp>
 #include <stdexcept>
 #include <string>
 

@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/get.hpp>
+#include <cstdint>
 #include <ctime>
 #include <iterator>
 #include <limits>
@@ -45,32 +46,32 @@ TableValue::TableValue()
 TableValue::TableValue(bool value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::uint8_t value)
+TableValue::TableValue(std::uint8_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::int8_t value)
+TableValue::TableValue(std::int8_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::uint16_t value)
+TableValue::TableValue(std::uint16_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::int16_t value)
+TableValue::TableValue(std::int16_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::uint32_t value)
+TableValue::TableValue(std::uint32_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::int32_t value)
+TableValue::TableValue(std::int32_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
-TableValue::TableValue(boost::uint64_t value)
+TableValue::TableValue(std::uint64_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
 TableValue TableValue::Timestamp(std::time_t ts) {
-  return TableValue(static_cast<boost::uint64_t>(ts));
+  return TableValue(static_cast<std::uint64_t>(ts));
 }
 
-TableValue::TableValue(boost::int64_t value)
+TableValue::TableValue(std::int64_t value)
     : m_impl(new Detail::TableValueImpl(value)) {}
 
 TableValue::TableValue(float value)
@@ -139,39 +140,39 @@ TableValue::ValueType TableValue::GetType() const {
 
 bool TableValue::GetBool() const { return boost::get<bool>(m_impl->m_value); }
 
-boost::uint8_t TableValue::GetUint8() const {
-  return boost::get<boost::uint8_t>(m_impl->m_value);
+std::uint8_t TableValue::GetUint8() const {
+  return boost::get<std::uint8_t>(m_impl->m_value);
 }
 
-boost::int8_t TableValue::GetInt8() const {
-  return boost::get<boost::int8_t>(m_impl->m_value);
+std::int8_t TableValue::GetInt8() const {
+  return boost::get<std::int8_t>(m_impl->m_value);
 }
 
-boost::uint16_t TableValue::GetUint16() const {
-  return boost::get<boost::uint16_t>(m_impl->m_value);
+std::uint16_t TableValue::GetUint16() const {
+  return boost::get<std::uint16_t>(m_impl->m_value);
 }
 
-boost::int16_t TableValue::GetInt16() const {
-  return boost::get<boost::int16_t>(m_impl->m_value);
+std::int16_t TableValue::GetInt16() const {
+  return boost::get<std::int16_t>(m_impl->m_value);
 }
 
-boost::uint32_t TableValue::GetUint32() const {
-  return boost::get<boost::uint32_t>(m_impl->m_value);
+std::uint32_t TableValue::GetUint32() const {
+  return boost::get<std::uint32_t>(m_impl->m_value);
 }
 
-boost::int32_t TableValue::GetInt32() const {
-  return boost::get<boost::int32_t>(m_impl->m_value);
+std::int32_t TableValue::GetInt32() const {
+  return boost::get<std::int32_t>(m_impl->m_value);
 }
 
 std::time_t TableValue::GetTimestamp() const {
-  return static_cast<std::time_t>(boost::get<boost::uint64_t>(m_impl->m_value));
+  return static_cast<std::time_t>(boost::get<std::uint64_t>(m_impl->m_value));
 }
 
-boost::int64_t TableValue::GetInt64() const {
-  return boost::get<boost::int64_t>(m_impl->m_value);
+std::int64_t TableValue::GetInt64() const {
+  return boost::get<std::int64_t>(m_impl->m_value);
 }
 
-boost::int64_t TableValue::GetInteger() const {
+std::int64_t TableValue::GetInteger() const {
   switch (m_impl->m_value.which()) {
     case VT_uint8:
       return GetUint8();
@@ -227,23 +228,23 @@ void TableValue::Set() { m_impl->m_value = Detail::void_t(); }
 
 void TableValue::Set(bool value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::uint8_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::uint8_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::int8_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int8_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::uint16_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::uint16_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::int16_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int16_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::uint32_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::uint32_t value) { m_impl->m_value = value; }
 
-void TableValue::Set(boost::int32_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int32_t value) { m_impl->m_value = value; }
 
 void TableValue::SetTimestamp(std::time_t value) {
-  m_impl->m_value = static_cast<boost::uint64_t>(value);
+  m_impl->m_value = static_cast<std::uint64_t>(value);
 }
 
-void TableValue::Set(boost::int64_t value) { m_impl->m_value = value; }
+void TableValue::Set(std::int64_t value) { m_impl->m_value = value; }
 
 void TableValue::Set(float value) { m_impl->m_value = value; }
 

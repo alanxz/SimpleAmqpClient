@@ -30,6 +30,7 @@
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/get.hpp>
 #include <ctime>
+#include <cstdint>
 
 #include "connected_test.h"
 
@@ -123,8 +124,8 @@ TEST(table_value, bool_value) {
 }
 
 TEST(table_value, uint8_value) {
-  boost::uint8_t v1 = 1;
-  boost::uint8_t v2 = 2;
+  std::uint8_t v1 = 1;
+  std::uint8_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint8, value.GetType());
@@ -168,8 +169,8 @@ TEST(table_value, uint8_value) {
 }
 
 TEST(table_value, int8_value) {
-  boost::int8_t v1 = 1;
-  boost::int8_t v2 = 2;
+  std::int8_t v1 = 1;
+  std::int8_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int8, value.GetType());
@@ -213,8 +214,8 @@ TEST(table_value, int8_value) {
 }
 
 TEST(table_value, uint16_value) {
-  boost::uint16_t v1 = 1;
-  boost::uint16_t v2 = 2;
+  std::uint16_t v1 = 1;
+  std::uint16_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint16, value.GetType());
@@ -258,8 +259,8 @@ TEST(table_value, uint16_value) {
 }
 
 TEST(table_value, int16_value) {
-  boost::int16_t v1 = 1;
-  boost::int16_t v2 = 2;
+  std::int16_t v1 = 1;
+  std::int16_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int16, value.GetType());
@@ -303,8 +304,8 @@ TEST(table_value, int16_value) {
 }
 
 TEST(table_value, uint32_value) {
-  boost::uint32_t v1 = 1;
-  boost::uint32_t v2 = 2;
+  std::uint32_t v1 = 1;
+  std::uint32_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_uint32, value.GetType());
@@ -348,8 +349,8 @@ TEST(table_value, uint32_value) {
 }
 
 TEST(table_value, int32_value) {
-  boost::int32_t v1 = 1;
-  boost::int32_t v2 = 2;
+  std::int32_t v1 = 1;
+  std::int32_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int32, value.GetType());
@@ -438,8 +439,8 @@ TEST(table_value, timestamp_value) {
 }
 
 TEST(table_value, int64_value) {
-  boost::int64_t v1 = 1;
-  boost::int64_t v2 = 2;
+  std::int64_t v1 = 1;
+  std::int64_t v2 = 2;
 
   TableValue value(v1);
   EXPECT_EQ(TableValue::VT_int64, value.GetType());

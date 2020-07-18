@@ -26,6 +26,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+#include <cstdint>
+
 #include "connected_test.h"
 
 TEST_F(connected_test, queue_declare) {
@@ -74,8 +76,8 @@ TEST_F(connected_test, queue_declare_notautodelete) {
 }
 
 TEST_F(connected_test, queue_declare_counts) {
-  boost::uint32_t message_count = 123;
-  boost::uint32_t consumer_count = 123;
+  std::uint32_t message_count = 123;
+  std::uint32_t consumer_count = 123;
 
   std::string queue = channel->DeclareQueueWithCounts(
       "queue_declare_counts", message_count, consumer_count);
@@ -101,8 +103,8 @@ TEST_F(connected_test, queue_declare_counts) {
 }
 
 TEST_F(connected_test, queue_declare_counts_table) {
-  boost::uint32_t message_count = 123;
-  boost::uint32_t consumer_count = 123;
+  std::uint32_t message_count = 123;
+  std::uint32_t consumer_count = 123;
 
   Table qTable;
 
