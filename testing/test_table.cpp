@@ -27,6 +27,7 @@
  */
 
 #include <algorithm>
+#include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/get.hpp>
 
 #include "connected_test.h"

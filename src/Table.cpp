@@ -29,6 +29,7 @@
 #include "SimpleAmqpClient/Table.h"
 
 #include <algorithm>
+#include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/get.hpp>
 #include <iterator>
 #include <limits>
