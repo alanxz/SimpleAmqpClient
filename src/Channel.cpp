@@ -56,6 +56,7 @@
 #include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
+#include "SimpleAmqpClient/MessageRejectedException.h"
 #include "SimpleAmqpClient/TableImpl.h"
 #include "SimpleAmqpClient/Util.h"
 
@@ -536,9 +537,12 @@ void Channel::BasicPublish(const std::string &exchange_name,
   m_impl->GetMethodOnChannel(channels, response, PUBLISH_ACK);
 
   if (AMQP_BASIC_NACK_METHOD == response.payload.method.id) {
+    auto return_method =
+        reinterpret_cast<amqp_basic_nack_t *>(response.payload.method.decoded);
+    MessageRejectedException message_rejected(return_method->delivery_tag);
     m_impl->ReturnChannel(channel);
     m_impl->MaybeReleaseBuffersOnChannel(channel);
-    throw std::runtime_error("Queue is full");
+    throw message_rejected;
   }
 
   if (AMQP_BASIC_RETURN_METHOD == response.payload.method.id) {
