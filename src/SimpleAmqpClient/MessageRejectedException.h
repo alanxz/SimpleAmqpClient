@@ -30,6 +30,7 @@
 
 #include <cstdint>
 #include <stdexcept>
+#include <string>
 
 #include "SimpleAmqpClient/BasicMessage.h"
 
@@ -50,7 +51,7 @@ class SIMPLEAMQPCLIENT_EXPORT MessageRejectedException
   MessageRejectedException(std::uint64_t delivery_tag)
       : std::runtime_error(
             std::string("Message rejected: ")
-                .append(boost::lexical_cast<std::string>(delivery_tag))),
+                .append(std::to_string(delivery_tag))),
         m_delivery_tag(delivery_tag) {}
 
   /// `delivery_tag` getter

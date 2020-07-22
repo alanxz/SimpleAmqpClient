@@ -51,8 +51,8 @@
 #include <string.h>
 
 #include <array>
+#include <string>
 #include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
 
 #define BROKER_HEARTBEAT 0
 
@@ -549,12 +549,9 @@ std::uint32_t ChannelImpl::ComputeBrokerVersion(amqp_connection_state_t state) {
   if (version_components.size() != 3) {
     return 0;
   }
-  std::uint32_t version_major =
-      boost::lexical_cast<std::uint32_t>(version_components[0]);
-  std::uint32_t version_minor =
-      boost::lexical_cast<std::uint32_t>(version_components[1]);
-  std::uint32_t version_patch =
-      boost::lexical_cast<std::uint32_t>(version_components[2]);
+  std::uint32_t version_major = std::stoul(version_components[0]);
+  std::uint32_t version_minor = std::stoul(version_components[1]);
+  std::uint32_t version_patch = std::stoul(version_components[2]);
   return (version_major & 0xFF) << 16 | (version_minor & 0xFF) << 8 |
          (version_patch & 0xFF);
 }
