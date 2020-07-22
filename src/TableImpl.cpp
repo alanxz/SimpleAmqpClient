@@ -36,7 +36,6 @@
 #include <string.h>
 
 #include <algorithm>
-#include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <new>
