@@ -87,8 +87,8 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage : boost::noncopyable {
    * @param body The message body. The message body is NOT copied.
    * Passed in message body is deallocated when: body is set or message is
    * destructed.
-   * @param properties The `amqp_basic_properties_t struct`. Note this makes a deep
-   * copy of the properties struct.
+   * @param properties The `amqp_basic_properties_t struct`. Note this makes a
+   * deep copy of the properties struct.
    * @returns a new BasicMessage object
    */
   static ptr_t Create(amqp_bytes_t_ &body,

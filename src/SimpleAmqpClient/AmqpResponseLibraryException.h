@@ -61,7 +61,7 @@ class SIMPLEAMQPCLIENT_EXPORT AmqpResponseLibraryException
   explicit AmqpResponseLibraryException(const std::string &message) throw();
 };
 
-} // namespace AmqpClient
+}  // namespace AmqpClient
 
 #ifdef _MSC_VER
 #pragma warning(pop)

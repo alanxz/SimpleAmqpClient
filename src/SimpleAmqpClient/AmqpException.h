@@ -453,7 +453,8 @@ class SIMPLEAMQPCLIENT_EXPORT ContentTooLargeException
 };
 
 /**
- * AMQP_NO_ROUTE error, occurs when the IP stack cannot route our data to the broker.
+ * AMQP_NO_ROUTE error, occurs when the IP stack cannot route our data to the
+ * broker.
  */
 class SIMPLEAMQPCLIENT_EXPORT NoRouteException : public ChannelException {
  public:
