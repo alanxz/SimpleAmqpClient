@@ -65,9 +65,11 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   /// a `shared_ptr` to Channel
   typedef boost::shared_ptr<Channel> ptr_t;
 
-  static const std::string EXCHANGE_TYPE_DIRECT; ///< `"direct"` string constant
-  static const std::string EXCHANGE_TYPE_FANOUT; ///< `"fanout"` string constant
-  static const std::string EXCHANGE_TYPE_TOPIC; ///< `"topic"` string constant
+  static const std::string
+      EXCHANGE_TYPE_DIRECT;                      ///< `"direct"` string constant
+  static const std::string
+      EXCHANGE_TYPE_FANOUT;                      ///< `"fanout"` string constant
+  static const std::string EXCHANGE_TYPE_TOPIC;  ///< `"topic"` string constant
 
   /**
    * Creates a new channel object
@@ -705,8 +707,9 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    *
    * This function will not wait for a message to arrive in a queue, it will
    * return `false` if the queue is empty.
-   * @note This function effectively polls the broker for a message; in general, better
-   * performance is realized using \ref BasicConsume / \ref BasicConsumeMessage.
+   * @note This function effectively polls the broker for a message; in general,
+   * better performance is realized using \ref BasicConsume / \ref
+   * BasicConsumeMessage.
    * @param [out] message A message envelope pointer that will be populated if a
    * message is delivered.
    * @param queue The name of the queue to try to get the message from.
@@ -736,7 +739,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * operations with a consumer.
    * @param no_local Defaults to true
    * @param no_ack If `true`, ack'ing the message is automatically done when the
-   * message is delivered. Defaults to `true` (message does not have to be ack'ed).
+   * message is delivered. Defaults to `true` (message does not have to be
+   * ack'ed).
    * @param exclusive Means only this consumer can access the queue.
    * @param message_prefetch_count Number of unacked messages the broker will
    * deliver. Setting this to more than 1 will allow the broker to deliver
@@ -763,7 +767,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * operations with a consumer.
    * @param no_local Defaults to true
    * @param no_ack If `true`, ack'ing the message is automatically done when the
-   * message is delivered. Defaults to `true` (message does not have to be ack'ed).
+   * message is delivered. Defaults to `true` (message does not have to be
+   * ack'ed).
    * @param exclusive Means only this consumer can access the queue.
    * @param message_prefetch_count Number of unacked messages the broker will
    * deliver. Setting this to more than 1 will allow the broker to deliver
@@ -844,7 +849,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    *
    * Waits for a single Basic message to be Delivered or the timeout to expire.
    *
-   * This function only works after \ref BasicConsume as been successfully called.
+   * This function only works after \ref BasicConsume as been successfully
+   * called.
    *
    * This function returns an envelope object which contains more information
    * about the message delivered.
@@ -883,7 +889,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * Waits for a single message to be delivered to one of the consumers opened
    * on this Channel, or for the timeout to occur.
    *
-   * This function only works after \ref BasicConsume has been successfully called.
+   * This function only works after \ref BasicConsume has been successfully
+   * called.
    *
    * @param [out] envelope The message object that is delivered.
    * @param timeout The timeout in milliseconds for the message to be delivered.

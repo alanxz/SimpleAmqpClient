@@ -39,8 +39,8 @@
 #include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
 #include "SimpleAmqpClient/Envelope.h"
-#include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/MessageRejectedException.h"
+#include "SimpleAmqpClient/MessageReturnedException.h"
 #include "SimpleAmqpClient/Version.h"
 
 #endif  // SIMPLEAMQPCLIENT_SIMPLEAMQPCLIENT_H

@@ -174,7 +174,8 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
    * for client use, meaning "all messages so far received".
    */
   struct DeliveryInfo {
-    /// A delivery tag, assigned by the broker to identify this delivery within a channel
+    /// A delivery tag, assigned by the broker to identify this delivery within
+    /// a channel
     boost::uint64_t delivery_tag;
     /// An ID of the delivery channel
     boost::uint16_t delivery_channel;
