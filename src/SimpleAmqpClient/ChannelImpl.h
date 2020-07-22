@@ -38,6 +38,7 @@
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#include <algorithm>
 #include <array>
 #include <boost/bind.hpp>
 #include <boost/chrono.hpp>

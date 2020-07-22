@@ -28,8 +28,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -61,8 +59,8 @@ class ChannelImpl;
  */
 class SIMPLEAMQPCLIENT_EXPORT Channel {
  public:
-  /// a `shared_ptr` to Channel
-  typedef boost::shared_ptr<Channel> ptr_t;
+  /// a `std::shared_ptr` to Channel
+  typedef std::shared_ptr<Channel> ptr_t;
 
   static const std::string
       EXCHANGE_TYPE_DIRECT;  ///< `"direct"` string constant
@@ -89,8 +87,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
                       const std::string &username = "guest",
                       const std::string &password = "guest",
                       const std::string &vhost = "/", int frame_max = 131072) {
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max, false);
+    return std::make_shared<Channel>(host, port, username, password, vhost,
+                                     frame_max, false);
   }
 
   /**
@@ -115,8 +113,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
                                   const std::string &identity = "guest",
                                   const std::string &vhost = "/",
                                   int frame_max = 131072) {
-    return boost::make_shared<Channel>(host, port, identity, "", vhost,
-                                       frame_max, true);
+    return std::make_shared<Channel>(host, port, identity, "", vhost, frame_max,
+                                     true);
   }
 
  protected:
@@ -212,8 +210,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     ssl_params.verify_hostname = verify_hostname;
     ssl_params.verify_peer = verify_peer;
 
-    return boost::make_shared<Channel>(host, port, username, password, vhost,
-                                       frame_max, ssl_params, false);
+    return std::make_shared<Channel>(host, port, username, password, vhost,
+                                     frame_max, ssl_params, false);
   }
 
   /**
@@ -255,8 +253,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     ssl_params.verify_hostname = verify_hostname;
     ssl_params.verify_peer = verify_peer;
 
-    return boost::make_shared<Channel>(host, port, identity, "", vhost,
-                                       frame_max, ssl_params, true);
+    return std::make_shared<Channel>(host, port, identity, "", vhost, frame_max,
+                                     ssl_params, true);
   }
 
   /**
