@@ -40,6 +40,7 @@
 #include <boost/chrono.hpp>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <new>
 #include <queue>
 #include <sstream>
@@ -141,8 +142,8 @@ Channel::OpenOpts Channel::OpenOpts::FromUri(const std::string &uri) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
 
-  boost::shared_ptr<char> uri_dup =
-      boost::shared_ptr<char>(strdup(uri.c_str()), free);
+  std::shared_ptr<char> uri_dup =
+      std::shared_ptr<char>(strdup(uri.c_str()), free);
 
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();
@@ -200,14 +201,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
       case 0: {
         const OpenOpts::BasicAuth &auth =
             boost::get<OpenOpts::BasicAuth>(opts.auth);
-        return boost::make_shared<Channel>(
+        return std::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.username, auth.password,
                         opts.vhost, opts.frame_max, false));
       }
       case 1: {
         const OpenOpts::ExternalSaslAuth &auth =
             boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
-        return boost::make_shared<Channel>(
+        return std::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
                         opts.frame_max, true));
       }
@@ -219,14 +220,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
     case 0: {
       const OpenOpts::BasicAuth &auth =
           boost::get<OpenOpts::BasicAuth>(opts.auth);
-      return boost::make_shared<Channel>(OpenSecureChannel(
+      return std::make_shared<Channel>(OpenSecureChannel(
           opts.host, opts.port, auth.username, auth.password, opts.vhost,
           opts.frame_max, opts.tls_params.get(), false));
     }
     case 1: {
       const OpenOpts::ExternalSaslAuth &auth =
           boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
-      return boost::make_shared<Channel>(
+      return std::make_shared<Channel>(
           OpenSecureChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
                             opts.frame_max, opts.tls_params.get(), true));
     }
@@ -477,8 +478,8 @@ int Channel::GetSocketFD() const {
 }
 
 bool Channel::CheckExchangeExists(boost::string_ref exchange_name) {
-  const boost::array<boost::uint32_t, 1> DECLARE_OK = {
-      {AMQP_EXCHANGE_DECLARE_OK_METHOD}};
+  const std::array<std::uint32_t, 1> DECLARE_OK = {
+      AMQP_EXCHANGE_DECLARE_OK_METHOD};
 
   amqp_exchange_declare_t declare = {};
   declare.exchange = StringRefToBytes(exchange_name);
@@ -600,8 +601,8 @@ void Channel::UnbindExchange(const std::string &destination,
 }
 
 bool Channel::CheckQueueExists(boost::string_ref queue_name) {
-  const boost::array<boost::uint32_t, 1> DECLARE_OK = {
-      {AMQP_QUEUE_DECLARE_OK_METHOD}};
+  const std::array<std::uint32_t, 1> DECLARE_OK = {
+      AMQP_QUEUE_DECLARE_OK_METHOD};
 
   amqp_queue_declare_t declare = {};
   declare.queue = StringRefToBytes(queue_name);

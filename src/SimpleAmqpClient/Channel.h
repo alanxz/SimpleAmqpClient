@@ -28,9 +28,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/make_shared.hpp>
 #include <boost/optional.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/variant.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <cstdint>
@@ -60,8 +58,8 @@ namespace AmqpClient {
  */
 class SIMPLEAMQPCLIENT_EXPORT Channel {
  public:
-  /// a `shared_ptr` to Channel
-  typedef boost::shared_ptr<Channel> ptr_t;
+  /// a `std::shared_ptr` to Channel
+  typedef std::shared_ptr<Channel> ptr_t;
 
   static const std::string
       EXCHANGE_TYPE_DIRECT;  ///< `"direct"` string constant

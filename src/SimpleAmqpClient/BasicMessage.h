@@ -28,8 +28,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -52,8 +50,8 @@ namespace AmqpClient {
  */
 class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
  public:
-  /// A shared pointer to BasicMessage
-  typedef boost::shared_ptr<BasicMessage> ptr_t;
+  /// A std::shared_ptr to BasicMessage
+  typedef std::shared_ptr<BasicMessage> ptr_t;
 
   /// With durable queues, messages can be requested to persist or not
   enum delivery_mode_t {
@@ -65,7 +63,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
   /**
    * Create a new empty BasicMessage object
    */
-  static ptr_t Create() { return boost::make_shared<BasicMessage>(); }
+  static ptr_t Create() { return std::make_shared<BasicMessage>(); }
 
   /**
    * Create a new BasicMessage object with given body
@@ -74,7 +72,7 @@ class SIMPLEAMQPCLIENT_EXPORT BasicMessage {
    * @returns a new BasicMessage object
    */
   static ptr_t Create(const std::string& body) {
-    return boost::make_shared<BasicMessage>(body);
+    return std::make_shared<BasicMessage>(body);
   }
 
   /// Construct empty BasicMessage
