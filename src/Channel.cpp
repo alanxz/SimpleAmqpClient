@@ -38,7 +38,6 @@
 
 #include <array>
 #include <boost/chrono.hpp>
-#include <boost/limits.hpp>
 #include <cstdint>
 #include <map>
 #include <new>
