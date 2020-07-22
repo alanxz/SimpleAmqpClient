@@ -32,7 +32,8 @@
 #include <amqp_framing.h>
 #include <assert.h>
 
-#include <boost/lexical_cast.hpp>
+#include <sstream>
+#include <string>
 
 namespace AmqpClient {
 
@@ -74,7 +75,7 @@ void AmqpException::Throw(const amqp_rpc_reply_t &reply) {
       throw std::logic_error(
           std::string(
               "Programming error: unknown server exception class/method")
-              .append(boost::lexical_cast<std::string>(reply.reply.id)));
+              .append(std::to_string(reply.reply.id)));
   }
 }
 
@@ -121,7 +122,7 @@ void AmqpException::Throw(const amqp_channel_close_t &reply) {
     default:
       throw std::logic_error(
           std::string("Programming error: unknown channel reply code: ")
-              .append(boost::lexical_cast<std::string>(reply.reply_code)));
+              .append(std::to_string(reply.reply_code)));
   }
 }
 
@@ -183,7 +184,7 @@ void AmqpException::Throw(const amqp_connection_close_t &reply) {
     default:
       throw std::logic_error(
           std::string("Programming error: unknown connection reply code: ")
-              .append(boost::lexical_cast<std::string>(reply.reply_code)));
+              .append(std::to_string(reply.reply_code)));
   }
 }
 
