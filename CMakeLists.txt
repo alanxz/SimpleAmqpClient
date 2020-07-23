@@ -148,14 +148,16 @@ option(ENABLE_TESTING "Enable smoke tests" OFF)
 if (ENABLE_TESTING)
     enable_testing()
 
-    set(BUILD_GTEST ON)
-    set(BUILD_GMOCK OFF)
+    set(BUILD_GTEST ON CACHE BOOL "" FORCE)
+    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
     # This only affects targets declared after this.
     set(BUILD_SHARED_LIBS OFF)
 
     mark_as_advanced(BUILD_GMOCK)
     mark_as_advanced(BUILD_GTEST)
+    mark_as_advanced(INSTALL_GTEST)
     mark_as_advanced(gmock_build_tests)
     mark_as_advanced(gtest_build_samples)
     mark_as_advanced(gtest_build_tests)
