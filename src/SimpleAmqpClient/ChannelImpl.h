@@ -38,10 +38,8 @@
 #include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <algorithm>
 #include <array>
-#include <boost/bind.hpp>
 #include <chrono>
 #include <map>
 #include <vector>
@@ -160,10 +158,11 @@ class Channel::ChannelImpl {
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) {
     frame_queue_t::iterator desired_frame = std::find_if(
         m_frame_queue.begin(), m_frame_queue.end(),
-        boost::bind(
-            &ChannelImpl::is_expected_method_on_channel<ChannelListType,
-                                                        ResponseListType>,
-            _1, channels, expected_responses));
+        [channels, expected_responses](auto &frame) {
+          return ChannelImpl::is_expected_method_on_channel<ChannelListType,
+                                                            ResponseListType>(
+              frame, channels, expected_responses);
+        });
 
     if (m_frame_queue.end() != desired_frame) {
       frame = *desired_frame;
@@ -244,10 +243,12 @@ class Channel::ChannelImpl {
   template <class ChannelListType>
   bool ConsumeMessageOnChannel(const ChannelListType channels,
                                Envelope::ptr_t &message, int timeout) {
-    envelope_list_t::iterator it = std::find_if(
-        m_delivered_messages.begin(), m_delivered_messages.end(),
-        boost::bind(ChannelImpl::envelope_on_channel<ChannelListType>, _1,
-                    channels));
+    envelope_list_t::iterator it =
+        std::find_if(m_delivered_messages.begin(), m_delivered_messages.end(),
+                     [channels](auto &message) {
+                       return ChannelImpl::envelope_on_channel<ChannelListType>(
+                           message, channels);
+                     });
 
     if (it != m_delivered_messages.end()) {
       message = *it;
