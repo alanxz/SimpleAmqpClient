@@ -36,10 +36,9 @@
 #include <string.h>
 
 #include <algorithm>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/static_visitor.hpp>
 #include <memory>
 #include <new>
+#include <variant>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4800)
@@ -167,7 +166,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
   for (array_t::const_iterator it = value.begin(); it != value.end();
        ++it, ++output_iterator) {
     *output_iterator =
-        boost::apply_visitor(generate_field_value(pool), it->m_impl->m_value);
+        std::visit(generate_field_value(pool), it->m_impl->m_value);
   }
   return v;
 }
@@ -221,8 +220,8 @@ amqp_table_t TableValueImpl::CreateAmqpTableInner(const Table &table,
 
     std::copy(it->first.begin(), it->first.end(), (char *)output_it->key.bytes);
 
-    output_it->value = boost::apply_visitor(
-        TableValueImpl::generate_field_value(pool), it->second.m_impl->m_value);
+    output_it->value = std::visit(TableValueImpl::generate_field_value(pool),
+                                  it->second.m_impl->m_value);
   }
 
   return new_table;

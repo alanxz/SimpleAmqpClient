@@ -29,13 +29,12 @@
 #include "SimpleAmqpClient/Table.h"
 
 #include <algorithm>
-#include <boost/type_traits/remove_cv.hpp>
-#include <boost/variant/get.hpp>
 #include <cstdint>
 #include <ctime>
 #include <iterator>
 #include <limits>
 #include <stdexcept>
+#include <variant>
 
 #include "SimpleAmqpClient/TableImpl.h"
 
@@ -135,45 +134,45 @@ bool TableValue::operator!=(const TableValue &l) const {
 TableValue::~TableValue() {}
 
 TableValue::ValueType TableValue::GetType() const {
-  return static_cast<ValueType>(m_impl->m_value.which());
+  return static_cast<ValueType>(m_impl->m_value.index());
 }
 
-bool TableValue::GetBool() const { return boost::get<bool>(m_impl->m_value); }
+bool TableValue::GetBool() const { return std::get<bool>(m_impl->m_value); }
 
 std::uint8_t TableValue::GetUint8() const {
-  return boost::get<std::uint8_t>(m_impl->m_value);
+  return std::get<std::uint8_t>(m_impl->m_value);
 }
 
 std::int8_t TableValue::GetInt8() const {
-  return boost::get<std::int8_t>(m_impl->m_value);
+  return std::get<std::int8_t>(m_impl->m_value);
 }
 
 std::uint16_t TableValue::GetUint16() const {
-  return boost::get<std::uint16_t>(m_impl->m_value);
+  return std::get<std::uint16_t>(m_impl->m_value);
 }
 
 std::int16_t TableValue::GetInt16() const {
-  return boost::get<std::int16_t>(m_impl->m_value);
+  return std::get<std::int16_t>(m_impl->m_value);
 }
 
 std::uint32_t TableValue::GetUint32() const {
-  return boost::get<std::uint32_t>(m_impl->m_value);
+  return std::get<std::uint32_t>(m_impl->m_value);
 }
 
 std::int32_t TableValue::GetInt32() const {
-  return boost::get<std::int32_t>(m_impl->m_value);
+  return std::get<std::int32_t>(m_impl->m_value);
 }
 
 std::time_t TableValue::GetTimestamp() const {
-  return static_cast<std::time_t>(boost::get<std::uint64_t>(m_impl->m_value));
+  return static_cast<std::time_t>(std::get<std::uint64_t>(m_impl->m_value));
 }
 
 std::int64_t TableValue::GetInt64() const {
-  return boost::get<std::int64_t>(m_impl->m_value);
+  return std::get<std::int64_t>(m_impl->m_value);
 }
 
 std::int64_t TableValue::GetInteger() const {
-  switch (m_impl->m_value.which()) {
+  switch (m_impl->m_value.index()) {
     case VT_uint8:
       return GetUint8();
     case VT_int8:
@@ -189,40 +188,36 @@ std::int64_t TableValue::GetInteger() const {
     case VT_int64:
       return GetInt64();
     default:
-      throw boost::bad_get();
+      throw std::bad_variant_access();
   }
 }
 
-float TableValue::GetFloat() const {
-  return boost::get<float>(m_impl->m_value);
-}
+float TableValue::GetFloat() const { return std::get<float>(m_impl->m_value); }
 
 double TableValue::GetDouble() const {
-  return boost::get<double>(m_impl->m_value);
+  return std::get<double>(m_impl->m_value);
 }
 
 double TableValue::GetReal() const {
-  switch (m_impl->m_value.which()) {
+  switch (m_impl->m_value.index()) {
     case VT_float:
       return GetFloat();
     case VT_double:
       return GetDouble();
     default:
-      throw boost::bad_get();
+      throw std::bad_variant_access();
   }
 }
 
 std::string TableValue::GetString() const {
-  return boost::get<std::string>(m_impl->m_value);
+  return std::get<std::string>(m_impl->m_value);
 }
 
 std::vector<TableValue> TableValue::GetArray() const {
-  return boost::get<Detail::array_t>(m_impl->m_value);
+  return std::get<Detail::array_t>(m_impl->m_value);
 }
 
-Table TableValue::GetTable() const {
-  return boost::get<Table>(m_impl->m_value);
-}
+Table TableValue::GetTable() const { return std::get<Table>(m_impl->m_value); }
 
 void TableValue::Set() { m_impl->m_value = Detail::void_t(); }
 
