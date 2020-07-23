@@ -30,11 +30,11 @@
 
 #include <amqp.h>
 
-#include <boost/variant/variant.hpp>
 #include <ctime>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "SimpleAmqpClient/Table.h"
@@ -50,10 +50,9 @@ inline bool operator==(const void_t &, const void_t &) { return true; }
 
 typedef std::vector<TableValue> array_t;
 
-typedef boost::variant<void_t, bool, std::int8_t, std::int16_t, std::int32_t,
-                       std::int64_t, float, double, std::string, array_t, Table,
-                       std::uint8_t, std::uint16_t, std::uint32_t,
-                       std::uint64_t>
+typedef std::variant<void_t, bool, std::int8_t, std::int16_t, std::int32_t,
+                     std::int64_t, float, double, std::string, array_t, Table,
+                     std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t>
     value_t;
 
 class TableValueImpl {
@@ -81,8 +80,7 @@ class TableValueImpl {
                                       amqp_pool_t &pool);
 
  public:
-  class generate_field_value
-      : public boost::static_visitor<amqp_field_value_t> {
+  class generate_field_value {
    public:
     explicit generate_field_value(amqp_pool_t &p) : pool(p) {}
     virtual ~generate_field_value() {}

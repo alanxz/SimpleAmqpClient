@@ -29,12 +29,12 @@
  */
 
 #include <boost/optional.hpp>
-#include <boost/variant.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
+#include <variant>
 
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Envelope.h"
@@ -106,7 +106,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     int port;           ///< Port to connect to, default is 5672.
     int frame_max;      ///< Max frame size in bytes. Default 128KB.
     /// One of BasicAuth or ExternalSaslAuth is required.
-    boost::variant<BasicAuth, ExternalSaslAuth> auth;
+    std::variant<std::monostate, BasicAuth, ExternalSaslAuth> auth;
     /// Connect using TLS/SSL when set, otherwise use an unencrypted channel.
     boost::optional<TLSParams> tls_params;
 

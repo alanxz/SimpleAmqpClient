@@ -193,21 +193,21 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
     throw std::runtime_error(
         "opts.port is not valid, it must be a positive number");
   }
-  if (opts.auth.empty()) {
+  if (opts.auth.index()==0) {
     throw std::runtime_error("opts.auth is not specified, it is required");
   }
   if (!opts.tls_params.is_initialized()) {
-    switch (opts.auth.which()) {
-      case 0: {
+    switch (opts.auth.index()) {
+      case 1: {
         const OpenOpts::BasicAuth &auth =
-            boost::get<OpenOpts::BasicAuth>(opts.auth);
+            std::get<OpenOpts::BasicAuth>(opts.auth);
         return std::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.username, auth.password,
                         opts.vhost, opts.frame_max, false));
       }
-      case 1: {
+      case 2: {
         const OpenOpts::ExternalSaslAuth &auth =
-            boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
+            std::get<OpenOpts::ExternalSaslAuth>(opts.auth);
         return std::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
                         opts.frame_max, true));
@@ -216,17 +216,17 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
         throw std::logic_error("Unhandled auth type");
     }
   }
-  switch (opts.auth.which()) {
-    case 0: {
+  switch (opts.auth.index()) {
+    case 1: {
       const OpenOpts::BasicAuth &auth =
-          boost::get<OpenOpts::BasicAuth>(opts.auth);
+          std::get<OpenOpts::BasicAuth>(opts.auth);
       return std::make_shared<Channel>(OpenSecureChannel(
           opts.host, opts.port, auth.username, auth.password, opts.vhost,
           opts.frame_max, opts.tls_params.get(), false));
     }
-    case 1: {
+    case 2: {
       const OpenOpts::ExternalSaslAuth &auth =
-          boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
+          std::get<OpenOpts::ExternalSaslAuth>(opts.auth);
       return std::make_shared<Channel>(
           OpenSecureChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
                             opts.frame_max, opts.tls_params.get(), true));
