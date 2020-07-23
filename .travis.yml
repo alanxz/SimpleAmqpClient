@@ -21,6 +21,7 @@ addons:
       - libboost-chrono-dev
       - libboost-system-dev
       - rabbitmq-server
+      - ninja-build
   coverity_scan:
     project:
       name: "alanxz/SimpleAmqpClient"
@@ -38,7 +39,7 @@ install:
   - cd rabbitmq-c
   - git checkout v0.10.0
   - export RABBITMQC_DIR=`pwd`/../../_install
-  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${RABBITMQC_DIR} -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF .
+  - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${RABBITMQC_DIR} -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_TOOLS=OFF .
   - cmake --build . --target install
   - popd
 
@@ -50,7 +51,7 @@ before_script:
 # Run the Build script
 script:
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then
-      cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQ_C_DIR} .. &&
+      cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQ_C_DIR} .. &&
       cmake --build . --target install ;
     fi
 
