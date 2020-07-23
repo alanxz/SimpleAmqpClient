@@ -46,12 +46,9 @@
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
-#include "SimpleAmqpClient/TableImpl.h"
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <string.h>
 
 #include <array>
-#include <boost/bind.hpp>
 #include <chrono>
 #include <string>
 
@@ -392,17 +389,19 @@ std::vector<amqp_channel_t> ChannelImpl::GetAllConsumerChannels() const {
 }
 
 bool ChannelImpl::CheckForQueuedMessageOnChannel(amqp_channel_t channel) const {
-  frame_queue_t::const_iterator it =
-      std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
-                   boost::bind(&ChannelImpl::is_method_on_channel, _1,
-                               AMQP_BASIC_DELIVER_METHOD, channel));
+  frame_queue_t::const_iterator it = std::find_if(
+      m_frame_queue.begin(), m_frame_queue.end(), [channel](auto &frame) {
+        return ChannelImpl::is_method_on_channel(
+            frame, AMQP_BASIC_DELIVER_METHOD, channel);
+      });
 
   if (it == m_frame_queue.end()) {
     return false;
   }
 
-  it = std::find_if(it + 1, m_frame_queue.end(),
-                    boost::bind(&ChannelImpl::is_on_channel, _1, channel));
+  it = std::find_if(it + 1, m_frame_queue.end(), [channel](auto &frame) {
+    return ChannelImpl::is_on_channel(frame, channel);
+  });
 
   if (it == m_frame_queue.end()) {
     return false;
@@ -415,8 +414,9 @@ bool ChannelImpl::CheckForQueuedMessageOnChannel(amqp_channel_t channel) const {
   uint64_t body_received = 0;
 
   while (body_received < body_length) {
-    it = std::find_if(it + 1, m_frame_queue.end(),
-                      boost::bind(&ChannelImpl::is_on_channel, _1, channel));
+    it = std::find_if(it + 1, m_frame_queue.end(), [channel](auto &frame) {
+      return ChannelImpl::is_on_channel(frame, channel);
+    });
 
     if (it == m_frame_queue.end()) {
       return false;
@@ -480,9 +480,10 @@ bool ChannelImpl::GetNextFrameFromBroker(amqp_frame_t &frame,
 bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel,
                                         amqp_frame_t &frame,
                                         std::chrono::microseconds timeout) {
-  frame_queue_t::iterator it =
-      std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
-                   boost::bind(&ChannelImpl::is_on_channel, _1, channel));
+  frame_queue_t::iterator it = std::find_if(
+      m_frame_queue.begin(), m_frame_queue.end(), [channel](auto &frame) {
+        return ChannelImpl::is_on_channel(frame, channel);
+      });
 
   if (m_frame_queue.end() != it) {
     frame = *it;
@@ -504,7 +505,9 @@ bool ChannelImpl::GetNextFrameOnChannel(amqp_channel_t channel,
 void ChannelImpl::MaybeReleaseBuffersOnChannel(amqp_channel_t channel) {
   if (m_frame_queue.end() ==
       std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
-                   boost::bind(&ChannelImpl::is_on_channel, _1, channel))) {
+                   [channel](auto &frame) {
+                     return ChannelImpl::is_on_channel(frame, channel);
+                   })) {
     amqp_maybe_release_buffers_on_channel(m_connection, channel);
   }
 }
