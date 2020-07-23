@@ -37,8 +37,12 @@
 #include <sys/types.h>
 #endif
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include <string.h>
+
+#include <array>
+#include <cassert>
+#include <chrono>
+#include <string>
 
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/AmqpLibraryException.h"
@@ -46,11 +50,6 @@
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
-#include <string.h>
-
-#include <array>
-#include <chrono>
-#include <string>
 
 #define BROKER_HEARTBEAT 0
 
@@ -527,6 +526,21 @@ bool bytesEqual(amqp_bytes_t r, amqp_bytes_t l) {
   }
   return false;
 }
+
+std::vector<std::string> splitVersion(const std::string &version) {
+  static char delim = '.';
+  std::vector<std::string> out;
+  std::size_t prev = 0;
+  std::size_t cur = version.find(delim);
+  while (cur != std::string::npos) {
+    out.push_back(version.substr(prev, cur - prev));
+    prev = cur + 1;
+    cur = version.find(delim, prev);
+  }
+  out.push_back(version.substr(prev, cur - prev));
+  return out;
+}
+
 }  // namespace
 
 std::uint32_t ChannelImpl::ComputeBrokerVersion(amqp_connection_state_t state) {
@@ -547,8 +561,7 @@ std::uint32_t ChannelImpl::ComputeBrokerVersion(amqp_connection_state_t state) {
   std::string version_string(
       static_cast<char *>(version_entry->value.value.bytes.bytes),
       version_entry->value.value.bytes.len);
-  std::vector<std::string> version_components;
-  boost::split(version_components, version_string, boost::is_any_of("."));
+  std::vector<std::string> version_components = splitVersion(version_string);
   if (version_components.size() != 3) {
     return 0;
   }
