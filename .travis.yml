@@ -3,14 +3,12 @@
 
 language: cpp
 
+os: linux
 dist: xenial
-sudo: true
 
 compiler:
   - gcc
   - clang
-
-services: rabbitmq
 
 env:
   global:
@@ -22,6 +20,7 @@ addons:
       - libboost-dev
       - libboost-chrono-dev
       - libboost-system-dev
+      - rabbitmq-server
   coverity_scan:
     project:
       name: "alanxz/SimpleAmqpClient"
