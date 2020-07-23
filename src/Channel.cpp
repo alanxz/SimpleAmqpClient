@@ -37,7 +37,6 @@
 #include <string.h>
 
 #include <array>
-#include <boost/chrono.hpp>
 #include <cstdint>
 #include <map>
 #include <memory>
