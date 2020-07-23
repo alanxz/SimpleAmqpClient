@@ -8,23 +8,24 @@ dist: xenial
 
 jobs:
   include:
-    - compiler: gcc
-      env: FLAGS=""
-    - compiler: clang
-      env: FLAGS=""
-    - compiler: clang
-      env: FLAGS="-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer"
-    - compiler: clang
-      env: FLAGS="-g -O1 -fsanitize=thread -fno-omit-frame-pointer"
+    - env: CC=gcc-7 CXX=g++-7 FLAGS=""
+    - env: CC=clang-8 CXX=clang++-8 FLAGS=""
+    - env: CC=clang-8 CXX=clang++-8 FLAGS="-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer"
+    - env: CC=clang-8 CXX=clang++-8 FLAGS="-g -O1 -fsanitize=thread -fno-omit-frame-pointer"
 
 addons:
   apt:
     sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-xenial-8
       - sourceline: deb http://dl.bintray.com/rabbitmq-erlang/debian xenial erlang
         key_url: https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
       - sourceline: deb https://dl.bintray.com/rabbitmq/debian xenial main
         key_url: https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
     packages:
+      - gcc-7
+      - g++-7
+      - clang-8
       - libboost-dev
       - libboost-chrono-dev
       - libboost-system-dev
