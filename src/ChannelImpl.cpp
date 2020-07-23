@@ -51,8 +51,9 @@
 #include <string.h>
 
 #include <array>
-#include <string>
 #include <boost/bind.hpp>
+#include <chrono>
+#include <string>
 
 #define BROKER_HEARTBEAT 0
 
@@ -451,25 +452,24 @@ void Channel::ChannelImpl::AddToFrameQueue(const amqp_frame_t &frame) {
 }
 
 bool Channel::ChannelImpl::GetNextFrameFromBroker(
-    amqp_frame_t &frame, boost::chrono::microseconds timeout) {
+    amqp_frame_t &frame, std::chrono::microseconds timeout) {
   struct timeval *tvp = NULL;
   struct timeval tv_timeout;
   memset(&tv_timeout, 0, sizeof(tv_timeout));
 
-  if (timeout != boost::chrono::microseconds::max()) {
-    // boost::chrono::seconds.count() returns std::int_atleast64_t,
+  if (timeout != std::chrono::microseconds::max()) {
+    // std::chrono::seconds.count() returns std::int_atleast64_t,
     // long can be 32 or 64 bit depending on the platform/arch
     // unless the timeout is something absurd cast to long will be ok, but
     // lets guard against the case where someone does something silly
-    assert(
-        boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count() <
-        static_cast<boost::chrono::seconds::rep>(
-            std::numeric_limits<long>::max()));
+    assert(std::chrono::duration_cast<std::chrono::seconds>(timeout).count() <
+           static_cast<std::chrono::seconds::rep>(
+               std::numeric_limits<long>::max()));
 
     tv_timeout.tv_sec = static_cast<long>(
-        boost::chrono::duration_cast<boost::chrono::seconds>(timeout).count());
+        std::chrono::duration_cast<std::chrono::seconds>(timeout).count());
     tv_timeout.tv_usec = static_cast<long>(
-        (timeout - boost::chrono::seconds(tv_timeout.tv_sec)).count());
+        (timeout - std::chrono::seconds(tv_timeout.tv_sec)).count());
 
     tvp = &tv_timeout;
   }
@@ -485,10 +485,10 @@ bool Channel::ChannelImpl::GetNextFrameFromBroker(
 
 bool Channel::ChannelImpl::GetNextFrameOnChannel(
     amqp_channel_t channel, amqp_frame_t &frame,
-    boost::chrono::microseconds timeout) {
-  frame_queue_t::iterator it = std::find_if(
-      m_frame_queue.begin(), m_frame_queue.end(),
-      boost::bind(&Channel::ChannelImpl::is_on_channel, _1, channel));
+    std::chrono::microseconds timeout) {
+  frame_queue_t::iterator it =
+      std::find_if(m_frame_queue.begin(), m_frame_queue.end(),
+                   boost::bind(&ChannelImpl::is_on_channel, _1, channel));
 
   if (m_frame_queue.end() != it) {
     frame = *it;

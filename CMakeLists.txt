@@ -48,7 +48,7 @@ if(Boost_Dynamic_Linking_ENABLED)
   set(Boost_USE_STATIC_RUNTIME OFF)
 endif()
 
-find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
+find_package(Boost 1.47.0 REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
