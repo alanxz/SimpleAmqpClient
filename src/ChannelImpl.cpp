@@ -47,6 +47,7 @@
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
+#include "SimpleAmqpClient/TableImpl.h"
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <string.h>
 
@@ -57,6 +58,60 @@
 
 namespace AmqpClient {
 namespace Detail {
+
+namespace {
+
+std::string BytesToString(amqp_bytes_t bytes) {
+  return std::string(reinterpret_cast<char *>(bytes.bytes), bytes.len);
+}
+
+void SetMessageProperties(BasicMessage &mes,
+                          const amqp_basic_properties_t &props) {
+  if (0 != (props._flags & AMQP_BASIC_CONTENT_TYPE_FLAG)) {
+    mes.ContentType(BytesToString(props.content_type));
+  }
+  if (0 != (props._flags & AMQP_BASIC_CONTENT_ENCODING_FLAG)) {
+    mes.ContentEncoding(BytesToString(props.content_encoding));
+  }
+  if (0 != (props._flags & AMQP_BASIC_DELIVERY_MODE_FLAG)) {
+    mes.DeliveryMode(
+        static_cast<BasicMessage::delivery_mode_t>(props.delivery_mode));
+  }
+  if (0 != (props._flags & AMQP_BASIC_PRIORITY_FLAG)) {
+    mes.Priority(props.priority);
+  }
+  if (0 != (props._flags & AMQP_BASIC_CORRELATION_ID_FLAG)) {
+    mes.CorrelationId(BytesToString(props.correlation_id));
+  }
+  if (0 != (props._flags & AMQP_BASIC_REPLY_TO_FLAG)) {
+    mes.ReplyTo(BytesToString(props.reply_to));
+  }
+  if (0 != (props._flags & AMQP_BASIC_EXPIRATION_FLAG)) {
+    mes.Expiration(BytesToString(props.expiration));
+  }
+  if (0 != (props._flags & AMQP_BASIC_MESSAGE_ID_FLAG)) {
+    mes.MessageId(BytesToString(props.message_id));
+  }
+  if (0 != (props._flags & AMQP_BASIC_TIMESTAMP_FLAG)) {
+    mes.Timestamp(props.timestamp);
+  }
+  if (0 != (props._flags & AMQP_BASIC_TYPE_FLAG)) {
+    mes.Type(BytesToString(props.type));
+  }
+  if (0 != (props._flags & AMQP_BASIC_USER_ID_FLAG)) {
+    mes.UserId(BytesToString(props.user_id));
+  }
+  if (0 != (props._flags & AMQP_BASIC_APP_ID_FLAG)) {
+    mes.AppId(BytesToString(props.app_id));
+  }
+  if (0 != (props._flags & AMQP_BASIC_CLUSTER_ID_FLAG)) {
+    mes.ClusterId(BytesToString(props.cluster_id));
+  }
+  if (0 != (props._flags & AMQP_BASIC_HEADERS_FLAG)) {
+    mes.HeaderTable(TableValueImpl::CreateTable(props.headers));
+  }
+}
+}  // namespace
 
 ChannelImpl::ChannelImpl() : m_last_used_channel(0), m_is_connected(false) {
   m_channels.push_back(CS_Used);
@@ -233,11 +288,12 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel) {
 
   GetNextFrameOnChannel(channel, frame);
 
-  if (frame.frame_type != AMQP_FRAME_HEADER)
+  if (frame.frame_type != AMQP_FRAME_HEADER) {
     // TODO: We should connection.close here
     throw std::runtime_error(
         "Channel::BasicConsumeMessage: received unexpected frame type (was "
         "expected AMQP_FRAME_HEADER)");
+  }
 
   // The memory for this is allocated in a pool associated with the connection
   // The BasicMessage constructor does a deep copy of the properties structure
@@ -252,7 +308,8 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel) {
   size_t body_size = static_cast<size_t>(frame.payload.properties.body_size);
   size_t received_size = 0;
 
-  amqp_bytes_t body = amqp_bytes_malloc(body_size);
+  BasicMessage::ptr_t message = BasicMessage::Create();
+  message->Body().reserve(body_size);
 
   // frame #3 and up:
   while (received_size < body_size) {
@@ -264,12 +321,15 @@ BasicMessage::ptr_t ChannelImpl::ReadContent(amqp_channel_t channel) {
           "Channel::BasicConsumeMessage: received unexpected frame type (was "
           "expecting AMQP_FRAME_BODY)");
 
-    void *body_ptr = reinterpret_cast<char *>(body.bytes) + received_size;
-    memcpy(body_ptr, frame.payload.body_fragment.bytes,
-           frame.payload.body_fragment.len);
+    message->Body().append(
+        reinterpret_cast<char *>(frame.payload.body_fragment.bytes),
+        frame.payload.body_fragment.len);
     received_size += frame.payload.body_fragment.len;
   }
-  return BasicMessage::Create(body, properties);
+
+  SetMessageProperties(*message, *properties);
+
+  return message;
 }
 
 void ChannelImpl::CheckFrameForClose(amqp_frame_t &frame,
