@@ -55,7 +55,7 @@ class SIMPLEAMQPCLIENT_EXPORT MessageRejectedException
         m_delivery_tag(delivery_tag) {}
 
   /// `delivery_tag` getter
-  uint64_t GetDeliverTag() { return m_delivery_tag; }
+  uint64_t GetDeliveryTag() { return m_delivery_tag; }
 
  private:
   uint64_t m_delivery_tag;
