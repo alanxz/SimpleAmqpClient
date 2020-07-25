@@ -50,6 +50,7 @@
 #include "SimpleAmqpClient/ChannelImpl.h"
 #include "SimpleAmqpClient/ConnectionClosedException.h"
 #include "SimpleAmqpClient/ConsumerTagNotFoundException.h"
+#include "SimpleAmqpClient/TableImpl.h"
 
 #define BROKER_HEARTBEAT 0
 

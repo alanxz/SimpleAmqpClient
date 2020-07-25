@@ -32,9 +32,9 @@
 #include <amqp.h>
 #include <amqp_framing.h>
 
-#include <boost/optional/optional.hpp>
 #include <cstdint>
 #include <cstring>
+#include <optional>
 #include <string>
 
 #include "SimpleAmqpClient/TableImpl.h"
@@ -43,20 +43,20 @@ namespace AmqpClient {
 
 struct BasicMessage::Impl {
   std::string body;
-  boost::optional<std::string> content_type;
-  boost::optional<std::string> content_encoding;
-  boost::optional<delivery_mode_t> delivery_mode;
-  boost::optional<std::uint8_t> priority;
-  boost::optional<std::string> correlation_id;
-  boost::optional<std::string> reply_to;
-  boost::optional<std::string> expiration;
-  boost::optional<std::string> message_id;
-  boost::optional<std::uint64_t> timestamp;
-  boost::optional<std::string> type;
-  boost::optional<std::string> user_id;
-  boost::optional<std::string> app_id;
-  boost::optional<std::string> cluster_id;
-  boost::optional<Table> header_table;
+  std::optional<std::string> content_type;
+  std::optional<std::string> content_encoding;
+  std::optional<delivery_mode_t> delivery_mode;
+  std::optional<std::uint8_t> priority;
+  std::optional<std::string> correlation_id;
+  std::optional<std::string> reply_to;
+  std::optional<std::string> expiration;
+  std::optional<std::string> message_id;
+  std::optional<std::uint64_t> timestamp;
+  std::optional<std::string> type;
+  std::optional<std::string> user_id;
+  std::optional<std::string> app_id;
+  std::optional<std::string> cluster_id;
+  std::optional<Table> header_table;
 };
 
 BasicMessage::BasicMessage() : m_impl(new Impl) {}
@@ -86,7 +86,7 @@ void BasicMessage::ContentType(const std::string& content_type) {
 }
 
 bool BasicMessage::ContentTypeIsSet() const {
-  return m_impl->content_type.is_initialized();
+  return m_impl->content_type.has_value();
 }
 
 void BasicMessage::ContentTypeClear() { m_impl->content_type.reset(); }
@@ -104,7 +104,7 @@ void BasicMessage::ContentEncoding(const std::string& content_encoding) {
 }
 
 bool BasicMessage::ContentEncodingIsSet() const {
-  return m_impl->content_encoding.is_initialized();
+  return m_impl->content_encoding.has_value();
 }
 
 void BasicMessage::ContentEncodingClear() { m_impl->content_encoding.reset(); }
@@ -118,7 +118,7 @@ void BasicMessage::DeliveryMode(delivery_mode_t delivery_mode) {
 }
 
 bool BasicMessage::DeliveryModeIsSet() const {
-  return m_impl->delivery_mode.is_initialized();
+  return m_impl->delivery_mode.has_value();
 }
 
 void BasicMessage::DeliveryModeClear() { m_impl->delivery_mode.reset(); }
@@ -132,7 +132,7 @@ void BasicMessage::Priority(std::uint8_t priority) {
 }
 
 bool BasicMessage::PriorityIsSet() const {
-  return m_impl->priority.is_initialized();
+  return m_impl->priority.has_value();
 }
 
 void BasicMessage::PriorityClear() { m_impl->priority.reset(); }
@@ -150,7 +150,7 @@ void BasicMessage::CorrelationId(const std::string& correlation_id) {
 }
 
 bool BasicMessage::CorrelationIdIsSet() const {
-  return m_impl->correlation_id.is_initialized();
+  return m_impl->correlation_id.has_value();
 }
 
 void BasicMessage::CorrelationIdClear() { m_impl->correlation_id.reset(); }
@@ -168,7 +168,7 @@ void BasicMessage::ReplyTo(const std::string& reply_to) {
 }
 
 bool BasicMessage::ReplyToIsSet() const {
-  return m_impl->reply_to.is_initialized();
+  return m_impl->reply_to.has_value();
 }
 
 void BasicMessage::ReplyToClear() { m_impl->reply_to.reset(); }
@@ -186,7 +186,7 @@ void BasicMessage::Expiration(const std::string& expiration) {
 }
 
 bool BasicMessage::ExpirationIsSet() const {
-  return m_impl->expiration.is_initialized();
+  return m_impl->expiration.has_value();
 }
 
 void BasicMessage::ExpirationClear() { m_impl->expiration.reset(); }
@@ -204,7 +204,7 @@ void BasicMessage::MessageId(const std::string& message_id) {
 }
 
 bool BasicMessage::MessageIdIsSet() const {
-  return m_impl->message_id.is_initialized();
+  return m_impl->message_id.has_value();
 }
 
 void BasicMessage::MessageIdClear() { m_impl->message_id.reset(); }
@@ -218,7 +218,7 @@ void BasicMessage::Timestamp(std::uint64_t timestamp) {
 }
 
 bool BasicMessage::TimestampIsSet() const {
-  return m_impl->timestamp.is_initialized();
+  return m_impl->timestamp.has_value();
 }
 
 void BasicMessage::TimestampClear() { m_impl->timestamp.reset(); }
@@ -233,7 +233,7 @@ const std::string& BasicMessage::Type() const {
 
 void BasicMessage::Type(const std::string& type) { m_impl->type = type; }
 
-bool BasicMessage::TypeIsSet() const { return m_impl->type.is_initialized(); }
+bool BasicMessage::TypeIsSet() const { return m_impl->type.has_value(); }
 
 void BasicMessage::TypeClear() { m_impl->type.reset(); }
 
@@ -250,7 +250,7 @@ void BasicMessage::UserId(const std::string& user_id) {
 }
 
 bool BasicMessage::UserIdIsSet() const {
-  return m_impl->user_id.is_initialized();
+  return m_impl->user_id.has_value();
 }
 
 void BasicMessage::UserIdClear() { m_impl->user_id.reset(); }
@@ -266,7 +266,7 @@ const std::string& BasicMessage::AppId() const {
 void BasicMessage::AppId(const std::string& app_id) { m_impl->app_id = app_id; }
 
 bool BasicMessage::AppIdIsSet() const {
-  return m_impl->app_id.is_initialized();
+  return m_impl->app_id.has_value();
 }
 
 void BasicMessage::AppIdClear() { m_impl->app_id.reset(); }
@@ -284,7 +284,7 @@ void BasicMessage::ClusterId(const std::string& cluster_id) {
 }
 
 bool BasicMessage::ClusterIdIsSet() const {
-  return m_impl->cluster_id.is_initialized();
+  return m_impl->cluster_id.has_value();
 }
 
 void BasicMessage::ClusterIdClear() { m_impl->cluster_id.reset(); }
@@ -309,7 +309,7 @@ void BasicMessage::HeaderTable(const Table& header_table) {
 }
 
 bool BasicMessage::HeaderTableIsSet() const {
-  return m_impl->header_table.is_initialized();
+  return m_impl->header_table.has_value();
 }
 
 void BasicMessage::HeaderTableClear() { m_impl->header_table.reset(); }
