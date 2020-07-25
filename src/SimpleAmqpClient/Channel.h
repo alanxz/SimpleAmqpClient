@@ -66,7 +66,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   typedef boost::shared_ptr<Channel> ptr_t;
 
   static const std::string
-      EXCHANGE_TYPE_DIRECT;                      ///< `"direct"` string constant
+      EXCHANGE_TYPE_DIRECT;  ///< `"direct"` string constant
   static const std::string
       EXCHANGE_TYPE_FANOUT;                      ///< `"fanout"` string constant
   static const std::string EXCHANGE_TYPE_TOPIC;  ///< `"topic"` string constant
