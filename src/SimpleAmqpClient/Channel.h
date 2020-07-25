@@ -28,13 +28,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/optional.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
 #include <variant>
+#include <optional>
 
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Envelope.h"
@@ -108,7 +108,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
     /// One of BasicAuth or ExternalSaslAuth is required.
     std::variant<std::monostate, BasicAuth, ExternalSaslAuth> auth;
     /// Connect using TLS/SSL when set, otherwise use an unencrypted channel.
-    boost::optional<TLSParams> tls_params;
+    std::optional<TLSParams> tls_params;
 
     /**
      * Create an OpenOpts struct from a URI.
