@@ -91,14 +91,6 @@ TEST_F(connected_test, channel_publish_full_rejected) {
                MessageRejectedException);
 }
 
-TEST_F(connected_test, DISABLED_channel_publish_returned_immediate) {
-  BasicMessage::ptr_t message = BasicMessage::Create("Test message");
-  std::string queue_name = channel->DeclareQueue("");
-
-  EXPECT_THROW(channel->BasicPublish("", queue_name, message, false, true),
-               MessageReturnedException);
-}
-
 TEST_F(connected_test, channel_publish_bad_exchange) {
   BasicMessage::ptr_t message = BasicMessage::Create("Test message");
 
