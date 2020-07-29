@@ -139,10 +139,6 @@ TEST_F(connected_test, queue_delete) {
   EXPECT_THROW(channel->DeclareQueue(queue, true), ChannelException);
 }
 
-TEST_F(connected_test, queue_delete_badqueue) {
-  EXPECT_THROW(channel->DeleteQueue("delete_queue_notexist"), ChannelException);
-}
-
 TEST_F(connected_test, queue_delete_ifunused) {
   std::string queue = channel->DeclareQueue("delete_queue_ifunused");
   channel->DeleteQueue(queue, true);
@@ -222,12 +218,6 @@ TEST_F(connected_test, queue_unbind) {
 
   channel->DeleteExchange("queue_unbind_exchange");
   channel->DeleteQueue(queue);
-}
-
-TEST_F(connected_test, queue_unbind_badbinding) {
-  EXPECT_THROW(channel->UnbindQueue("queue_unbind_queuenotexist",
-                                    "queue_unbind_exchangenotexist", "rk"),
-               ChannelException);
 }
 
 TEST_F(connected_test, queue_purge) {
