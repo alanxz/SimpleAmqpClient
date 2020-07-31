@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/get.hpp>
+#include <ctime>
 
 #include "connected_test.h"
 
@@ -45,7 +46,7 @@ TEST(table_value, void_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -65,7 +66,7 @@ TEST(table_value, void_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -90,7 +91,7 @@ TEST(table_value, bool_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -110,7 +111,7 @@ TEST(table_value, bool_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -136,7 +137,7 @@ TEST(table_value, uint8_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -156,7 +157,7 @@ TEST(table_value, uint8_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -181,7 +182,7 @@ TEST(table_value, int8_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -201,7 +202,7 @@ TEST(table_value, int8_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -226,7 +227,7 @@ TEST(table_value, uint16_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -246,7 +247,7 @@ TEST(table_value, uint16_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -271,7 +272,7 @@ TEST(table_value, int16_value) {
   EXPECT_THROW(value.GetUint16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -291,7 +292,7 @@ TEST(table_value, int16_value) {
   EXPECT_THROW(value.GetUint16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -316,7 +317,7 @@ TEST(table_value, uint32_value) {
   EXPECT_THROW(value.GetUint16(), boost::bad_get);
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -336,7 +337,7 @@ TEST(table_value, uint32_value) {
   EXPECT_THROW(value.GetUint16(), boost::bad_get);
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -361,7 +362,7 @@ TEST(table_value, int32_value) {
   EXPECT_THROW(value.GetUint16(), boost::bad_get);
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -381,7 +382,7 @@ TEST(table_value, int32_value) {
   EXPECT_THROW(value.GetUint16(), boost::bad_get);
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -391,14 +392,13 @@ TEST(table_value, int32_value) {
   EXPECT_THROW(value.GetTable(), boost::bad_get);
 }
 
-TEST(table_value, uint64_value) {
-  boost::uint64_t v1 = 1;
-  boost::uint64_t v2 = 2;
+TEST(table_value, timestamp_value) {
+  std::time_t v1 = 1;
+  std::time_t v2 = 2;
 
-  TableValue value(v1);
-  EXPECT_EQ(TableValue::VT_uint64, value.GetType());
-  EXPECT_EQ(v1, value.GetUint64());
-  EXPECT_EQ(v1, value.GetInteger());
+  TableValue value = TableValue::Timestamp(v1);
+  EXPECT_EQ(TableValue::VT_timestamp, value.GetType());
+  EXPECT_EQ(v1, value.GetTimestamp());
 
   EXPECT_THROW(value.GetBool(), boost::bad_get);
   EXPECT_THROW(value.GetUint8(), boost::bad_get);
@@ -408,6 +408,7 @@ TEST(table_value, uint64_value) {
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
+  EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
   EXPECT_THROW(value.GetReal(), boost::bad_get);
@@ -415,10 +416,9 @@ TEST(table_value, uint64_value) {
   EXPECT_THROW(value.GetArray(), boost::bad_get);
   EXPECT_THROW(value.GetTable(), boost::bad_get);
 
-  value.Set(v2);
-  EXPECT_EQ(TableValue::VT_uint64, value.GetType());
-  EXPECT_EQ(v2, value.GetUint64());
-  EXPECT_EQ(v2, value.GetInteger());
+  value.SetTimestamp(v2);
+  EXPECT_EQ(TableValue::VT_timestamp, value.GetType());
+  EXPECT_EQ(v2, value.GetTimestamp());
 
   EXPECT_THROW(value.GetBool(), boost::bad_get);
   EXPECT_THROW(value.GetUint8(), boost::bad_get);
@@ -428,53 +428,7 @@ TEST(table_value, uint64_value) {
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
-}
-
-TEST(table_value, uint64_value_larger_than_int64_max) {
-  const boost::uint64_t maxInt64 =
-      static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
-  boost::uint64_t v1 = maxInt64 + 1;
-  boost::uint64_t v2 = maxInt64 + 2;
-
-  TableValue value(v1);
-  EXPECT_EQ(TableValue::VT_uint64, value.GetType());
-  EXPECT_EQ(v1, value.GetUint64());
-
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), std::overflow_error);
-  EXPECT_THROW(value.GetFloat(), boost::bad_get);
-  EXPECT_THROW(value.GetDouble(), boost::bad_get);
-  EXPECT_THROW(value.GetReal(), boost::bad_get);
-  EXPECT_THROW(value.GetString(), boost::bad_get);
-  EXPECT_THROW(value.GetArray(), boost::bad_get);
-  EXPECT_THROW(value.GetTable(), boost::bad_get);
-
-  value.Set(v2);
-  EXPECT_EQ(TableValue::VT_uint64, value.GetType());
-  EXPECT_EQ(v2, value.GetUint64());
-
-  EXPECT_THROW(value.GetBool(), boost::bad_get);
-  EXPECT_THROW(value.GetUint8(), boost::bad_get);
-  EXPECT_THROW(value.GetInt8(), boost::bad_get);
-  EXPECT_THROW(value.GetUint16(), boost::bad_get);
-  EXPECT_THROW(value.GetInt16(), boost::bad_get);
-  EXPECT_THROW(value.GetUint32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetInt64(), boost::bad_get);
-  EXPECT_THROW(value.GetInteger(), std::overflow_error);
+  EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
   EXPECT_THROW(value.GetReal(), boost::bad_get);
@@ -499,7 +453,7 @@ TEST(table_value, int64_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
   EXPECT_THROW(value.GetReal(), boost::bad_get);
@@ -519,7 +473,7 @@ TEST(table_value, int64_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
   EXPECT_THROW(value.GetReal(), boost::bad_get);
@@ -544,7 +498,7 @@ TEST(table_value, float_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -564,7 +518,7 @@ TEST(table_value, float_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetDouble(), boost::bad_get);
@@ -589,7 +543,7 @@ TEST(table_value, double_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -609,7 +563,7 @@ TEST(table_value, double_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -633,7 +587,7 @@ TEST(table_value, string_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -653,7 +607,7 @@ TEST(table_value, string_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -683,7 +637,7 @@ TEST(table_value, array_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -705,7 +659,7 @@ TEST(table_value, array_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -735,7 +689,7 @@ TEST(table_value, table_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -757,7 +711,7 @@ TEST(table_value, table_value) {
   EXPECT_THROW(value.GetInt16(), boost::bad_get);
   EXPECT_THROW(value.GetUint32(), boost::bad_get);
   EXPECT_THROW(value.GetInt32(), boost::bad_get);
-  EXPECT_THROW(value.GetUint64(), boost::bad_get);
+  EXPECT_THROW(value.GetTimestamp(), boost::bad_get);
   EXPECT_THROW(value.GetInt64(), boost::bad_get);
   EXPECT_THROW(value.GetInteger(), boost::bad_get);
   EXPECT_THROW(value.GetFloat(), boost::bad_get);
@@ -839,7 +793,7 @@ TEST(table, convert_to_rabbitmq) {
   table_in.insert(TableEntry("int16_key", int16_t(16)));
   table_in.insert(TableEntry("uint32_key", uint32_t(32)));
   table_in.insert(TableEntry("int32_key", int32_t(32)));
-  table_in.insert(TableEntry("uint64_key", uint64_t(64)));
+  table_in.insert(TableEntry("timestamp_key", TableValue::Timestamp(64)));
   table_in.insert(TableEntry("int64_key", int64_t(64)));
   table_in.insert(TableEntry("float_key", float(1.5)));
   table_in.insert(TableEntry("double_key", double(2.25)));
@@ -887,7 +841,7 @@ TEST_F(connected_test, basic_message_header_roundtrip) {
   table_in.insert(TableEntry("int16_key", int16_t(16)));
   table_in.insert(TableEntry("uint32_key", uint32_t(32)));
   table_in.insert(TableEntry("int32_key", int32_t(32)));
-  table_in.insert(TableEntry("uint64_key", uint64_t(64)));
+  table_in.insert(TableEntry("timestamp_key", TableValue::Timestamp(64)));
   table_in.insert(TableEntry("int64_key", int64_t(64)));
   table_in.insert(TableEntry("float_key", float(1.5)));
   table_in.insert(TableEntry("double_key", double(2.25)));

@@ -28,8 +28,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+#include <boost/chrono.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <ctime>
 #include <map>
 #include <string>
 #include <vector>
@@ -82,21 +84,21 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
 
   /** Types enumeration */
   enum ValueType {
-    VT_void = 0,     ///< void type
-    VT_bool = 1,     ///< boolean type
-    VT_int8 = 2,     ///< 1-byte/char signed type
-    VT_int16 = 3,    ///< 2-byte/short signed type
-    VT_int32 = 4,    ///< 4-byte/int signed type
-    VT_int64 = 5,    ///< 8-byte/long long int signed type
-    VT_float = 6,    ///< single-precision floating point type
-    VT_double = 7,   ///< double-precision floating point type
-    VT_string = 8,   ///< string type
-    VT_array = 9,    ///< array of TableValues type
-    VT_table = 10,   ///< a table type
-    VT_uint8 = 11,   ///< 1-byte/char unsigned type
-    VT_uint16 = 12,  ///< 2-byte/short unsigned type
-    VT_uint32 = 13,  ///< 4-byte/int unsigned type
-    VT_uint64 = 14   ///< 8-byte/long long int unsigned type
+    VT_void = 0,        ///< void type
+    VT_bool = 1,        ///< boolean type
+    VT_int8 = 2,        ///< 1-byte/char signed type
+    VT_int16 = 3,       ///< 2-byte/short signed type
+    VT_int32 = 4,       ///< 4-byte/int signed type
+    VT_int64 = 5,       ///< 8-byte/long long int signed type
+    VT_float = 6,       ///< single-precision floating point type
+    VT_double = 7,      ///< double-precision floating point type
+    VT_string = 8,      ///< string type
+    VT_array = 9,       ///< array of TableValues type
+    VT_table = 10,      ///< a table type
+    VT_uint8 = 11,      ///< 1-byte/char unsigned type
+    VT_uint16 = 12,     ///< 2-byte/short unsigned type
+    VT_uint32 = 13,     ///< 4-byte/int unsigned type
+    VT_timestamp = 14,  ///< std::time_t type
   };
 
   /**
@@ -155,12 +157,24 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    */
   TableValue(boost::int32_t value);
 
+ private:
   /**
-   * Construct a 8-byte unsigned integer value
+   * Private
+   *
+   * RabbitMQ does not support unsigned 64-bit values in tables,
+   * however, timestamps are used for this.
+   */
+  TableValue(boost::uint64_t value);
+
+ public:
+  /**
+   * Construct an AMQP timestamp TableValue
+   *
+   * This seconds since epoch.
    *
    * @param [in] value the value
    */
-  TableValue(boost::uint64_t value);
+  static TableValue Timestamp(std::time_t value);
 
   /**
    * Construct a 8-byte signed integer value
@@ -298,6 +312,13 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
   boost::uint64_t GetUint64() const;
 
   /**
+   * Get the timestamp value
+   *
+   * @returns the value if its a VT_timestamp type, 0 otherwise
+   */
+  std::time_t GetTimestamp() const;
+
+  /**
    * Get the int64 value
    *
    * @returns the value if its a VT_int64 type, 0 otherwise
@@ -312,8 +333,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    * of uint64_t is possible, please use GetUint64()
    *
    * @returns an integer number if the ValueType is VT_uint8, VT_int8,
-   * VT_uint16, VT_int16, VT_uint32, VT_int32, VT_uint64
-   * or VT_int64 type, 0 otherwise
+   * VT_uint16, VT_int16, VT_uint32, VT_int32,or VT_int64 type, 0 otherwise.
    */
   boost::int64_t GetInteger() const;
 
@@ -414,14 +434,14 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
   void Set(boost::int32_t value);
 
   /**
-   * Set teh value as a uint64_t
+   * Set the value as a timestamp.
    *
    * @param [in] value the value
    */
-  void Set(boost::uint64_t value);
+  void SetTimestamp(std::time_t value);
 
   /**
-   * Set teh value as a int64_t
+   * Set the value as a int64_t
    *
    * @param [in] value the value
    */
