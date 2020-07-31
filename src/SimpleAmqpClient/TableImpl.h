@@ -33,6 +33,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/variant/variant.hpp>
+#include <ctime>
 #include <string>
 #include <vector>
 
