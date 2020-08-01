@@ -1,3 +1,20 @@
+# Changes since v2.4 (v2.5)
+
+NOTE: this release requires rabbitmq-c v0.8.0 or better.
+
+  - add: support timestamp values in `Table` (1057ed4)
+  - enh: improve efficiency of `BasicMessage` reducing number of copies (938b102)
+  - doc: many clarifications in documentation (47f4c79)
+  - add: support for BasicPublish message rejection due to queue full (ecfbbfc)
+  - add: support for additional parameters in creating SSL connection (56713c0, eaa6044)
+  - add: `Channel::GetSocketFD` to allow access to underlying channel socket. (7c14a2e)
+  - add: multiple flag on `Channel::BasicAck` (6323892)
+  - add: support for unsigned types in `Table` (20296d2)
+  - enh: support for RabbitMQ auth-failure extension (0b67021)
+  - fix: consumer prefetch difference on RabbitMQ v3.3+ (59a1e05)
+  - rabbitmq-c errors are wrapped in `AmqpLibraryException` (a3a3ef7)
+
+
 Changes since v2.3 (v2.4):
 - Add support for consumer cancellation notification (5d35698)
 - Improvements in extra-frame bookkeeping reducing memory useage under certain

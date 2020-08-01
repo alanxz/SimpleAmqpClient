@@ -20,9 +20,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # 3. If any interfaces have been added since the last public release, then increment age.
 # 4. If any interfaces have been removed since the last public release, then set age to 0.
 
-set(SAC_SOVERSION_CURRENT   6)
+set(SAC_SOVERSION_CURRENT   7)
 set(SAC_SOVERSION_REVISION  0)
-set(SAC_SOVERSION_AGE       4)
+set(SAC_SOVERSION_AGE       0)
 
 math(EXPR SAC_SOVERSION_MAJOR "${SAC_SOVERSION_CURRENT} - ${SAC_SOVERSION_AGE}")
 math(EXPR SAC_SOVERSION_MINOR "${SAC_SOVERSION_AGE}")

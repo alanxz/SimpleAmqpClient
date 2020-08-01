@@ -17,8 +17,8 @@ Known to work in the following environments:
 
 ### Pre-requisites
 +  [boost-1.47.0](http://www.boost.org/) or newer (uses chrono, system internally in addition to other header based libraries such as sharedptr and noncopyable)
-+  [rabbitmq-c](http://github.com/alanxz/rabbitmq-c) you'll need version 0.5.1 or better.
-+  [cmake 2.8+](http://www.cmake.org/) what is needed for the build system
++  [rabbitmq-c](http://github.com/alanxz/rabbitmq-c) you'll need version 0.8.0 or better.
++  [cmake 3.5+](http://www.cmake.org/) what is needed for the build system
 +  [Doxygen](http://www.stack.nl/~dimitri/doxygen/) OPTIONAL only necessary to generate API documentation
 
 ### Build procedure
@@ -34,11 +34,11 @@ Then use your the appropriate build utility to build the library (make, msbuild)
 
 Interesting targets
 +  test - will build and run the tests
-+  install - will install the library and headers to whatever CMAKE_INSTALL_PREFIX is defined to
++  install - will install the library and headers to whatever `CMAKE_INSTALL_PREFIX` is defined to
 +  doc - will generate API documentation if you have doxygen setup
 
 Notes:
-+ The test google-test based test suite can be enabled by passing ```-DENABLE_TESTING=ON``` to
++ The test google-test based test suite can be enabled by passing `-DENABLE_TESTING=ON` to
   cmake
 
 Using the library
