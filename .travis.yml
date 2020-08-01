@@ -10,10 +10,6 @@ compiler:
   - gcc
   - clang
 
-env:
-  global:
-   - secure: "Fbs306tCqDrDZTEwTE4ZvQ9Jb1BRbGNMgdkDy4G+EY02tuuxHFOh0Dm9N5ylVEzOcMZUpYLogh5HDpXtvVB71hmkphfDodqdinNAmalsWzg/lOx4x414/WMyo6/vT7X+qxHmLpt/XuLVSSBP7u96hg3+/3QOhQ/x2cBMI4eAMqg="
-
 addons:
   apt:
     packages:
@@ -22,14 +18,6 @@ addons:
       - libboost-system-dev
       - rabbitmq-server
       - ninja-build
-  coverity_scan:
-    project:
-      name: "alanxz/SimpleAmqpClient"
-      description: "Simple C++ Interface to rabbitmq-c"
-    notification_email: alan.antonuk@gmail.com
-    build_command_prepend: cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQC_DIR} ..
-    build_command: cmake --build .
-    branch_pattern: coverity_scan
 
 # install pre-reqs
 install:
@@ -50,12 +38,8 @@ before_script:
 
 # Run the Build script
 script:
-  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then
-      cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQ_C_DIR} .. &&
-      cmake --build . --target install ;
-    fi
+  - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQ_C_DIR} ..
+  - cmake --build . --target install
 
 after_script:
-  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then
-      LD_LIBRARY_PATH=../_install/lib AMQP_BROKER=localhost ctest -V . ;
-    fi
+  - LD_LIBRARY_PATH=../_install/lib AMQP_BROKER=localhost ctest -V .
