@@ -45,6 +45,4 @@ before_script:
 script:
   - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQ_C_DIR} ..
   - cmake --build . --target install
-
-after_script:
-  - LD_LIBRARY_PATH=../_install/lib AMQP_BROKER=localhost ctest -V .
+  - AMQP_BROKER=localhost ctest -V .
