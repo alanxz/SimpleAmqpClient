@@ -6,9 +6,14 @@ language: cpp
 os: linux
 dist: xenial
 
-compiler:
-  - gcc
-  - clang
+jobs:
+  include:
+    - compiler: gcc
+      env: FLAGS=""
+    - compiler: clang
+      env: FLAGS=""
+    - compiler: clang
+      env: FLAGS="-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer"
 
 addons:
   apt:
@@ -43,6 +48,6 @@ before_script:
 
 # Run the Build script
 script:
-  - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQ_C_DIR} ..
+  - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${FLAGS}" -DCMAKE_INSTALL_PREFIX=../_install -DENABLE_TESTING=ON -DRabbitmqc_DIR=${RABBITMQ_C_DIR} ..
   - cmake --build . --target install
-  - AMQP_BROKER=localhost ctest -V .
+  - AMQP_BROKER=localhost ASAN_OPTIONS=detect_leaks=1 ctest -V .
