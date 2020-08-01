@@ -28,7 +28,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/chrono.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <ctime>
