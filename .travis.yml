@@ -14,6 +14,8 @@ jobs:
       env: FLAGS=""
     - compiler: clang
       env: FLAGS="-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer"
+    - compiler: clang
+      env: FLAGS="-g -O1 -fsanitize=thread -fno-omit-frame-pointer"
 
 addons:
   apt:
