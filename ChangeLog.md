@@ -1,3 +1,8 @@
+# Changes since v2.5.0 (v2.5.1)
+
+  - fix: restore GNUInstallDirs that was mistakenly removed.
+  - refactor of Channel constructors
+
 # Changes since v2.4 (v2.5)
 
 NOTE: this release requires rabbitmq-c v0.8.0 or better.
