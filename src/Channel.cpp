@@ -227,6 +227,10 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();
   }
+  if (info.ssl) {
+    throw std::runtime_error(
+        "CreateFromUri only supports non-SSL-enabled URIs");
+  }
 
   return Create(std::string(info.host), info.port, std::string(info.user),
                 std::string(info.password), std::string(info.vhost), frame_max);
@@ -246,16 +250,16 @@ Channel::ptr_t Channel::CreateSecureFromUri(
   if (0 != amqp_parse_url(uri_dup.get(), &info)) {
     throw BadUriException();
   }
+  if (!info.ssl) {
+    throw std::runtime_error(
+        "CreateSecureFromUri only supports SSL-enabled URIs");
+  }
 
-  if (info.ssl) {
     return CreateSecure(path_to_ca_cert, std::string(info.host),
                         path_to_client_key, path_to_client_cert, info.port,
                         std::string(info.user), std::string(info.password),
                         std::string(info.vhost), frame_max,
                         verify_hostname_and_peer);
-  }
-  throw std::runtime_error(
-      "CreateSecureFromUri only supports SSL-enabled URIs.");
 }
 
 Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
