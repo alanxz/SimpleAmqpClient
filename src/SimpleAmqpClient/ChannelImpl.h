@@ -36,6 +36,7 @@
 
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/BasicMessage.h"
+#include "SimpleAmqpClient/Channel.h"
 #include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
@@ -47,9 +48,8 @@
 #include <vector>
 
 namespace AmqpClient {
-namespace Detail {
 
-class ChannelImpl : boost::noncopyable {
+class Channel::ChannelImpl : boost::noncopyable {
  public:
   ChannelImpl();
   virtual ~ChannelImpl();
@@ -365,6 +365,5 @@ class ChannelImpl : boost::noncopyable {
   bool m_is_connected;
 };
 
-}  // namespace Detail
 }  // namespace AmqpClient
 #endif  // SIMPLEAMQPCLIENT_CHANNELIMPL_H
