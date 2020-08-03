@@ -235,7 +235,7 @@ Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
 Channel::ptr_t Channel::CreateSecureFromUri(
     const std::string &uri, const std::string &path_to_ca_cert,
     const std::string &path_to_client_key,
-    const std::string &path_to_client_cert, bool verify_hostname,
+    const std::string &path_to_client_cert, bool verify_hostname_and_peer,
     int frame_max) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
@@ -251,7 +251,8 @@ Channel::ptr_t Channel::CreateSecureFromUri(
     return CreateSecure(path_to_ca_cert, std::string(info.host),
                         path_to_client_key, path_to_client_cert, info.port,
                         std::string(info.user), std::string(info.password),
-                        std::string(info.vhost), frame_max, verify_hostname);
+                        std::string(info.vhost), frame_max,
+                        verify_hostname_and_peer);
   }
   throw std::runtime_error(
       "CreateSecureFromUri only supports SSL-enabled URIs.");

@@ -229,7 +229,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * @param path_to_client_key Path to client key file
    * @param path_to_client_cert Path to client certificate file
    * @param verify_hostname Verify the hostname against the certificate when
-   * opening the SSL connection.
+   * opening the SSL connection and the certificate chain that is sent by the
+   * broker.
    * @param frame_max requests that the broker limit the maximum size of
    * any frame to this value
    * @returns a new Channel object
@@ -238,7 +239,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                    const std::string &path_to_ca_cert,
                                    const std::string &path_to_client_key = "",
                                    const std::string &path_to_client_cert = "",
-                                   bool verify_hostname = true,
+                                   bool verify_hostname_and_peer = true,
                                    int frame_max = 131072);
 
  private:
