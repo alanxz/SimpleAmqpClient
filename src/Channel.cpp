@@ -143,6 +143,80 @@ const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
+struct Channel::SSLConnectionParams {
+  std::string path_to_ca_cert;
+  std::string path_to_client_key;
+  std::string path_to_client_cert;
+  bool verify_hostname;
+  bool verify_peer;
+};
+
+Channel::ptr_t Channel::Create(const std::string &host, int port,
+                               const std::string &username,
+                               const std::string &password,
+                               const std::string &vhost, int frame_max) {
+  return boost::make_shared<Channel>(
+      OpenChannel(host, port, username, password, vhost, frame_max, false));
+}
+
+Channel::ptr_t Channel::CreateSaslExternal(const std::string &host, int port,
+                                           const std::string &identity,
+                                           const std::string &vhost,
+                                           int frame_max) {
+  return boost::make_shared<Channel>(
+      OpenChannel(host, port, identity, "", vhost, frame_max, true));
+}
+
+Channel::ptr_t Channel::CreateSecure(const std::string &path_to_ca_cert,
+                                     const std::string &host,
+                                     const std::string &path_to_client_key,
+                                     const std::string &path_to_client_cert,
+                                     int port, const std::string &username,
+                                     const std::string &password,
+                                     const std::string &vhost, int frame_max,
+                                     bool verify_hostname_and_peer) {
+  return CreateSecure(path_to_ca_cert, host, path_to_client_key,
+                      path_to_client_cert, port, username, password, vhost,
+                      frame_max, verify_hostname_and_peer,
+                      verify_hostname_and_peer);
+}
+
+Channel::ptr_t Channel::CreateSecure(const std::string &path_to_ca_cert,
+                                     const std::string &host,
+                                     const std::string &path_to_client_key,
+                                     const std::string &path_to_client_cert,
+                                     int port, const std::string &username,
+                                     const std::string &password,
+                                     const std::string &vhost, int frame_max,
+                                     bool verify_hostname, bool verify_peer) {
+  SSLConnectionParams ssl_params;
+  ssl_params.path_to_ca_cert = path_to_ca_cert;
+  ssl_params.path_to_client_key = path_to_client_key;
+  ssl_params.path_to_client_cert = path_to_client_cert;
+  ssl_params.verify_hostname = verify_hostname;
+  ssl_params.verify_peer = verify_peer;
+
+  return boost::make_shared<Channel>(OpenSecureChannel(
+      host, port, username, password, vhost, frame_max, ssl_params, false));
+}
+
+Channel::ptr_t Channel::CreateSecureSaslExternal(
+    const std::string &path_to_ca_cert, const std::string &host,
+    const std::string &path_to_client_key,
+    const std::string &path_to_client_cert, int port,
+    const std::string &identity, const std::string &vhost, int frame_max,
+    bool verify_hostname, bool verify_peer) {
+  SSLConnectionParams ssl_params;
+  ssl_params.path_to_ca_cert = path_to_ca_cert;
+  ssl_params.path_to_client_key = path_to_client_key;
+  ssl_params.path_to_client_cert = path_to_client_cert;
+  ssl_params.verify_hostname = verify_hostname;
+  ssl_params.verify_peer = verify_peer;
+
+  return boost::make_shared<Channel>(OpenSecureChannel(
+      host, port, identity, "", vhost, frame_max, ssl_params, true));
+}
+
 Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
   amqp_connection_info info;
   amqp_default_connection_info(&info);
@@ -183,42 +257,46 @@ Channel::ptr_t Channel::CreateSecureFromUri(
       "CreateSecureFromUri only supports SSL-enabled URIs.");
 }
 
-Channel::Channel(const std::string &host, int port, const std::string &username,
-                 const std::string &password, const std::string &vhost,
-                 int frame_max, bool sasl_external)
-    : m_impl(new Detail::ChannelImpl) {
-  m_impl->m_connection = amqp_new_connection();
+Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
+                                           const std::string &username,
+                                           const std::string &password,
+                                           const std::string &vhost,
+                                           int frame_max, bool sasl_external) {
+  ChannelImpl *impl = new ChannelImpl;
+  impl->m_connection = amqp_new_connection();
 
-  if (NULL == m_impl->m_connection) {
+  if (NULL == impl->m_connection) {
     throw std::bad_alloc();
   }
 
   try {
-    amqp_socket_t *socket = amqp_tcp_socket_new(m_impl->m_connection);
+    amqp_socket_t *socket = amqp_tcp_socket_new(impl->m_connection);
     int sock = amqp_socket_open(socket, host.c_str(), port);
-    m_impl->CheckForError(sock);
+    impl->CheckForError(sock);
 
-    m_impl->DoLogin(username, password, vhost, frame_max, sasl_external);
+    impl->DoLogin(username, password, vhost, frame_max, sasl_external);
   } catch (...) {
-    amqp_destroy_connection(m_impl->m_connection);
+    amqp_destroy_connection(impl->m_connection);
+    delete impl;
     throw;
   }
 
-  m_impl->SetIsConnected(true);
+  impl->SetIsConnected(true);
+  return impl;
 }
 
 #ifdef SAC_SSL_SUPPORT_ENABLED
-Channel::Channel(const std::string &host, int port, const std::string &username,
-                 const std::string &password, const std::string &vhost,
-                 int frame_max, const SSLConnectionParams &ssl_params,
-                 bool sasl_external)
-    : m_impl(new Detail::ChannelImpl) {
-  m_impl->m_connection = amqp_new_connection();
-  if (NULL == m_impl->m_connection) {
+Channel::ChannelImpl *Channel::OpenSecureChannel(
+    const std::string &host, int port, const std::string &username,
+    const std::string &password, const std::string &vhost, int frame_max,
+    const SSLConnectionParams &ssl_params, bool sasl_external) {
+  Channel::ChannelImpl *impl = new ChannelImpl;
+  impl->m_connection = amqp_new_connection();
+  if (NULL == impl->m_connection) {
     throw std::bad_alloc();
   }
 
-  amqp_socket_t *socket = amqp_ssl_socket_new(m_impl->m_connection);
+  amqp_socket_t *socket = amqp_ssl_socket_new(impl->m_connection);
   if (NULL == socket) {
     throw std::bad_alloc();
   }
@@ -254,22 +332,26 @@ Channel::Channel(const std::string &host, int port, const std::string &username,
           status, "Error setting client certificate for socket");
     }
 
-    m_impl->DoLogin(username, password, vhost, frame_max, sasl_external);
+    impl->DoLogin(username, password, vhost, frame_max, sasl_external);
   } catch (...) {
-    amqp_destroy_connection(m_impl->m_connection);
+    amqp_destroy_connection(impl->m_connection);
+    delete impl;
     throw;
   }
 
-  m_impl->SetIsConnected(true);
+  impl->SetIsConnected(true);
+  return impl;
 }
 #else
-Channel::Channel(const std::string &, int, const std::string &,
-                 const std::string &, const std::string &, int,
-                 const SSLConnectionParams &, bool) {
+Channel::ChannelImpl *Channel::OpenSecureChannel(
+    const std::string &, int, const std::string &, const std::string &,
+    const std::string &, int, const SSLConnectionParams &, bool) {
   throw std::logic_error(
       "SSL support has not been compiled into SimpleAmqpClient");
 }
 #endif
+
+Channel::Channel(ChannelImpl *impl) : m_impl(impl) {}
 
 Channel::~Channel() {
   amqp_connection_close(m_impl->m_connection, AMQP_REPLY_SUCCESS);
