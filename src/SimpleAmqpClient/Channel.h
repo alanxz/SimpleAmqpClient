@@ -30,9 +30,11 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/optional.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+#include <boost/variant.hpp>
 #include <string>
 #include <vector>
 
@@ -66,6 +68,76 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   static const std::string
       EXCHANGE_TYPE_FANOUT;                      ///< `"fanout"` string constant
   static const std::string EXCHANGE_TYPE_TOPIC;  ///< `"topic"` string constant
+
+  struct SIMPLEAMQPCLIENT_EXPORT OpenOpts {
+    /// Use username and password to authenticate with the broker.
+    struct SIMPLEAMQPCLIENT_EXPORT BasicAuth {
+      std::string username;
+      std::string password;
+
+      BasicAuth() {}
+      BasicAuth(const std::string &username, const std::string &password)
+          : username(username), password(password) {}
+      bool operator==(const BasicAuth &) const;
+    };
+
+    /// Use External SASL method to authenticate with the broker.
+    struct SIMPLEAMQPCLIENT_EXPORT ExternalSaslAuth {
+      std::string identity;
+
+      ExternalSaslAuth() {}
+      explicit ExternalSaslAuth(const std::string &identity)
+          : identity(identity) {}
+      bool operator==(const ExternalSaslAuth &) const;
+    };
+
+    /// Parameters
+    struct SIMPLEAMQPCLIENT_EXPORT TLSParams {
+      std::string client_key_path;   ///< Path to client key.
+      std::string client_cert_path;  ///< Path to client cert.
+      std::string ca_cert_path;      ///< Path to CA cert.
+      bool verify_hostname;  ///< Verify host matches certificate. Default: true
+      bool verify_peer;      ///< Verify presented certificate. Default: true
+
+      TLSParams() : verify_hostname(true), verify_peer(true) {}
+      bool operator==(const TLSParams &) const;
+    };
+
+    std::string host;   ///< Broker hostname. Required.
+    std::string vhost;  ///< Virtualhost on the broker. Default '/', required.
+    int port;           ///< Port to connect to, default is 5672.
+    int frame_max;      ///< Max frame size in bytes. Default 128KB.
+    /// One of BasicAuth or ExternalSaslAuth is required.
+    boost::variant<BasicAuth, ExternalSaslAuth> auth;
+    /// Connect using TLS/SSL when set, otherwise use an unencrypted channel.
+    boost::optional<TLSParams> tls_params;
+
+    /**
+     * Create an OpenOpts struct from a URI.
+     *
+     * URIs look like amqp[s]://[username[:password]@]host[:port]/[vhost].
+     * Unspecified parts of the URL will take default values:
+     * - username: guest
+     * - password: guest
+     * - host: localhost
+     * - port: 5672 for 'amqp', and 5671 for 'amqps'
+     * - vhost: '/'
+     *
+     * NOTE: for TLS/SSL connections, additional configuration is required.
+     */
+    static OpenOpts FromUri(const std::string &uri);
+
+    OpenOpts() : vhost("/"), port(5672), frame_max(131072) {}
+    bool operator==(const OpenOpts &) const;
+  };
+
+  /**
+   * Open a new channel to the broker.
+   *
+   * See documentation for \ref OpenOpts for details on what can be
+   * passed into this function.
+   */
+  static ptr_t Open(const OpenOpts &opts);
 
   /**
    * Creates a new channel object
@@ -826,13 +898,11 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                   const std::string &vhost, int frame_max,
                                   bool sasl_external);
 
-  struct SSLConnectionParams;
-
   static ChannelImpl *OpenSecureChannel(const std::string &host, int port,
                                         const std::string &username,
                                         const std::string &password,
                                         const std::string &vhost, int frame_max,
-                                        const SSLConnectionParams &ssl_params,
+                                        const OpenOpts::TLSParams &tls_params,
                                         bool sasl_external);
 
   /// PIMPL idiom

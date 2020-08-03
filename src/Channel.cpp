@@ -143,28 +143,128 @@ const std::string Channel::EXCHANGE_TYPE_DIRECT("direct");
 const std::string Channel::EXCHANGE_TYPE_FANOUT("fanout");
 const std::string Channel::EXCHANGE_TYPE_TOPIC("topic");
 
-struct Channel::SSLConnectionParams {
-  std::string path_to_ca_cert;
-  std::string path_to_client_key;
-  std::string path_to_client_cert;
-  bool verify_hostname;
-  bool verify_peer;
-};
+Channel::OpenOpts Channel::OpenOpts::FromUri(const std::string &uri) {
+  amqp_connection_info info;
+  amqp_default_connection_info(&info);
+
+  boost::shared_ptr<char> uri_dup =
+      boost::shared_ptr<char>(strdup(uri.c_str()), free);
+
+  if (0 != amqp_parse_url(uri_dup.get(), &info)) {
+    throw BadUriException();
+  }
+
+  OpenOpts opts;
+  opts.host = info.host;
+  opts.vhost = info.vhost;
+  opts.port = info.port;
+  opts.auth = OpenOpts::BasicAuth(info.user, info.password);
+  if (info.ssl) {
+    opts.tls_params = OpenOpts::TLSParams();
+  }
+  return opts;
+}
+
+bool Channel::OpenOpts::BasicAuth::operator==(const BasicAuth &o) const {
+  return username == o.username && password == o.password;
+}
+
+bool Channel::OpenOpts::ExternalSaslAuth::operator==(
+    const ExternalSaslAuth &o) const {
+  return identity == o.identity;
+}
+
+bool Channel::OpenOpts::TLSParams::operator==(const TLSParams &o) const {
+  return client_key_path == o.client_key_path &&
+         client_cert_path == o.client_cert_path &&
+         ca_cert_path == o.ca_cert_path &&
+         verify_hostname == o.verify_hostname && verify_peer == o.verify_peer;
+}
+
+bool Channel::OpenOpts::operator==(const OpenOpts &o) const {
+  return host == o.host && vhost == o.vhost && port == o.port &&
+         frame_max == o.frame_max && auth == o.auth &&
+         tls_params == o.tls_params;
+}
+
+Channel::ptr_t Channel::Open(const OpenOpts &opts) {
+  if (opts.host.empty()) {
+    throw std::runtime_error("opts.host is not specified, it is required");
+  }
+  if (opts.vhost.empty()) {
+    throw std::runtime_error("opts.vhost is not specified, it is required");
+  }
+  if (opts.port <= 0) {
+    throw std::runtime_error(
+        "opts.port is not valid, it must be a positive number");
+  }
+  if (opts.auth.empty()) {
+    throw std::runtime_error("opts.auth is not specified, it is required");
+  }
+  if (!opts.tls_params.is_initialized()) {
+    switch (opts.auth.which()) {
+      case 0: {
+        const OpenOpts::BasicAuth &auth =
+            boost::get<OpenOpts::BasicAuth>(opts.auth);
+        return boost::make_shared<Channel>(
+            OpenChannel(opts.host, opts.port, auth.username, auth.password,
+                        opts.vhost, opts.frame_max, false));
+      }
+      case 1: {
+        const OpenOpts::ExternalSaslAuth &auth =
+            boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
+        return boost::make_shared<Channel>(
+            OpenChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
+                        opts.frame_max, true));
+      }
+      default:
+        throw std::logic_error("Unhandled auth type");
+    }
+  }
+  switch (opts.auth.which()) {
+    case 0: {
+      const OpenOpts::BasicAuth &auth =
+          boost::get<OpenOpts::BasicAuth>(opts.auth);
+      return boost::make_shared<Channel>(OpenSecureChannel(
+          opts.host, opts.port, auth.username, auth.password, opts.vhost,
+          opts.frame_max, opts.tls_params.get(), false));
+    }
+    case 1: {
+      const OpenOpts::ExternalSaslAuth &auth =
+          boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
+      return boost::make_shared<Channel>(
+          OpenSecureChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
+                            opts.frame_max, opts.tls_params.get(), true));
+    }
+    default:
+      throw std::logic_error("Unhandled auth type");
+  }
+}
 
 Channel::ptr_t Channel::Create(const std::string &host, int port,
                                const std::string &username,
                                const std::string &password,
                                const std::string &vhost, int frame_max) {
-  return boost::make_shared<Channel>(
-      OpenChannel(host, port, username, password, vhost, frame_max, false));
+  OpenOpts opts;
+  opts.host = host;
+  opts.vhost = vhost;
+  opts.port = port;
+  opts.frame_max = frame_max;
+  opts.auth = OpenOpts::BasicAuth(username, password);
+  return Open(opts);
 }
 
 Channel::ptr_t Channel::CreateSaslExternal(const std::string &host, int port,
                                            const std::string &identity,
                                            const std::string &vhost,
                                            int frame_max) {
-  return boost::make_shared<Channel>(
-      OpenChannel(host, port, identity, "", vhost, frame_max, true));
+  OpenOpts opts;
+  opts.host = host;
+  opts.vhost = vhost;
+  opts.port = port;
+  opts.frame_max = frame_max;
+  opts.auth = OpenOpts::ExternalSaslAuth(identity);
+  return Open(opts);
 }
 
 Channel::ptr_t Channel::CreateSecure(const std::string &path_to_ca_cert,
@@ -175,10 +275,22 @@ Channel::ptr_t Channel::CreateSecure(const std::string &path_to_ca_cert,
                                      const std::string &password,
                                      const std::string &vhost, int frame_max,
                                      bool verify_hostname_and_peer) {
-  return CreateSecure(path_to_ca_cert, host, path_to_client_key,
-                      path_to_client_cert, port, username, password, vhost,
-                      frame_max, verify_hostname_and_peer,
-                      verify_hostname_and_peer);
+  OpenOpts::TLSParams params;
+  params.client_key_path = path_to_client_key;
+  params.client_cert_path = path_to_client_cert;
+  params.ca_cert_path = path_to_ca_cert;
+  params.verify_hostname = verify_hostname_and_peer;
+  params.verify_peer = verify_hostname_and_peer;
+
+  OpenOpts opts;
+  opts.host = host;
+  opts.vhost = vhost;
+  opts.port = port;
+  opts.frame_max = frame_max;
+  opts.auth = OpenOpts::BasicAuth(username, password);
+  opts.tls_params = params;
+
+  return Open(opts);
 }
 
 Channel::ptr_t Channel::CreateSecure(const std::string &path_to_ca_cert,
@@ -189,15 +301,22 @@ Channel::ptr_t Channel::CreateSecure(const std::string &path_to_ca_cert,
                                      const std::string &password,
                                      const std::string &vhost, int frame_max,
                                      bool verify_hostname, bool verify_peer) {
-  SSLConnectionParams ssl_params;
-  ssl_params.path_to_ca_cert = path_to_ca_cert;
-  ssl_params.path_to_client_key = path_to_client_key;
-  ssl_params.path_to_client_cert = path_to_client_cert;
-  ssl_params.verify_hostname = verify_hostname;
-  ssl_params.verify_peer = verify_peer;
+  OpenOpts::TLSParams params;
+  params.client_key_path = path_to_client_key;
+  params.client_cert_path = path_to_client_cert;
+  params.ca_cert_path = path_to_ca_cert;
+  params.verify_hostname = verify_hostname;
+  params.verify_peer = verify_peer;
 
-  return boost::make_shared<Channel>(OpenSecureChannel(
-      host, port, username, password, vhost, frame_max, ssl_params, false));
+  OpenOpts opts;
+  opts.host = host;
+  opts.vhost = vhost;
+  opts.port = port;
+  opts.frame_max = frame_max;
+  opts.auth = OpenOpts::BasicAuth(username, password);
+  opts.tls_params = params;
+
+  return Open(opts);
 }
 
 Channel::ptr_t Channel::CreateSecureSaslExternal(
@@ -206,34 +325,32 @@ Channel::ptr_t Channel::CreateSecureSaslExternal(
     const std::string &path_to_client_cert, int port,
     const std::string &identity, const std::string &vhost, int frame_max,
     bool verify_hostname, bool verify_peer) {
-  SSLConnectionParams ssl_params;
-  ssl_params.path_to_ca_cert = path_to_ca_cert;
-  ssl_params.path_to_client_key = path_to_client_key;
-  ssl_params.path_to_client_cert = path_to_client_cert;
-  ssl_params.verify_hostname = verify_hostname;
-  ssl_params.verify_peer = verify_peer;
+  OpenOpts::TLSParams params;
+  params.client_key_path = path_to_client_key;
+  params.client_cert_path = path_to_client_cert;
+  params.ca_cert_path = path_to_ca_cert;
+  params.verify_hostname = verify_hostname;
+  params.verify_peer = verify_peer;
 
-  return boost::make_shared<Channel>(OpenSecureChannel(
-      host, port, identity, "", vhost, frame_max, ssl_params, true));
+  OpenOpts opts;
+  opts.host = host;
+  opts.vhost = vhost;
+  opts.port = port;
+  opts.frame_max = frame_max;
+  opts.auth = OpenOpts::ExternalSaslAuth(identity);
+  opts.tls_params = params;
+
+  return Open(opts);
 }
 
 Channel::ptr_t Channel::CreateFromUri(const std::string &uri, int frame_max) {
-  amqp_connection_info info;
-  amqp_default_connection_info(&info);
-
-  boost::shared_ptr<char> uri_dup =
-      boost::shared_ptr<char>(strdup(uri.c_str()), free);
-
-  if (0 != amqp_parse_url(uri_dup.get(), &info)) {
-    throw BadUriException();
-  }
-  if (info.ssl) {
+  OpenOpts opts = OpenOpts::FromUri(uri);
+  if (opts.tls_params.is_initialized()) {
     throw std::runtime_error(
         "CreateFromUri only supports non-SSL-enabled URIs");
   }
-
-  return Create(std::string(info.host), info.port, std::string(info.user),
-                std::string(info.password), std::string(info.vhost), frame_max);
+  opts.frame_max = frame_max;
+  return Open(opts);
 }
 
 Channel::ptr_t Channel::CreateSecureFromUri(
@@ -241,25 +358,21 @@ Channel::ptr_t Channel::CreateSecureFromUri(
     const std::string &path_to_client_key,
     const std::string &path_to_client_cert, bool verify_hostname_and_peer,
     int frame_max) {
-  amqp_connection_info info;
-  amqp_default_connection_info(&info);
-
-  boost::shared_ptr<char> uri_dup =
-      boost::shared_ptr<char>(strdup(uri.c_str()), free);
-
-  if (0 != amqp_parse_url(uri_dup.get(), &info)) {
-    throw BadUriException();
-  }
-  if (!info.ssl) {
+  OpenOpts opts = OpenOpts::FromUri(uri);
+  if (!opts.tls_params.is_initialized()) {
     throw std::runtime_error(
         "CreateSecureFromUri only supports SSL-enabled URIs");
   }
 
-    return CreateSecure(path_to_ca_cert, std::string(info.host),
-                        path_to_client_key, path_to_client_cert, info.port,
-                        std::string(info.user), std::string(info.password),
-                        std::string(info.vhost), frame_max,
-                        verify_hostname_and_peer);
+  OpenOpts::TLSParams params;
+  opts.tls_params->client_key_path = path_to_client_key;
+  opts.tls_params->client_cert_path = path_to_client_cert;
+  opts.tls_params->ca_cert_path = path_to_ca_cert;
+  opts.tls_params->verify_hostname = verify_hostname_and_peer;
+  opts.tls_params->verify_peer = verify_hostname_and_peer;
+  opts.frame_max = frame_max;
+
+  return Open(opts);
 }
 
 Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
@@ -294,7 +407,7 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
 Channel::ChannelImpl *Channel::OpenSecureChannel(
     const std::string &host, int port, const std::string &username,
     const std::string &password, const std::string &vhost, int frame_max,
-    const SSLConnectionParams &ssl_params, bool sasl_external) {
+    const OpenOpts::TLSParams &tls_params, bool sasl_external) {
   Channel::ChannelImpl *impl = new ChannelImpl;
   impl->m_connection = amqp_new_connection();
   if (NULL == impl->m_connection) {
@@ -306,25 +419,24 @@ Channel::ChannelImpl *Channel::OpenSecureChannel(
     throw std::bad_alloc();
   }
 #if AMQP_VERSION >= 0x00080001
-  amqp_ssl_socket_set_verify_peer(socket, ssl_params.verify_peer);
-  amqp_ssl_socket_set_verify_hostname(socket, ssl_params.verify_hostname);
+  amqp_ssl_socket_set_verify_peer(socket, tls_params.verify_peer);
+  amqp_ssl_socket_set_verify_hostname(socket, tls_params.verify_hostname);
 #else
-  amqp_ssl_socket_set_verify(socket, ssl_params.verify_hostname);
+  amqp_ssl_socket_set_verify(socket, tls_params.verify_hostname);
 #endif
 
   try {
     int status =
-        amqp_ssl_socket_set_cacert(socket, ssl_params.path_to_ca_cert.c_str());
+        amqp_ssl_socket_set_cacert(socket, tls_params.ca_cert_path.c_str());
     if (status) {
       throw AmqpLibraryException::CreateException(
           status, "Error setting CA certificate for socket");
     }
 
-    if (ssl_params.path_to_client_key != "" &&
-        ssl_params.path_to_client_cert != "") {
-      status = amqp_ssl_socket_set_key(socket,
-                                       ssl_params.path_to_client_cert.c_str(),
-                                       ssl_params.path_to_client_key.c_str());
+    if (tls_params.client_key_path != "" && tls_params.client_cert_path != "") {
+      status =
+          amqp_ssl_socket_set_key(socket, tls_params.client_cert_path.c_str(),
+                                  tls_params.client_key_path.c_str());
       if (status) {
         throw AmqpLibraryException::CreateException(
             status, "Error setting client certificate for socket");
@@ -350,7 +462,7 @@ Channel::ChannelImpl *Channel::OpenSecureChannel(
 #else
 Channel::ChannelImpl *Channel::OpenSecureChannel(
     const std::string &, int, const std::string &, const std::string &,
-    const std::string &, int, const SSLConnectionParams &, bool) {
+    const std::string &, int, const OpenOpts::TLSParams &, bool) {
   throw std::logic_error(
       "SSL support has not been compiled into SimpleAmqpClient");
 }

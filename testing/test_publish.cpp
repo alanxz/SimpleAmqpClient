@@ -38,8 +38,9 @@ TEST_F(connected_test, publish_success) {
 
 TEST(test_publish, publish_large_message) {
   // Smallest frame size allowed by AMQP
-  Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(),
-                                           5672, "guest", "guest", "/", 4096);
+  Channel::OpenOpts opts = connected_test::GetTestOpenOpts();
+  opts.frame_max = 4096;
+  Channel::ptr_t channel = Channel::Open(opts);
   // Create a message with a body larger than a single frame
   BasicMessage::ptr_t message = BasicMessage::Create(std::string(4099, 'a'));
 
