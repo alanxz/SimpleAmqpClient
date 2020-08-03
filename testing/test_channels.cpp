@@ -132,8 +132,9 @@ TEST_F(connected_test, channel_consume_success_timeout) {
 }
 
 TEST(test_channels, big_message) {
-  Channel::ptr_t channel = Channel::Create(connected_test::GetBrokerHost(),
-                                           5672, "guest", "guest", "/", 4096);
+  Channel::OpenOpts opts = connected_test::GetTestOpenOpts();
+  opts.frame_max = 4096;
+  Channel::ptr_t channel = Channel::Open(opts);
   BasicMessage::ptr_t message = BasicMessage::Create(std::string(4099, 'a'));
 
   std::string queue = channel->DeclareQueue("");
