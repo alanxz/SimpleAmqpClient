@@ -190,6 +190,8 @@ if (BUILD_API_DOCS)
     )
 endif ()
 
+include(GNUInstallDirs)
+
 install(TARGETS SimpleAmqpClient
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
