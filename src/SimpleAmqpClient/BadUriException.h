@@ -30,13 +30,15 @@
 
 #include <stdexcept>
 
+#include "SimpleAmqpClient/Util.h"
+
 /// @file SimpleAmqpClient/BadUriException.h
 /// Defines AmqpClient::BadUriException
 
 namespace AmqpClient {
 
 /** "URI is malformed" exception */
-class BadUriException : public std::runtime_error {
+class SIMPLEAMQPCLIENT_EXPORT BadUriException : public std::runtime_error {
  public:
   explicit BadUriException() : std::runtime_error("URI is malformed") {}
 };
