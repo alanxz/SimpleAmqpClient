@@ -31,6 +31,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "SimpleAmqpClient/Util.h"
+
 /// @file SimpleAmqpClient/ConsumerCancelledException.h
 /// Defines AmqpClient::ConsumerCancelledException
 
@@ -43,7 +45,8 @@ namespace AmqpClient {
  * subscribed queue is being deleted, or when a client issues basic.cancel
  * request.
  */
-class ConsumerCancelledException : public std::runtime_error {
+class SIMPLEAMQPCLIENT_EXPORT ConsumerCancelledException
+    : public std::runtime_error {
  public:
   /// Constructor
   explicit ConsumerCancelledException(const std::string &consumer_tag) throw()
