@@ -38,4 +38,12 @@
 #define SIMPLEAMQPCLIENT_EXPORT
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define SAC_DEPRECATED(msg) __attribute__((deprecated(msg)))
+#elif defined(_MSC_VER)
+#define SAC_DEPRECATED(msg) __declspec(deprecated(msg))
+#else
+#define SAC_DEPRECATED(msg)
+#endif
+
 #endif  // SIMPLEAMQPCLIENT_UTIL_H
