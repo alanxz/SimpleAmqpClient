@@ -154,6 +154,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * frame to this value
    * @return a new Channel object pointer
    */
+  SAC_DEPRECATED("Channel::Create is deprecated. Use Channel::Open.")
   static ptr_t Create(const std::string &host = "127.0.0.1", int port = 5672,
                       const std::string &username = "guest",
                       const std::string &password = "guest",
@@ -176,6 +177,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * frame to this value
    * @return a new Channel object pointer
    */
+  SAC_DEPRECATED(
+      "Channel::CreateSaslExternal is deprecated. Use Channel::Open.")
   static ptr_t CreateSaslExternal(const std::string &host = "127.0.0.1",
                                   int port = 5672,
                                   const std::string &identity = "guest",
@@ -203,6 +206,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    *
    * @return a new Channel object pointer
    */
+  SAC_DEPRECATED("Channel::CreateSecure is deprecated. Use Channel::Open.")
   static ptr_t CreateSecure(const std::string &path_to_ca_cert = "",
                             const std::string &host = "127.0.0.1",
                             const std::string &path_to_client_key = "",
@@ -239,6 +243,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    *
    * @return a new Channel object pointer
    */
+  SAC_DEPRECATED("Channel::CreateSecure is deprecated. Use Channel::Open.")
   static ptr_t CreateSecure(const std::string &path_to_ca_cert,
                             const std::string &host,
                             const std::string &path_to_client_key,
@@ -272,6 +277,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    *
    * @return a new Channel object pointer
    */
+  SAC_DEPRECATED(
+      "Channel::CreateSecureSaslExternal is deprecated. Use Channel::Open.")
   static ptr_t CreateSecureSaslExternal(const std::string &path_to_ca_cert,
                                         const std::string &host,
                                         const std::string &path_to_client_key,
@@ -289,6 +296,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * any frame to this value
    * @returns a new Channel object
    */
+  SAC_DEPRECATED("Channel::CreateFromUri is deprecated. Use Channel::Open.")
   static ptr_t CreateFromUri(const std::string &uri, int frame_max = 131072);
 
   /**
@@ -307,6 +315,8 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * any frame to this value
    * @returns a new Channel object
    */
+  SAC_DEPRECATED(
+      "Channel::CreateSecureFromUri is deprecated. Use Channel::Open.")
   static ptr_t CreateSecureFromUri(const std::string &uri,
                                    const std::string &path_to_ca_cert,
                                    const std::string &path_to_client_key = "",
