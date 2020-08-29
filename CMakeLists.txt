@@ -96,6 +96,8 @@ set(SAC_LIB_SRCS
     src/SimpleAmqpClient/AmqpException.h
     src/AmqpException.cpp
 
+    src/SimpleAmqpClient/Bytes.h
+
     src/SimpleAmqpClient/Channel.h
     src/Channel.cpp
 
