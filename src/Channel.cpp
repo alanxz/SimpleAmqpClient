@@ -789,8 +789,8 @@ void Channel::BasicPublish(const std::string &exchange_name,
 
   m_impl->CheckForError(amqp_basic_publish(
       m_impl->m_connection, channel, StringToBytes(exchange_name),
-      StringToBytes(routing_key), mandatory, immediate,
-      &properties, StringToBytes(message->Body())));
+      StringToBytes(routing_key), mandatory, immediate, &properties,
+      StringToBytes(message->Body())));
 
   // If we've done things correctly we can get one of 4 things back from the
   // broker
