@@ -2,6 +2,7 @@
 #define SIMPLEAMQPCLIENT_BYTES_H
 
 #include <amqp.h>
+
 #include <string>
 
 namespace AmqpClient {
