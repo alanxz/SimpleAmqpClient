@@ -97,36 +97,36 @@ amqp_basic_properties_t CreateAmqpProperties(const BasicMessage &mes,
   }
   if (mes.ExpirationIsSet()) {
     ret.expiration = StringToBytes(mes.Expiration());
-    ret._flags = AMQP_BASIC_EXPIRATION_FLAG;
+    ret._flags |= AMQP_BASIC_EXPIRATION_FLAG;
   }
   if (mes.MessageIdIsSet()) {
     ret.message_id = StringToBytes(mes.MessageId());
-    ret._flags = AMQP_BASIC_MESSAGE_ID_FLAG;
+    ret._flags |= AMQP_BASIC_MESSAGE_ID_FLAG;
   }
   if (mes.TimestampIsSet()) {
     ret.timestamp = mes.Timestamp();
-    ret._flags = AMQP_BASIC_TIMESTAMP_FLAG;
+    ret._flags |= AMQP_BASIC_TIMESTAMP_FLAG;
   }
   if (mes.TypeIsSet()) {
     ret.type = StringToBytes(mes.Type());
-    ret._flags = AMQP_BASIC_TYPE_FLAG;
+    ret._flags |= AMQP_BASIC_TYPE_FLAG;
   }
   if (mes.UserIdIsSet()) {
     ret.user_id = StringToBytes(mes.UserId());
-    ret._flags = AMQP_BASIC_USER_ID_FLAG;
+    ret._flags |= AMQP_BASIC_USER_ID_FLAG;
   }
   if (mes.AppIdIsSet()) {
     ret.app_id = StringToBytes(mes.AppId());
-    ret._flags = AMQP_BASIC_APP_ID_FLAG;
+    ret._flags |= AMQP_BASIC_APP_ID_FLAG;
   }
   if (mes.ClusterIdIsSet()) {
     ret.cluster_id = StringToBytes(mes.ClusterId());
-    ret._flags = AMQP_BASIC_CLUSTER_ID_FLAG;
+    ret._flags |= AMQP_BASIC_CLUSTER_ID_FLAG;
   }
   if (mes.HeaderTableIsSet()) {
     ret.headers =
         Detail::TableValueImpl::CreateAmqpTable(mes.HeaderTable(), pool);
-    ret._flags = AMQP_BASIC_HEADERS_FLAG;
+    ret._flags |= AMQP_BASIC_HEADERS_FLAG;
   }
   return ret;
 }
