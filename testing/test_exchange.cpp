@@ -51,12 +51,21 @@ TEST_F(connected_test, declare_exchange_topic) {
   channel->DeleteExchange("declare_topic");
 }
 
+TEST_F(connected_test, check_exchange_exists_succeeds) {
+  channel->DeclareExchange("declare_exists");
+  EXPECT_TRUE(channel->CheckExchangeExists("declare_exists"));
+}
+
 TEST_F(connected_test, declare_exchange_passive_good) {
   channel->DeclareExchange("declare_passive", Channel::EXCHANGE_TYPE_DIRECT);
   channel->DeclareExchange("declare_passive", Channel::EXCHANGE_TYPE_DIRECT,
                            true);
 
   channel->DeleteExchange("declare_passive");
+}
+
+TEST_F(connected_test, check_exchange_exists_fails) {
+  EXPECT_FALSE(channel->CheckExchangeExists("declare_notexist"));
 }
 
 TEST_F(connected_test, declare_exchange_passive_notexist) {
