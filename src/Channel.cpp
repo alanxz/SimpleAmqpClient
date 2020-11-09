@@ -48,6 +48,7 @@
 #include <utility>
 #include <vector>
 
+#include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/AmqpLibraryException.h"
 #include "SimpleAmqpClient/AmqpResponseLibraryException.h"
 #include "SimpleAmqpClient/BadUriException.h"
@@ -471,6 +472,25 @@ Channel::~Channel() {
 
 int Channel::GetSocketFD() const {
   return amqp_get_sockfd(m_impl->m_connection);
+}
+
+bool Channel::CheckExchangeExists(const std::string &exchange_name) {
+  const boost::array<boost::uint32_t, 1> DECLARE_OK = {
+      {AMQP_EXCHANGE_DECLARE_OK_METHOD}};
+
+  amqp_exchange_declare_t declare = {};
+  declare.exchange = StringToBytes(exchange_name);
+  declare.passive = true;
+  declare.nowait = false;
+
+  try {
+    amqp_frame_t frame =
+        m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
+  } catch (NotFoundException e) {
+    return false;
+  }
+  return true;
 }
 
 void Channel::DeclareExchange(const std::string &exchange_name,

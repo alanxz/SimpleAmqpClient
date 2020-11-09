@@ -345,6 +345,14 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   int GetSocketFD() const;
 
   /**
+   * Checks to see if an exchange exists on the broker.
+   *
+   * @param exchange_name the name of the exchange to check for.
+   * @returns true if the exchange exists on the broker, false otherwise.
+   */
+  bool CheckExchangeExists(const std::string &exchange_name);
+
+  /**
    * Declares an exchange
    *
    * Creates an exchange on the AMQP broker if it does not already exist
