@@ -1,6 +1,9 @@
 *~
 .*.sw?
 
+.cache/
+.vscode/
+build/
 CMakeCache.txt
 cmake_install.cmake
 CMakeFiles/
@@ -13,4 +16,5 @@ Debug/
 ipch/
 install_manifest.txt
 .ycm_extra_conf.py*
+compile_commands.json
 *.orig
