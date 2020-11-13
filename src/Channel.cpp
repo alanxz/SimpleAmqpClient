@@ -474,12 +474,12 @@ int Channel::GetSocketFD() const {
   return amqp_get_sockfd(m_impl->m_connection);
 }
 
-bool Channel::CheckExchangeExists(const std::string &exchange_name) {
+bool Channel::CheckExchangeExists(boost::string_ref exchange_name) {
   const boost::array<boost::uint32_t, 1> DECLARE_OK = {
       {AMQP_EXCHANGE_DECLARE_OK_METHOD}};
 
   amqp_exchange_declare_t declare = {};
-  declare.exchange = StringToBytes(exchange_name);
+  declare.exchange = StringRefToBytes(exchange_name);
   declare.passive = true;
   declare.nowait = false;
 
