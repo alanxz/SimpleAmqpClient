@@ -34,6 +34,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+#include <boost/utility/string_ref.hpp>
 #include <boost/variant.hpp>
 #include <string>
 #include <vector>
@@ -350,7 +351,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * @param exchange_name the name of the exchange to check for.
    * @returns true if the exchange exists on the broker, false otherwise.
    */
-  bool CheckExchangeExists(const std::string &exchange_name);
+  bool CheckExchangeExists(boost::string_ref exchange_name);
 
   /**
    * Declares an exchange
