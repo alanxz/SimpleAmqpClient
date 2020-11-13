@@ -447,6 +447,15 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    */
   void UnbindExchange(const std::string &destination, const std::string &source,
                       const std::string &routing_key, const Table &arguments);
+
+  /**
+   * Checks to see if a queue exists on the broker.
+   *
+   * @param queue_name the name of the exchange to check for.
+   * @returns true if the exchange exists on the broker, false otherwise.
+   */
+  bool CheckQueueExists(boost::string_ref queue_name);
+
   /**
    * Declare a queue
    *

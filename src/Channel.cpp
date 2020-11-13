@@ -598,6 +598,25 @@ void Channel::UnbindExchange(const std::string &destination,
   m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
+bool Channel::CheckQueueExists(boost::string_ref queue_name) {
+  const boost::array<boost::uint32_t, 1> DECLARE_OK = {
+      {AMQP_QUEUE_DECLARE_OK_METHOD}};
+
+  amqp_queue_declare_t declare = {};
+  declare.queue = StringRefToBytes(queue_name);
+  declare.passive = true;
+  declare.nowait = false;
+
+  try {
+    amqp_frame_t frame =
+        m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
+    m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
+  } catch (NotFoundException e) {
+    return false;
+  }
+  return true;
+}
+
 std::string Channel::DeclareQueue(const std::string &queue_name, bool passive,
                                   bool durable, bool exclusive,
                                   bool auto_delete) {

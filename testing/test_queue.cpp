@@ -40,11 +40,20 @@ TEST_F(connected_test, queue_declare_named) {
   channel->DeleteQueue(queue);
 }
 
+TEST_F(connected_test, check_queue_exists_success) {
+  channel->DeclareQueue("declare_queue_passive");
+  EXPECT_TRUE(channel->CheckQueueExists("declare_queue_passive"));
+}
+
 TEST_F(connected_test, queue_declare_passive) {
   std::string queue = channel->DeclareQueue("declare_queue_passive");
   channel->DeclareQueue("declare_queue_passive", true);
 
   channel->DeleteQueue(queue);
+}
+
+TEST_F(connected_test, check_queue_exists_fail) {
+  EXPECT_FALSE(channel->CheckQueueExists("declare_queue_notexist"));
 }
 
 TEST_F(connected_test, queue_declare_passive_fail) {
