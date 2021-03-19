@@ -196,8 +196,8 @@ include(GNUInstallDirs)
 
 include(CMakePackageConfigHelpers)
 set(SAC_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/SimpleAmqpClient)
-set(project_config "${CMAKE_CURRENT_BINARY_DIR}/SimpleAmqpClient-config.cmake")
-set(version_config "${CMAKE_CURRENT_BINARY_DIR}/SimpleAmqpClient-config-version.cmake")
+set(project_config "${CMAKE_CURRENT_BINARY_DIR}/SimpleAmqpClientConfig.cmake")
+set(version_config "${CMAKE_CURRENT_BINARY_DIR}/SimpleAmqpClientConfig-version.cmake")
 set(targets_export_name SimpleAmqpClient-targets)
 list(APPEND INSTALL_TARGETS SimpleAmqpClient)
 
@@ -208,7 +208,7 @@ write_basic_package_version_file(
 	)
 
 configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SimpleAmqpClient-config.cmake.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SimpleAmqpClientConfig.cmake.in"
     "${project_config}"
     INSTALL_DESTINATION "${SAC_CMAKE_DIR}"
 	)
