@@ -206,12 +206,18 @@ write_basic_package_version_file(
     VERSION ${SAC_VERSION}
     COMPATIBILITY AnyNewerVersion
 	)
-￼
+
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SimpleAmqpClient-config.cmake.in"
     "${project_config}"
     INSTALL_DESTINATION "${SAC_CMAKE_DIR}"
 	)
+
+install(TARGETS ${INSTALL_TARGETS} EXPORT ${targets_export_name}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
 
 install(FILES ${project_config} ${version_config}
     DESTINATION ${SAC_CMAKE_DIR}
@@ -220,12 +226,6 @@ install(FILES ${project_config} ${version_config}
 install(EXPORT ${targets_export_name}
     DESTINATION ${SAC_CMAKE_DIR}
     NAMESPACE SimpleAmqpClient::
-    )
-
-install(TARGETS SimpleAmqpClient
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
 install(FILES
