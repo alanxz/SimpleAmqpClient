@@ -137,6 +137,10 @@ set(SAC_LIB_SRCS
 
 add_library(SimpleAmqpClient ${SAC_LIB_SRCS})
 add_library(${PROJECT_NAME}::SimpleAmqpClient ALIAS SimpleAmqpClient)
+target_include_directories(
+  SimpleAmqpClient
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
+         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/>")
 target_link_libraries(SimpleAmqpClient rabbitmq::rabbitmq-static ${SOCKET_LIBRARY} Boost::chrono Boost::system $<$<BOOL:${Boost_Dynamic_Linking_ENABLED}>:Boost::dynamic_linking>)
 
 if (WIN32)
