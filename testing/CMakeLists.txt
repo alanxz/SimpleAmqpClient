@@ -1,6 +1,3 @@
-include_directories(BEFORE SYSTEM ${gtest_SOURCE_DIR}/include)
-include_directories(../src)
-
 add_executable(test_api
     connected_test.h
     test_connect.cpp
@@ -15,5 +12,6 @@ add_executable(test_api
     test_ack.cpp
     test_nack.cpp
     )
+target_include_directories(test_api PRIVATE ${gtest_SOURCE_DIR}/include ${Rabbitmqc_INCLUDE_DIR} "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_link_libraries(test_api SimpleAmqpClient gtest gtest_main)
 add_test(test_api test_api)

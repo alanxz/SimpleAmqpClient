@@ -3,7 +3,7 @@
 # version of CMake by first installing Extra Packages for Enterprise Linux
 # (https://fedoraproject.org/wiki/EPEL#Extra_Packages_for_Enterprise_Linux_.28EPEL.29)
 # and then issuing `yum install cmake3` on the command line.
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 
 project(SimpleAmqpClient LANGUAGES CXX)
 
@@ -43,7 +43,6 @@ set(SAC_APIVERSION ${_API_VERSION_MAJOR}.${_API_VERSION_MINOR}.${_API_VERSION_PA
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 find_package(Rabbitmqc REQUIRED)
-INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
 
 option(ENABLE_SSL_SUPPORT "Enable SSL support." ${Rabbitmqc_SSL_ENABLED})
 
@@ -115,7 +114,12 @@ set(SAC_LIB_SRCS
 
 
 add_library(SimpleAmqpClient ${SAC_LIB_SRCS})
-target_link_libraries(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY})
+target_include_directories(
+  SimpleAmqpClient 
+  PRIVATE ${Rabbitmqc_INCLUDE_DIR}
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
+         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/>")
+target_link_libraries(SimpleAmqpClient Rabbitmqc::rabbitmq ${SOCKET_LIBRARY})
 
 if (WIN32)
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
