@@ -53,8 +53,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
-find_package(Rabbitmqc REQUIRED)
-INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
+find_package(rabbitmq-c CONFIG REQUIRED)
 
 option(ENABLE_SSL_SUPPORT "Enable SSL support." ${Rabbitmqc_SSL_ENABLED})
 
@@ -135,7 +134,7 @@ set(SAC_LIB_SRCS
 
 
 add_library(SimpleAmqpClient ${SAC_LIB_SRCS})
-target_link_libraries(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY} ${Boost_LIBRARIES} $<$<BOOL:${Boost_Dynamic_Linking_ENABLED}>:Boost::dynamic_linking>)
+target_link_libraries(SimpleAmqpClient rabbitmq::rabbitmq-static ${SOCKET_LIBRARY} ${Boost_LIBRARIES} $<$<BOOL:${Boost_Dynamic_Linking_ENABLED}>:Boost::dynamic_linking>)
 
 if (WIN32)
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
