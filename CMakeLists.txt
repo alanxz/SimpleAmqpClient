@@ -179,6 +179,7 @@ endif ()
 include(GNUInstallDirs)
 
 install(TARGETS SimpleAmqpClient
+    EXPORT ${PROJECT_NAME}Targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -215,3 +216,42 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAmqpClient.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
     )
+    
+include(CMakePackageConfigHelpers)
+# create and install target cmake file
+install(
+  EXPORT ${PROJECT_NAME}Targets
+  NAMESPACE ${PROJECT_NAME}::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
+# create main config file for find_package
+# create project config file
+set(PROJECT_CONFIG_CONTENT "@PACKAGE_INIT@\n")
+# appending find_dependency for each dependency
+if(PROJECT_DEP_PKG)
+  string(APPEND PROJECT_CONFIG_CONTENT "include(CMakeFindDependencyMacro)\n")
+  foreach(PKG_NAME ${PROJECT_DEP_PKG})
+    string(APPEND PROJECT_CONFIG_CONTENT
+           "find_dependency(${PKG_NAME} REQUIRED)\n")
+  endforeach()
+endif()
+string(APPEND PROJECT_CONFIG_CONTENT
+       "include(\"\${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}Targets.cmake\")")
+file(WRITE PROJECT_CONFIG_FILE ${PROJECT_CONFIG_CONTENT})
+
+configure_package_config_file(
+  PROJECT_CONFIG_FILE ${PROJECT_NAME}Config.cmake
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+file(REMOVE PROJECT_CONFIG_FILE)
+
+# create version file
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  VERSION ${SAC_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+# install cmake configs
+install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+              "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
