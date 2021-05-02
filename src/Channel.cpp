@@ -421,23 +421,25 @@ Channel::ChannelImpl *Channel::OpenSecureChannel(
 #endif
 
   try {
-    int status =
-        amqp_ssl_socket_set_cacert(socket, tls_params.ca_cert_path.c_str());
-    if (status) {
-      throw AmqpLibraryException::CreateException(
-          status, "Error setting CA certificate for socket");
-    }
-
-    if (tls_params.client_key_path != "" && tls_params.client_cert_path != "") {
+    int status;
+    if (tls_params.verify_hostname && tls_params.verify_peer) {
       status =
-          amqp_ssl_socket_set_key(socket, tls_params.client_cert_path.c_str(),
-                                  tls_params.client_key_path.c_str());
+          amqp_ssl_socket_set_cacert(socket, tls_params.ca_cert_path.c_str());
       if (status) {
         throw AmqpLibraryException::CreateException(
-            status, "Error setting client certificate for socket");
+            status, "Error setting CA certificate for socket");
+      }
+
+      if (tls_params.client_key_path != "" && tls_params.client_cert_path != "") {
+        status =
+            amqp_ssl_socket_set_key(socket, tls_params.client_cert_path.c_str(),
+                                    tls_params.client_key_path.c_str());
+        if (status) {
+          throw AmqpLibraryException::CreateException(
+              status, "Error setting client certificate for socket");
+        }
       }
     }
-
     status = amqp_socket_open(socket, host.c_str(), port);
     if (status) {
       throw AmqpLibraryException::CreateException(
