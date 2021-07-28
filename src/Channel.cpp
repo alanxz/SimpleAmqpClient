@@ -203,14 +203,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
             boost::get<OpenOpts::BasicAuth>(opts.auth);
         return boost::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.username, auth.password,
-                        opts.vhost, opts.frame_max, false));
+                        opts.vhost, opts.frame_max, false, opts.heart_beat));
       }
       case 1: {
         const OpenOpts::ExternalSaslAuth &auth =
             boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
         return boost::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
-                        opts.frame_max, true));
+                        opts.frame_max, true, opts.heart_beat));
       }
       default:
         throw std::logic_error("Unhandled auth type");
@@ -222,14 +222,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
           boost::get<OpenOpts::BasicAuth>(opts.auth);
       return boost::make_shared<Channel>(OpenSecureChannel(
           opts.host, opts.port, auth.username, auth.password, opts.vhost,
-          opts.frame_max, opts.tls_params.get(), false));
+          opts.frame_max, opts.tls_params.get(), false, opts.heart_beat));
     }
     case 1: {
       const OpenOpts::ExternalSaslAuth &auth =
           boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
-      return boost::make_shared<Channel>(
-          OpenSecureChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
-                            opts.frame_max, opts.tls_params.get(), true));
+      return boost::make_shared<Channel>(OpenSecureChannel(
+          opts.host, opts.port, auth.identity, "", opts.vhost, opts.frame_max,
+          opts.tls_params.get(), true, opts.heart_beat));
     }
     default:
       throw std::logic_error("Unhandled auth type");
@@ -374,7 +374,8 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
                                            const std::string &username,
                                            const std::string &password,
                                            const std::string &vhost,
-                                           int frame_max, bool sasl_external) {
+                                           int frame_max, bool sasl_external,
+                                           int heart_beat) {
   ChannelImpl *impl = new ChannelImpl;
   impl->m_connection = amqp_new_connection();
 
@@ -387,7 +388,8 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
     int sock = amqp_socket_open(socket, host.c_str(), port);
     impl->CheckForError(sock);
 
-    impl->DoLogin(username, password, vhost, frame_max, sasl_external);
+    impl->DoLogin(username, password, vhost, frame_max, sasl_external,
+                  heart_beat);
   } catch (...) {
     amqp_destroy_connection(impl->m_connection);
     delete impl;
@@ -402,7 +404,7 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
 Channel::ChannelImpl *Channel::OpenSecureChannel(
     const std::string &host, int port, const std::string &username,
     const std::string &password, const std::string &vhost, int frame_max,
-    const OpenOpts::TLSParams &tls_params, bool sasl_external) {
+    const OpenOpts::TLSParams &tls_params, bool sasl_external, int heart_beat) {
   Channel::ChannelImpl *impl = new ChannelImpl;
   impl->m_connection = amqp_new_connection();
   if (NULL == impl->m_connection) {
@@ -444,7 +446,8 @@ Channel::ChannelImpl *Channel::OpenSecureChannel(
           status, "Error setting client certificate for socket");
     }
 
-    impl->DoLogin(username, password, vhost, frame_max, sasl_external);
+    impl->DoLogin(username, password, vhost, frame_max, sasl_external,
+                  heart_beat);
   } catch (...) {
     amqp_destroy_connection(impl->m_connection);
     delete impl;
@@ -457,7 +460,7 @@ Channel::ChannelImpl *Channel::OpenSecureChannel(
 #else
 Channel::ChannelImpl *Channel::OpenSecureChannel(
     const std::string &, int, const std::string &, const std::string &,
-    const std::string &, int, const OpenOpts::TLSParams &, bool) {
+    const std::string &, int, const OpenOpts::TLSParams &, bool, int) {
   throw std::logic_error(
       "SSL support has not been compiled into SimpleAmqpClient");
 }

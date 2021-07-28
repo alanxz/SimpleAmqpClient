@@ -112,6 +112,9 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     boost::variant<BasicAuth, ExternalSaslAuth> auth;
     /// Connect using TLS/SSL when set, otherwise use an unencrypted channel.
     boost::optional<TLSParams> tls_params;
+    int heart_beat;  ///< the number of seconds between heartbeat frame to
+                     ///< request of the broker. A value of 0 disables
+                     ///< heartbeats
 
     /**
      * Create an OpenOpts struct from a URI.
@@ -128,7 +131,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
      */
     static OpenOpts FromUri(const std::string &uri);
 
-    OpenOpts() : vhost("/"), port(5672), frame_max(131072) {}
+    OpenOpts() : vhost("/"), port(5672), frame_max(131072), heart_beat(0) {}
     bool operator==(const OpenOpts &) const;
   };
 
@@ -924,14 +927,14 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                   const std::string &username,
                                   const std::string &password,
                                   const std::string &vhost, int frame_max,
-                                  bool sasl_external);
+                                  bool sasl_external, int heart_beat);
 
   static ChannelImpl *OpenSecureChannel(const std::string &host, int port,
                                         const std::string &username,
                                         const std::string &password,
                                         const std::string &vhost, int frame_max,
                                         const OpenOpts::TLSParams &tls_params,
-                                        bool sasl_external);
+                                        bool sasl_external, int heart_beat);
 
   /// PIMPL idiom
   boost::scoped_ptr<ChannelImpl> m_impl;
