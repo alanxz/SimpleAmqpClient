@@ -11,6 +11,7 @@ Installing
 ----------------
 
 Known to work in the following environments:
+- Windows 10 (MSVC 2019, Win64)
 - Windows 7 (MSVC 10, Win64, Win32). Likely to work in others, but has not been tested
 - Linux (RHEL 6.0, GCC-4.4.5, 32 and 64 bit). Likely to work on other configurations, but has not been tested
 - Mac OS X (10.7, 10.6, gcc-4.2, 32 and 64-bit). Likely to work on older version, but has not been tested
@@ -40,6 +41,22 @@ Interesting targets
 Notes:
 + The test google-test based test suite can be enabled by passing `-DENABLE_TESTING=ON` to
   cmake
+
+### Build procedure for Windows
+
+Boost libraries are needed, so you can install them using nuget:
+```
+nuget install boost_chrono-vc142 -Version 1.77.0
+nuget install boost_system-vc142 -Version 1.77.0
+nuget install boost -Version 1.77.0
+```
+To build and install succesfully, [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) should be built as shared library.
+
+Let *boost_chrono* and *boost_system* be in same directory ```C:\boost```, [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) be on ```C:\rabbitmq-c```,
+SSL be OFF, and VS2019 is used, than CMake CLI is:
+```
+cd cmake -G "Visual Studio 16" -A x64 -DBoost_INCLUDE_DIR="C:/boost.XX.XX.X.X/lib/native/include" -DBOOST_ROOT="C:/boost.X.XX.X.X" -DBOOST_LIBRARYDIR="C:/boost" -DRabbitmqc_INCLUDE_DIR="C:/rabbitmq-c/include" -DRabbitmqc_LIBRARY="C:/rabbitmq-c/lib/rabbitmq.4.lib" -DBoost_USE_STATIC_LIBS=ON -DBUILD_STATIC_LIBS=ON -DENABLE_SSL_SUPPORT=OFF ..
+```
 
 Using the library
 -----------------
