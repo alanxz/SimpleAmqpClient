@@ -50,7 +50,7 @@ nuget install boost_chrono-vc142 -Version 1.77.0
 nuget install boost_system-vc142 -Version 1.77.0
 nuget install boost -Version 1.77.0
 ```
-To build and install succesfully, [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) should be built as shared library.
+To build and install succesfully, [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) should be built **as shared library**.
 
 Let *boost_chrono* and *boost_system* be in same directory ```C:\boost```, [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) be on ```C:\rabbitmq-c```,
 SSL be OFF, and VS2019 is used, than CMake CLI is:
