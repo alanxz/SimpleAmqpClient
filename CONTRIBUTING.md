@@ -1,15 +1,19 @@
-Contributing to SimpleAmqpClient
-===============================
+# Contributing
 
-Thanks for contributing to SimpleAmqpClient. I firmly believe that 
-participation help make open source software great.  With that in mind there 
-are a few things you can do to make this interaction a bit smoother.
+<!--
+    Short overview, rules, general guidelines, notes about pull requests and
+    style should go here.
+-->
 
-Please use the following guidelines when creating an issue or submitting
-a pull request
+## Code of Conduct
 
-Creating an issue
------------------
+Please see the [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) document.
 
-Submitting a pull-request
-------------------------
+## Getting started
+
+Helpful notes for developers can be found in the [`HACKING.md`](HACKING.md)
+document.
+
+In addition to he above, if you use the presets file as instructed, then you
+should NOT check it into source control, just as the CMake documentation
+suggests.

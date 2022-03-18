@@ -1,0 +1,19 @@
+{
+  "name": "simpleamqpclient",
+  "version-semver": "2.5.1",
+  "dependencies": [
+    "librabbitmq",
+    "boost-chrono",
+    "boost-system"
+  ],
+  "default-features": [],
+  "features": {
+    "test": {
+      "description": "Dependencies for testing",
+      "dependencies": [
+        "gtest"
+      ]
+    }
+  },
+  "builtin-baseline": "5cf60186a241e84e8232641ee973395d4fde90e1"
+}
