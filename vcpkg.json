@@ -4,7 +4,8 @@
   "dependencies": [
     "librabbitmq",
     "boost-chrono",
-    "boost-system"
+    "boost-system",
+    "boost-variant"
   ],
   "default-features": [],
   "features": {
