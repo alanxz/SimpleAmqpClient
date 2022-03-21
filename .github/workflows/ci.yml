@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  BUILD_TYPE: Release
+  VCPKG_BINARY_SOURCES: 'default;nuget,GitHub,read'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install static analyzers
+      run: sudo apt-get install clang-tidy cppcheck -y -q
+
+    - name: vcpkg
+      shell: 'bash'
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git && ./vcpkg/bootstrap-vcpkg.sh
+        mono `./vcpkg/vcpkg fetch nuget | tail -n 1` sources add -source "https://nuget.pkg.github.com/twig-energy/index.json" -storepasswordincleartext -name "GitHub" -username "twig-energy" -password "${{ secrets.GITHUB_TOKEN }}"
+
+    - name: Configure
+      shell: 'bash'
+      env:
+        VCPKG_ROOT: "./vcpkg"
+      run: cmake --preset=ci-ubuntu
+
+    - name: Build
+      run: cmake --build --preset=ci-ubuntu -j 2
+
+    - name: Install
+      run: cmake --install build --prefix prefix
+
+    - name: Test
+      working-directory: build
+      run: ctest --output-on-failure -C Release -j 2

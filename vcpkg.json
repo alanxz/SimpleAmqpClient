@@ -5,7 +5,10 @@
     "librabbitmq",
     "boost-chrono",
     "boost-system",
-    "boost-variant"
+    "boost-variant",
+    "boost-lexical-cast",
+    "boost-algorithm",
+    "boost-foreach"
   ],
   "default-features": [],
   "features": {
@@ -16,5 +19,5 @@
       ]
     }
   },
-  "builtin-baseline": "5cf60186a241e84e8232641ee973395d4fde90e1"
+  "builtin-baseline": "a3df696929b28195b0d7a477ba6cd16dba48fa52"
 }

@@ -15,6 +15,11 @@ include(cmake/variables.cmake)
 
 find_package(rabbitmq-c CONFIG REQUIRED)
 find_package(Boost REQUIRED chrono system)
+find_path(BOOST_VARIANT_INCLUDE_DIRS "boost/variant.hpp")
+find_path(BOOST_ALGORITHM_INCLUDE_DIRS "boost/algorithm")
+find_path(BOOST_FOREACH_INCLUDE_DIRS "boost/foreach.hpp")
+find_path(RABBITMQC_INCLUDE_DIRS "amqp.h")
+
 
 # ---- Declare library ----
 
@@ -59,13 +64,20 @@ target_include_directories(
     SimpleAmqpClient_SimpleAmqpClient ${warning_guard}
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
-    "$<BUILD_INTERFACE:${PACKAGE_PREFIX_DIR}/include>"
+    "$<BUILD_INTERFACE:${BOOST_VARIANT_INCLUDE_DIRS}>"
+    "$<BUILD_INTERFACE:${BOOST_ALGORITHM_INCLUDE_DIRS}>"
+    "$<BUILD_INTERFACE:${BOOST_FOREACH_INCLUDE_DIRS}>"
+    "$<BUILD_INTERFACE:${RABBITMQC_INCLUDE_DIRS}>"
 )
 
 target_include_directories(
     SimpleAmqpClient_SimpleAmqpClient SYSTEM
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>"
+    "$<BUILD_INTERFACE:${BOOST_VARIANT_INCLUDE_DIRS}>"
+    "$<BUILD_INTERFACE:${BOOST_ALGORITHM_INCLUDE_DIRS}>"
+    "$<BUILD_INTERFACE:${BOOST_FOREACH_INCLUDE_DIRS}>"
+    "$<BUILD_INTERFACE:${RABBITMQC_INCLUDE_DIRS}>"
 )
 
 target_compile_features(SimpleAmqpClient_SimpleAmqpClient PUBLIC cxx_std_17)
