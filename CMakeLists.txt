@@ -80,6 +80,8 @@ target_include_directories(
     "$<BUILD_INTERFACE:${RABBITMQC_INCLUDE_DIRS}>"
 )
 
+target_compile_definitions(SimpleAmqpClient_SimpleAmqpClient PUBLIC SAC_SSL_SUPPORT_ENABLED)
+
 target_compile_features(SimpleAmqpClient_SimpleAmqpClient PUBLIC cxx_std_17)
 
 target_link_libraries(SimpleAmqpClient_SimpleAmqpClient PUBLIC rabbitmq::rabbitmq-static Boost::boost Boost::chrono Boost::system)
