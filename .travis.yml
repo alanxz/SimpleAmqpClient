@@ -26,9 +26,6 @@ addons:
       - gcc-7
       - g++-7
       - clang-8
-      - libboost-dev
-      - libboost-chrono-dev
-      - libboost-system-dev
       - rabbitmq-server
       - ninja-build
 
