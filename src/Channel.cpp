@@ -476,7 +476,7 @@ int Channel::GetSocketFD() const {
   return amqp_get_sockfd(m_impl->m_connection);
 }
 
-bool Channel::CheckExchangeExists(boost::string_ref exchange_name) {
+bool Channel::CheckExchangeExists(std::string_view exchange_name) {
   const std::array<std::uint32_t, 1> DECLARE_OK = {
       AMQP_EXCHANGE_DECLARE_OK_METHOD};
 
@@ -599,7 +599,7 @@ void Channel::UnbindExchange(const std::string &destination,
   m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
 }
 
-bool Channel::CheckQueueExists(boost::string_ref queue_name) {
+bool Channel::CheckQueueExists(std::string_view queue_name) {
   const std::array<std::uint32_t, 1> DECLARE_OK = {
       AMQP_QUEUE_DECLARE_OK_METHOD};
 

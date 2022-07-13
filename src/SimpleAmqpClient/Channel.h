@@ -28,10 +28,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/utility/string_ref.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <variant>
 #include <optional>
@@ -352,7 +352,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    * @param exchange_name the name of the exchange to check for.
    * @returns true if the exchange exists on the broker, false otherwise.
    */
-  bool CheckExchangeExists(boost::string_ref exchange_name);
+  bool CheckExchangeExists(std::string_view exchange_name);
 
   /**
    * Declares an exchange
@@ -455,7 +455,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel {
    * @param queue_name the name of the exchange to check for.
    * @returns true if the exchange exists on the broker, false otherwise.
    */
-  bool CheckQueueExists(boost::string_ref queue_name);
+  bool CheckQueueExists(std::string_view queue_name);
 
   /**
    * Declare a queue
