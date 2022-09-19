@@ -831,6 +831,7 @@ void Channel::BasicPublish(const std::string &exchange_name,
       StringToBytes(routing_key), mandatory, immediate, &properties,
       StringToBytes(message->Body())));
 
+#ifdef SIMPLEAMQPCLIENT_ENABLE_PUBLISH_CONFIRM
   // If we've done things correctly we can get one of 4 things back from the
   // broker
   // - basic.ack - our channel is in confirm mode, messsage was 'dealt with' by
@@ -872,7 +873,7 @@ void Channel::BasicPublish(const std::string &exchange_name,
     m_impl->MaybeReleaseBuffersOnChannel(channel);
     throw message_returned;
   }
-
+#endif
   m_impl->ReturnChannel(channel);
   m_impl->MaybeReleaseBuffersOnChannel(channel);
 }

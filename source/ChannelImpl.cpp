@@ -185,11 +185,13 @@ amqp_channel_t Channel::ChannelImpl::CreateNewChannel() {
   DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(
       new_channel, AMQP_CHANNEL_OPEN_METHOD, &channel_open, OPEN_OK);
 
+#ifdef SIMPLEAMQPCLIENT_ENABLE_PUBLISH_CONFIRM
   static const boost::array<boost::uint32_t, 1> CONFIRM_OK = {
       {AMQP_CONFIRM_SELECT_OK_METHOD}};
   amqp_confirm_select_t confirm_select = {};
   DoRpcOnChannel<boost::array<boost::uint32_t, 1> >(
       new_channel, AMQP_CONFIRM_SELECT_METHOD, &confirm_select, CONFIRM_OK);
+#endif
 
   m_channels.at(new_channel) = CS_Open;
 
