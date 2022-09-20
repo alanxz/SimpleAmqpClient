@@ -203,14 +203,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
             boost::get<OpenOpts::BasicAuth>(opts.auth);
         return boost::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.username, auth.password,
-                        opts.vhost, opts.frame_max, false));
+                        opts.vhost, opts.frame_max, false, opts.is_publisher_confirms));
       }
       case 1: {
         const OpenOpts::ExternalSaslAuth &auth =
             boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
         return boost::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
-                        opts.frame_max, true));
+                        opts.frame_max, true, opts.is_publisher_confirms));
       }
       default:
         throw std::logic_error("Unhandled auth type");
@@ -222,14 +222,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
           boost::get<OpenOpts::BasicAuth>(opts.auth);
       return boost::make_shared<Channel>(OpenSecureChannel(
           opts.host, opts.port, auth.username, auth.password, opts.vhost,
-          opts.frame_max, opts.tls_params.get(), false));
+          opts.frame_max, opts.tls_params.get(), false, opts.is_publisher_confirms));
     }
     case 1: {
       const OpenOpts::ExternalSaslAuth &auth =
           boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
       return boost::make_shared<Channel>(
           OpenSecureChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
-                            opts.frame_max, opts.tls_params.get(), true));
+                            opts.frame_max, opts.tls_params.get(), true, opts.is_publisher_confirms));
     }
     default:
       throw std::logic_error("Unhandled auth type");
@@ -374,8 +374,10 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
                                            const std::string &username,
                                            const std::string &password,
                                            const std::string &vhost,
-                                           int frame_max, bool sasl_external) {
+                                           int frame_max, bool sasl_external,
+                                           bool is_publisher_confirms) {
   ChannelImpl *impl = new ChannelImpl;
+  impl->is_publisher_confirms = is_publisher_confirms;
   impl->m_connection = amqp_new_connection();
 
   if (NULL == impl->m_connection) {
@@ -402,8 +404,10 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
 Channel::ChannelImpl *Channel::OpenSecureChannel(
     const std::string &host, int port, const std::string &username,
     const std::string &password, const std::string &vhost, int frame_max,
-    const OpenOpts::TLSParams &tls_params, bool sasl_external) {
+    const OpenOpts::TLSParams &tls_params, bool sasl_external,
+    bool is_publisher_confirms) {
   Channel::ChannelImpl *impl = new ChannelImpl;
+  impl->is_publisher_confirms = is_publisher_confirms;
   impl->m_connection = amqp_new_connection();
   if (NULL == impl->m_connection) {
     throw std::bad_alloc();
@@ -457,7 +461,7 @@ Channel::ChannelImpl *Channel::OpenSecureChannel(
 #else
 Channel::ChannelImpl *Channel::OpenSecureChannel(
     const std::string &, int, const std::string &, const std::string &,
-    const std::string &, int, const OpenOpts::TLSParams &, bool) {
+    const std::string &, int, const OpenOpts::TLSParams &, bool, bool) {
   throw std::logic_error(
       "SSL support has not been compiled into SimpleAmqpClient");
 }
@@ -831,49 +835,51 @@ void Channel::BasicPublish(const std::string &exchange_name,
       StringToBytes(routing_key), mandatory, immediate, &properties,
       StringToBytes(message->Body())));
 
-#ifdef SIMPLEAMQPCLIENT_ENABLE_PUBLISH_CONFIRM
-  // If we've done things correctly we can get one of 4 things back from the
-  // broker
-  // - basic.ack - our channel is in confirm mode, messsage was 'dealt with' by
-  // the broker
-  // - basic.nack - our channel is in confirm mode, queue has max-length set and
-  // is full, queue overflow stratege is reject-publish
-  // - basic.return then basic.ack - the message wasn't delievered, but was
-  // dealt with
-  // - channel.close - probably tried to publish to a non-existant exchange, in
-  // any case error!
-  // - connection.clsoe - something really bad happened
-  const boost::array<boost::uint32_t, 3> PUBLISH_ACK = {
-      {AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD,
-       AMQP_BASIC_NACK_METHOD}};
-  amqp_frame_t response;
-  boost::array<amqp_channel_t, 1> channels = {{channel}};
-  m_impl->GetMethodOnChannel(channels, response, PUBLISH_ACK);
 
-  if (AMQP_BASIC_NACK_METHOD == response.payload.method.id) {
-    amqp_basic_nack_t *return_method =
-        reinterpret_cast<amqp_basic_nack_t *>(response.payload.method.decoded);
-    MessageRejectedException message_rejected(return_method->delivery_tag);
-    m_impl->ReturnChannel(channel);
-    m_impl->MaybeReleaseBuffersOnChannel(channel);
-    throw message_rejected;
+  if(this->m_impl->is_publisher_confirms) {
+    // If we've done things correctly we can get one of 4 things back from the
+    // broker
+    // - basic.ack - our channel is in confirm mode, messsage was 'dealt with' by
+    // the broker
+    // - basic.nack - our channel is in confirm mode, queue has max-length set and
+    // is full, queue overflow stratege is reject-publish
+    // - basic.return then basic.ack - the message wasn't delievered, but was
+    // dealt with
+    // - channel.close - probably tried to publish to a non-existant exchange, in
+    // any case error!
+    // - connection.clsoe - something really bad happened
+    const boost::array<boost::uint32_t, 3> PUBLISH_ACK = {
+        {AMQP_BASIC_ACK_METHOD, AMQP_BASIC_RETURN_METHOD,
+         AMQP_BASIC_NACK_METHOD}};
+    amqp_frame_t response;
+    boost::array<amqp_channel_t, 1> channels = {{channel}};
+    m_impl->GetMethodOnChannel(channels, response, PUBLISH_ACK);
+
+    if (AMQP_BASIC_NACK_METHOD == response.payload.method.id) {
+      amqp_basic_nack_t *return_method =
+          reinterpret_cast<amqp_basic_nack_t *>(response.payload.method.decoded);
+      MessageRejectedException message_rejected(return_method->delivery_tag);
+      m_impl->ReturnChannel(channel);
+      m_impl->MaybeReleaseBuffersOnChannel(channel);
+      throw message_rejected;
+    }
+
+    if (AMQP_BASIC_RETURN_METHOD == response.payload.method.id) {
+      MessageReturnedException message_returned =
+          m_impl->CreateMessageReturnedException(
+              *(reinterpret_cast<amqp_basic_return_t *>(
+                  response.payload.method.decoded)),
+              channel);
+
+      const boost::array<boost::uint32_t, 1> BASIC_ACK = {
+          {AMQP_BASIC_ACK_METHOD}};
+      m_impl->GetMethodOnChannel(channels, response, BASIC_ACK);
+      m_impl->ReturnChannel(channel);
+      m_impl->MaybeReleaseBuffersOnChannel(channel);
+      throw message_returned;
+    }
   }
 
-  if (AMQP_BASIC_RETURN_METHOD == response.payload.method.id) {
-    MessageReturnedException message_returned =
-        m_impl->CreateMessageReturnedException(
-            *(reinterpret_cast<amqp_basic_return_t *>(
-                response.payload.method.decoded)),
-            channel);
-
-    const boost::array<boost::uint32_t, 1> BASIC_ACK = {
-        {AMQP_BASIC_ACK_METHOD}};
-    m_impl->GetMethodOnChannel(channels, response, BASIC_ACK);
-    m_impl->ReturnChannel(channel);
-    m_impl->MaybeReleaseBuffersOnChannel(channel);
-    throw message_returned;
-  }
-#endif
   m_impl->ReturnChannel(channel);
   m_impl->MaybeReleaseBuffersOnChannel(channel);
 }

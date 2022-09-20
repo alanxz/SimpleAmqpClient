@@ -341,6 +341,7 @@ class Channel::ChannelImpl : boost::noncopyable {
   bool BrokerHasNewQosBehavior() const { return 0x030300 <= m_brokerVersion; }
 
   amqp_connection_state_t m_connection;
+  bool is_publisher_confirms;
 
  private:
   static boost::uint32_t ComputeBrokerVersion(
