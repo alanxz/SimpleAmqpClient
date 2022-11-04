@@ -10,28 +10,38 @@ on:
 
 env:
   BUILD_TYPE: Release
-  VCPKG_BINARY_SOURCES: 'default;nuget,GitHub,read'
+  VCPKG_COMMIT: "898b728edc5e0d12b50015f9cd18247c4257a3eb"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3
+        ports:
+          - 5672:5672
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install static analyzers
       run: sudo apt-get install clang-tidy cppcheck -y -q
 
-    - name: vcpkg
-      shell: 'bash'
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git && ./vcpkg/bootstrap-vcpkg.sh
-        mono `./vcpkg/vcpkg fetch nuget | tail -n 1` sources add -source "https://nuget.pkg.github.com/twig-energy/index.json" -storepasswordincleartext -name "GitHub" -username "twig-energy" -password "${{ secrets.GITHUB_TOKEN }}"
+
+    - name: Install vcpkg
+      uses: friendlyanon/setup-vcpkg@v1
+      with:
+        committish: "${{ env.VCPKG_COMMIT }}"
+        cache-version: "sanitize-clang-17"
+        cache-restore-keys: |
+          vcpkg-Linux-sanitize-clang-17-
+          vcpkg-Linux-test-clang-17-
 
     - name: Configure
-      shell: 'bash'
       env:
-        VCPKG_ROOT: "./vcpkg"
-      run: cmake --preset=ci-ubuntu
+        GH_TOKEN: ${{ secrets.ANDERS_WIND_REPO_ACCESS_TOKEN }}
+      run: |
+        gh auth setup-git
+        cmake --preset=ci-ubuntu
 
     - name: Build
       run: cmake --build --preset=ci-ubuntu -j 2
@@ -41,4 +51,6 @@ jobs:
 
     - name: Test
       working-directory: build
+      env:
+        AMQP_BROKER: "localhost"
       run: ctest --output-on-failure -C Release -j 2
