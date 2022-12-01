@@ -794,15 +794,13 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * deliver. Setting this to more than 1 will allow the broker to deliver
    * messages while a current message is being processed. A value of
    * 0 means no limit. This option is ignored if `no_ack = true`.
-   * @param globalQos Sets basic.qos.global explicitly.
+   * @param global_qos Sets basic.qos.global explicitly.
    * @returns the consumer tag
    */
   std::string BasicConsume(const std::string &queue,
-                           const std::string &consumer_tag = "",
-                           bool no_local = true, bool no_ack = true,
-                           bool exclusive = true,
-                           boost::uint16_t message_prefetch_count = 1,
-                           bool globalQos = false);
+                           const std::string &consumer_tag, bool no_local,
+                           bool no_ack, bool exclusive,
+                           boost::uint16_t message_prefetch_count, bool global_qos);
 
   /**
    * Starts consuming Basic messages on a queue
@@ -853,7 +851,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     * deliver. Setting this to more than 1 will allow the broker to deliver
     * messages while a current message is being processed. A value of
     * 0 means no limit. This option is ignored if `no_ack = true`.
-    * @param globalQos Sets basic.qos.global explicitly.
+    * @param global_qos Sets basic.qos.global explicitly.
     * @param arguments A table of additional arguments when creating the
     * consumer
     * @returns the consumer tag
@@ -861,8 +859,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
   std::string BasicConsume(const std::string &queue,
                            const std::string &consumer_tag, bool no_local,
                            bool no_ack, bool exclusive,
-                           boost::uint16_t message_prefetch_count,
-                           bool globalQos,
+                           boost::uint16_t message_prefetch_count, bool global_qos,
                            const Table &arguments);
 
   /**
