@@ -29,7 +29,7 @@
 #include <amqp.h>
 
 #include <algorithm>
-#include <boost/array.hpp>
+#include <array>
 #include <iostream>
 
 #include "connected_test.h"
@@ -103,13 +103,12 @@ TEST(basic_message, initial_message_replace2) {
 }
 
 TEST(basic_message, embedded_nulls) {
-  const boost::array<char, 7> message_data = {
-      {'a', 'b', 'c', 0, '1', '2', '3'}};
+  const std::array<char, 7> message_data = {'a', 'b', 'c', 0, '1', '2', '3'};
   const std::string body(message_data.data(), message_data.size());
   BasicMessage::ptr_t message = BasicMessage::Create(body);
   EXPECT_EQ(body, message->Body());
 
-  const boost::array<char, 7> message_data2 = {
+  const std::array<char, 7> message_data2 = {
       {'1', '2', '3', 0, 'a', 'b', 'c'}};
   const std::string body2(message_data2.data(), message_data2.size());
   message->Body(body2);

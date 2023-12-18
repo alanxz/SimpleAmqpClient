@@ -28,16 +28,16 @@
 
 #include "SimpleAmqpClient/MessageReturnedException.h"
 
-#include <boost/lexical_cast.hpp>
+#include <string>
 
 namespace AmqpClient {
 MessageReturnedException::MessageReturnedException(
-    BasicMessage::ptr_t message, boost::uint32_t reply_code,
+    BasicMessage::ptr_t message, std::uint32_t reply_code,
     const std::string &reply_text, const std::string &exchange,
     const std::string &routing_key) throw()
     : std::runtime_error(
           std::string("Message returned. Reply code: ")
-              .append(boost::lexical_cast<std::string>(reply_code))
+              .append(std::to_string(reply_code))
               .append(" ")
               .append(reply_text)),
       m_message(message),

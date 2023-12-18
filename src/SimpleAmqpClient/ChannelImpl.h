@@ -32,26 +32,28 @@
 #include <amqp.h>
 #include <amqp_framing.h>
 
-#include <boost/array.hpp>
-
 #include "SimpleAmqpClient/AmqpException.h"
 #include "SimpleAmqpClient/BasicMessage.h"
 #include "SimpleAmqpClient/Channel.h"
 #include "SimpleAmqpClient/ConsumerCancelledException.h"
 #include "SimpleAmqpClient/Envelope.h"
 #include "SimpleAmqpClient/MessageReturnedException.h"
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
-#include <boost/bind.hpp>
-#include <boost/chrono.hpp>
-#include <boost/noncopyable.hpp>
+#include <algorithm>
+#include <array>
+#include <chrono>
 #include <map>
 #include <vector>
 
 namespace AmqpClient {
 
-class Channel::ChannelImpl : boost::noncopyable {
+class Channel::ChannelImpl {
  public:
   ChannelImpl();
+
+  // Non-copyable
+  ChannelImpl(const ChannelImpl &) = delete;
+  ChannelImpl &operator=(const ChannelImpl &) = delete;
+
   virtual ~ChannelImpl();
 
   typedef std::vector<amqp_channel_t> channel_list_t;
@@ -67,20 +69,19 @@ class Channel::ChannelImpl : boost::noncopyable {
   bool IsChannelOpen(amqp_channel_t channel);
 
   bool GetNextFrameFromBroker(amqp_frame_t &frame,
-                              boost::chrono::microseconds timeout);
+                              std::chrono::microseconds timeout);
 
   bool CheckForQueuedMessageOnChannel(amqp_channel_t message_on_channel) const;
   void AddToFrameQueue(const amqp_frame_t &frame);
 
   template <class ChannelListType>
-  bool GetNextFrameFromBrokerOnChannel(const ChannelListType channels,
-                                       amqp_frame_t &frame_out,
-                                       boost::chrono::microseconds timeout =
-                                           boost::chrono::microseconds::max()) {
-    boost::chrono::steady_clock::time_point end_point;
-    boost::chrono::microseconds timeout_left = timeout;
-    if (timeout != boost::chrono::microseconds::max()) {
-      end_point = boost::chrono::steady_clock::now() + timeout;
+  bool GetNextFrameFromBrokerOnChannel(
+      const ChannelListType channels, amqp_frame_t &frame_out,
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) {
+    std::chrono::steady_clock::time_point end_point;
+    std::chrono::microseconds timeout_left = timeout;
+    if (timeout != std::chrono::microseconds::max()) {
+      end_point = std::chrono::steady_clock::now() + timeout;
     }
 
     amqp_frame_t frame;
@@ -104,15 +105,14 @@ class Channel::ChannelImpl : boost::noncopyable {
         AddToFrameQueue(frame);
       }
 
-      if (timeout != boost::chrono::microseconds::max()) {
-        boost::chrono::steady_clock::time_point now =
-            boost::chrono::steady_clock::now();
+      if (timeout != std::chrono::microseconds::max()) {
+        std::chrono::steady_clock::time_point now =
+            std::chrono::steady_clock::now();
         if (now >= end_point) {
           return false;
         }
-        timeout_left =
-            boost::chrono::duration_cast<boost::chrono::microseconds>(
-                end_point - now);
+        timeout_left = std::chrono::duration_cast<std::chrono::microseconds>(
+            end_point - now);
       }
     }
     return false;
@@ -120,7 +120,7 @@ class Channel::ChannelImpl : boost::noncopyable {
 
   bool GetNextFrameOnChannel(
       amqp_channel_t channel, amqp_frame_t &frame,
-      boost::chrono::microseconds timeout = boost::chrono::microseconds::max());
+      std::chrono::microseconds timeout = std::chrono::microseconds::max());
 
   static bool is_on_channel(const amqp_frame_t frame, amqp_channel_t channel) {
     return channel == frame.channel;
@@ -152,16 +152,17 @@ class Channel::ChannelImpl : boost::noncopyable {
   }
 
   template <class ChannelListType, class ResponseListType>
-  bool GetMethodOnChannel(const ChannelListType channels, amqp_frame_t &frame,
-                          const ResponseListType &expected_responses,
-                          boost::chrono::microseconds timeout =
-                              boost::chrono::microseconds::max()) {
+  bool GetMethodOnChannel(
+      const ChannelListType channels, amqp_frame_t &frame,
+      const ResponseListType &expected_responses,
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) {
     frame_queue_t::iterator desired_frame = std::find_if(
         m_frame_queue.begin(), m_frame_queue.end(),
-        boost::bind(
-            &ChannelImpl::is_expected_method_on_channel<ChannelListType,
-                                                        ResponseListType>,
-            _1, channels, expected_responses));
+        [channels, expected_responses](auto &frame) {
+          return ChannelImpl::is_expected_method_on_channel<ChannelListType,
+                                                            ResponseListType>(
+              frame, channels, expected_responses);
+        });
 
     if (m_frame_queue.end() != desired_frame) {
       frame = *desired_frame;
@@ -169,10 +170,10 @@ class Channel::ChannelImpl : boost::noncopyable {
       return true;
     }
 
-    boost::chrono::steady_clock::time_point end_point;
-    boost::chrono::microseconds timeout_left = timeout;
-    if (timeout != boost::chrono::microseconds::max()) {
-      end_point = boost::chrono::steady_clock::now() + timeout;
+    std::chrono::steady_clock::time_point end_point;
+    std::chrono::microseconds timeout_left = timeout;
+    if (timeout != std::chrono::microseconds::max()) {
+      end_point = std::chrono::steady_clock::now() + timeout;
     }
 
     amqp_frame_t incoming_frame;
@@ -196,35 +197,34 @@ class Channel::ChannelImpl : boost::noncopyable {
       }
       m_frame_queue.push_back(incoming_frame);
 
-      if (timeout != boost::chrono::microseconds::max()) {
-        boost::chrono::steady_clock::time_point now =
-            boost::chrono::steady_clock::now();
+      if (timeout != std::chrono::microseconds::max()) {
+        std::chrono::steady_clock::time_point now =
+            std::chrono::steady_clock::now();
         if (now >= end_point) {
           return false;
         }
-        timeout_left =
-            boost::chrono::duration_cast<boost::chrono::microseconds>(
-                end_point - now);
+        timeout_left = std::chrono::duration_cast<std::chrono::microseconds>(
+            end_point - now);
       }
     }
     return false;
   }
 
   template <class ResponseListType>
-  amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, boost::uint32_t method_id,
+  amqp_frame_t DoRpcOnChannel(amqp_channel_t channel, std::uint32_t method_id,
                               void *decoded,
                               const ResponseListType &expected_responses) {
     CheckForError(amqp_send_method(m_connection, channel, method_id, decoded));
 
     amqp_frame_t response;
-    boost::array<amqp_channel_t, 1> channels = {{channel}};
+    std::array<amqp_channel_t, 1> channels = {channel};
 
     GetMethodOnChannel(channels, response, expected_responses);
     return response;
   }
 
   template <class ResponseListType>
-  amqp_frame_t DoRpc(boost::uint32_t method_id, void *decoded,
+  amqp_frame_t DoRpc(std::uint32_t method_id, void *decoded,
                      const ResponseListType &expected_responses) {
     amqp_channel_t channel = GetChannel();
     amqp_frame_t ret =
@@ -243,10 +243,12 @@ class Channel::ChannelImpl : boost::noncopyable {
   template <class ChannelListType>
   bool ConsumeMessageOnChannel(const ChannelListType channels,
                                Envelope::ptr_t &message, int timeout) {
-    envelope_list_t::iterator it = std::find_if(
-        m_delivered_messages.begin(), m_delivered_messages.end(),
-        boost::bind(ChannelImpl::envelope_on_channel<ChannelListType>, _1,
-                    channels));
+    envelope_list_t::iterator it =
+        std::find_if(m_delivered_messages.begin(), m_delivered_messages.end(),
+                     [channels](auto &message) {
+                       return ChannelImpl::envelope_on_channel<ChannelListType>(
+                           message, channels);
+                     });
 
     if (it != m_delivered_messages.end()) {
       message = *it;
@@ -260,12 +262,12 @@ class Channel::ChannelImpl : boost::noncopyable {
   template <class ChannelListType>
   bool ConsumeMessageOnChannelInner(const ChannelListType channels,
                                     Envelope::ptr_t &message, int timeout) {
-    const boost::array<boost::uint32_t, 2> DELIVER_OR_CANCEL = {
-        {AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD}};
+    const std::array<std::uint32_t, 2> DELIVER_OR_CANCEL = {
+        AMQP_BASIC_DELIVER_METHOD, AMQP_BASIC_CANCEL_METHOD};
 
-    boost::chrono::microseconds real_timeout =
-        (timeout >= 0 ? boost::chrono::milliseconds(timeout)
-                      : boost::chrono::microseconds::max());
+    std::chrono::microseconds real_timeout =
+        (timeout >= 0 ? std::chrono::milliseconds(timeout)
+                      : std::chrono::microseconds::max());
 
     amqp_frame_t deliver;
     if (!GetMethodOnChannel(channels, deliver, DELIVER_OR_CANCEL,
@@ -298,7 +300,7 @@ class Channel::ChannelImpl : boost::noncopyable {
     const std::string in_consumer_tag(
         (char *)deliver_method->consumer_tag.bytes,
         deliver_method->consumer_tag.len);
-    const boost::uint64_t delivery_tag = deliver_method->delivery_tag;
+    const std::uint64_t delivery_tag = deliver_method->delivery_tag;
     const bool redelivered = (deliver_method->redelivered == 0 ? false : true);
     MaybeReleaseBuffersOnChannel(deliver.channel);
 
@@ -343,7 +345,7 @@ class Channel::ChannelImpl : boost::noncopyable {
   amqp_connection_state_t m_connection;
 
  private:
-  static boost::uint32_t ComputeBrokerVersion(
+  static std::uint32_t ComputeBrokerVersion(
       const amqp_connection_state_t state);
 
   frame_queue_t m_frame_queue;
@@ -358,7 +360,7 @@ class Channel::ChannelImpl : boost::noncopyable {
   typedef std::vector<channel_state_t> channel_state_list_t;
 
   channel_state_list_t m_channels;
-  boost::uint32_t m_brokerVersion;
+  std::uint32_t m_brokerVersion;
   // A channel that is likely to be an CS_Open state
   amqp_channel_t m_last_used_channel;
 

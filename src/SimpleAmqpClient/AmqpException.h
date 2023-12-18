@@ -28,7 +28,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 
@@ -84,8 +84,8 @@ class SIMPLEAMQPCLIENT_EXPORT AmqpException : public std::runtime_error {
    * @param [in] method_id the method id of the method that caused the error
    */
   explicit AmqpException(const std::string &what, const std::string &reply_text,
-                         boost::uint16_t class_id,
-                         boost::uint16_t method_id) throw();
+                         std::uint16_t class_id,
+                         std::uint16_t method_id) throw();
 
   /**
    * Destructor
@@ -109,34 +109,28 @@ class SIMPLEAMQPCLIENT_EXPORT AmqpException : public std::runtime_error {
    *
    * @returns the error code
    */
-  virtual boost::uint16_t reply_code() const throw() = 0;
+  virtual std::uint16_t reply_code() const throw() = 0;
 
   /**
    * Get the class id of the method that caused the error
    *
    * @returns the class id
    */
-  virtual boost::uint16_t class_id() const throw() { return m_class_id; }
+  virtual std::uint16_t class_id() const throw() { return m_class_id; }
 
   /**
    * Get the method id of the method that caused the error
    *
    * @returns the method id
    */
-  virtual boost::uint16_t method_id() const throw() { return m_method_id; }
-
-  /**
-   * Get the error string returned from the broker
-   *
-   * @returns the error string from the broker
-   */
+  virtual std::uint16_t method_id() const throw() { return m_method_id; }
   virtual std::string reply_text() const throw() { return m_reply_text; }
 
  protected:
   /** @cond INTERNAL */
   std::string m_reply_text;
-  boost::uint16_t m_class_id;
-  boost::uint16_t m_method_id;
+  std::uint16_t m_class_id;
+  std::uint16_t m_method_id;
   /** @endcond */
 };
 
@@ -159,8 +153,8 @@ class SIMPLEAMQPCLIENT_EXPORT ConnectionException : public AmqpException {
    */
   explicit ConnectionException(const std::string &what,
                                const std::string &reply_text,
-                               boost::uint16_t class_id,
-                               boost::uint16_t method_id) throw()
+                               std::uint16_t class_id,
+                               std::uint16_t method_id) throw()
       : AmqpException(what, reply_text, class_id, method_id) {}
 
   virtual bool is_soft_error() const throw() { return false; }
@@ -184,8 +178,8 @@ class SIMPLEAMQPCLIENT_EXPORT ChannelException : public AmqpException {
    */
   explicit ChannelException(const std::string &what,
                             const std::string &reply_text,
-                            boost::uint16_t class_id,
-                            boost::uint16_t method_id) throw()
+                            std::uint16_t class_id,
+                            std::uint16_t method_id) throw()
       : AmqpException(what, reply_text, class_id, method_id) {}
 
   virtual bool is_soft_error() const throw() { return true; }
@@ -198,18 +192,18 @@ class SIMPLEAMQPCLIENT_EXPORT ConnectionForcedException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit ConnectionForcedException(const std::string &what,
                                      const std::string &reply_text,
-                                     boost::uint16_t class_id,
-                                     boost::uint16_t method_id) throw()
+                                     std::uint16_t class_id,
+                                     std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -219,18 +213,18 @@ class SIMPLEAMQPCLIENT_EXPORT InvalidPathException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit InvalidPathException(const std::string &what,
                                 const std::string &reply_text,
-                                boost::uint16_t class_id,
-                                boost::uint16_t method_id) throw()
+                                std::uint16_t class_id,
+                                std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -241,18 +235,18 @@ class SIMPLEAMQPCLIENT_EXPORT InvalidPathException
 class SIMPLEAMQPCLIENT_EXPORT FrameErrorException : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit FrameErrorException(const std::string &what,
                                const std::string &reply_text,
-                               boost::uint16_t class_id,
-                               boost::uint16_t method_id) throw()
+                               std::uint16_t class_id,
+                               std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -264,17 +258,17 @@ class SIMPLEAMQPCLIENT_EXPORT SyntaxErrorException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
   /**
    * Constructor
    */
   explicit SyntaxErrorException(const std::string &what,
                                 const std::string &reply_text,
-                                boost::uint16_t class_id,
-                                boost::uint16_t method_id) throw()
+                                std::uint16_t class_id,
+                                std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -286,18 +280,18 @@ class SIMPLEAMQPCLIENT_EXPORT CommandInvalidException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit CommandInvalidException(const std::string &what,
                                    const std::string &reply_text,
-                                   boost::uint16_t class_id,
-                                   boost::uint16_t method_id) throw()
+                                   std::uint16_t class_id,
+                                   std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -309,17 +303,18 @@ class SIMPLEAMQPCLIENT_EXPORT ChannelErrorException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
+
   /**
    * Constructor
    */
   explicit ChannelErrorException(const std::string &what,
                                  const std::string &reply_text,
-                                 boost::uint16_t class_id,
-                                 boost::uint16_t method_id) throw()
+                                 std::uint16_t class_id,
+                                 std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -331,18 +326,18 @@ class SIMPLEAMQPCLIENT_EXPORT UnexpectedFrameException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit UnexpectedFrameException(const std::string &what,
                                     const std::string &reply_text,
-                                    boost::uint16_t class_id,
-                                    boost::uint16_t method_id) throw()
+                                    std::uint16_t class_id,
+                                    std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -354,18 +349,18 @@ class SIMPLEAMQPCLIENT_EXPORT ResourceErrorException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit ResourceErrorException(const std::string &what,
                                   const std::string &reply_text,
-                                  boost::uint16_t class_id,
-                                  boost::uint16_t method_id) throw()
+                                  std::uint16_t class_id,
+                                  std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -377,18 +372,18 @@ class SIMPLEAMQPCLIENT_EXPORT ResourceErrorException
 class SIMPLEAMQPCLIENT_EXPORT NotAllowedException : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit NotAllowedException(const std::string &what,
                                const std::string &reply_text,
-                               boost::uint16_t class_id,
-                               boost::uint16_t method_id) throw()
+                               std::uint16_t class_id,
+                               std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -398,18 +393,18 @@ class SIMPLEAMQPCLIENT_EXPORT NotImplementedException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
   /**
    * Constructor
    */
   explicit NotImplementedException(const std::string &what,
                                    const std::string &reply_text,
-                                   boost::uint16_t class_id,
-                                   boost::uint16_t method_id) throw()
+                                   std::uint16_t class_id,
+                                   std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -419,16 +414,18 @@ class SIMPLEAMQPCLIENT_EXPORT InternalErrorException
     : public ConnectionException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
-  /** Constructor */
+  /**
+   * Constructor
+   */
   explicit InternalErrorException(const std::string &what,
                                   const std::string &reply_text,
-                                  boost::uint16_t class_id,
-                                  boost::uint16_t method_id) throw()
+                                  std::uint16_t class_id,
+                                  std::uint16_t method_id) throw()
       : ConnectionException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -440,16 +437,18 @@ class SIMPLEAMQPCLIENT_EXPORT ContentTooLargeException
     : public ChannelException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
+  static const std::uint16_t REPLY_CODE;
 
-  /** Constructor */
+  /**
+   * Constructor
+   */
   explicit ContentTooLargeException(const std::string &what,
                                     const std::string reply_text,
-                                    boost::uint16_t class_id,
-                                    boost::uint16_t method_id) throw()
+                                    std::uint16_t class_id,
+                                    std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -459,15 +458,18 @@ class SIMPLEAMQPCLIENT_EXPORT ContentTooLargeException
 class SIMPLEAMQPCLIENT_EXPORT NoRouteException : public ChannelException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
-  /** Constructor */
+  static const std::uint16_t REPLY_CODE;
+
+  /**
+   * Constructor
+   */
   explicit NoRouteException(const std::string &what,
                             const std::string reply_text,
-                            boost::uint16_t class_id,
-                            boost::uint16_t method_id) throw()
+                            std::uint16_t class_id,
+                            std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -478,15 +480,18 @@ class SIMPLEAMQPCLIENT_EXPORT NoRouteException : public ChannelException {
 class SIMPLEAMQPCLIENT_EXPORT NoConsumersException : public ChannelException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
-  /** Constructor */
+  static const std::uint16_t REPLY_CODE;
+
+  /**
+   * Constructor
+   */
   explicit NoConsumersException(const std::string &what,
                                 const std::string reply_text,
-                                boost::uint16_t class_id,
-                                boost::uint16_t method_id) throw()
+                                std::uint16_t class_id,
+                                std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -496,15 +501,18 @@ class SIMPLEAMQPCLIENT_EXPORT NoConsumersException : public ChannelException {
 class SIMPLEAMQPCLIENT_EXPORT AccessRefusedException : public ChannelException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
-  /** Constructor */
+  static const std::uint16_t REPLY_CODE;
+
+  /**
+   * Constructor
+   */
   explicit AccessRefusedException(const std::string &what,
                                   const std::string reply_text,
-                                  boost::uint16_t class_id,
-                                  boost::uint16_t method_id) throw()
+                                  std::uint16_t class_id,
+                                  std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -514,15 +522,18 @@ class SIMPLEAMQPCLIENT_EXPORT AccessRefusedException : public ChannelException {
 class SIMPLEAMQPCLIENT_EXPORT NotFoundException : public ChannelException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
-  /** Constructor */
+  static const std::uint16_t REPLY_CODE;
+
+  /**
+   * Constructor
+   */
   explicit NotFoundException(const std::string &what,
                              const std::string reply_text,
-                             boost::uint16_t class_id,
-                             boost::uint16_t method_id) throw()
+                             std::uint16_t class_id,
+                             std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -533,15 +544,18 @@ class SIMPLEAMQPCLIENT_EXPORT ResourceLockedException
     : public ChannelException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
-  /** Constructor */
+  static const std::uint16_t REPLY_CODE;
+
+  /**
+   * Constructor
+   */
   explicit ResourceLockedException(const std::string &what,
                                    const std::string reply_text,
-                                   boost::uint16_t class_id,
-                                   boost::uint16_t method_id) throw()
+                                   std::uint16_t class_id,
+                                   std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 /**
@@ -552,15 +566,18 @@ class SIMPLEAMQPCLIENT_EXPORT PreconditionFailedException
     : public ChannelException {
  public:
   /** reply code */
-  static const boost::uint16_t REPLY_CODE;
-  /** Constructor */
+  static const std::uint16_t REPLY_CODE;
+
+  /**
+   * Constructor
+   */
   explicit PreconditionFailedException(const std::string &what,
                                        const std::string reply_text,
-                                       boost::uint16_t class_id,
-                                       boost::uint16_t method_id) throw()
+                                       std::uint16_t class_id,
+                                       std::uint16_t method_id) throw()
       : ChannelException(what, reply_text, class_id, method_id) {}
 
-  virtual boost::uint16_t reply_code() const throw() { return REPLY_CODE; }
+  virtual std::uint16_t reply_code() const throw() { return REPLY_CODE; }
 };
 
 }  // namespace AmqpClient

@@ -17,7 +17,6 @@ Known to work in the following environments:
 - Mac OS X (10.7, 10.6, gcc-4.2, 32 and 64-bit). Likely to work on older version, but has not been tested
 
 ### Pre-requisites
-+  [boost-1.47.0](http://www.boost.org/) or newer (uses chrono, system internally in addition to other header based libraries such as sharedptr and noncopyable)
 +  [rabbitmq-c](http://github.com/alanxz/rabbitmq-c) you'll need version 0.8.0 or better.
 +  [cmake 3.5+](http://www.cmake.org/) what is needed for the build system
 +  [Doxygen](http://www.stack.nl/~dimitri/doxygen/) OPTIONAL only necessary to generate API documentation
@@ -44,18 +43,12 @@ Notes:
 
 ### Build procedure for Windows
 
-Boost libraries are needed, so you can install them using nuget:
-```
-nuget install boost_chrono-vc142 -Version 1.77.0
-nuget install boost_system-vc142 -Version 1.77.0
-nuget install boost -Version 1.77.0
-```
 To build and install succesfully, [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) should be built **as shared library**.
 
-Let *boost_chrono* and *boost_system* be in same directory ```C:\boost```, [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) be on ```C:\rabbitmq-c```,
+Let [rabbitmq-c](https://github.com/alanxz/rabbitmq-c) be on ```C:\rabbitmq-c```,
 SSL be OFF, and VS2019 is used, than CMake CLI is:
 ```
-cd cmake -G "Visual Studio 16" -A x64 -DBoost_INCLUDE_DIR="C:/boost.XX.XX.X.X/lib/native/include" -DBOOST_ROOT="C:/boost.X.XX.X.X" -DBOOST_LIBRARYDIR="C:/boost" -DRabbitmqc_INCLUDE_DIR="C:/rabbitmq-c/include" -DRabbitmqc_LIBRARY="C:/rabbitmq-c/lib/rabbitmq.4.lib" -DBoost_USE_STATIC_LIBS=ON -DBUILD_STATIC_LIBS=ON -DENABLE_SSL_SUPPORT=OFF ..
+cd cmake -G "Visual Studio 16" -A x64 -DRabbitmqc_INCLUDE_DIR="C:/rabbitmq-c/include" -DRabbitmqc_LIBRARY="C:/rabbitmq-c/lib/rabbitmq.4.lib" -DBUILD_STATIC_LIBS=ON -DENABLE_SSL_SUPPORT=OFF ..
 ```
 
 Using the library
@@ -72,9 +65,9 @@ instance of this class.
 
     AmqpClient::Channel::ptr_t connection = AmqpClient::Channel::Create("localhost");
 
-All classes have a typedef ptr_t which is equivalent to boost::shared_ptr<> of the 
+All classes have a typedef ptr_t which is equivalent to std::shared_ptr<> of the 
 containing class.  All classes also have a Create() method does the job creating a new
-ptr_t using boost::make_shared<>(). It is recommended that you use these methods
+ptr_t using std::make_shared<>(). It is recommended that you use these methods
 to construct objects in the library.
 
 Commands dealing with declaring/binding/unbinding/deleting exchanges and queues are

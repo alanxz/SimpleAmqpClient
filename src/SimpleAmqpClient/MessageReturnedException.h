@@ -28,7 +28,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <stdexcept>
 
 #include "SimpleAmqpClient/BasicMessage.h"
@@ -49,7 +49,7 @@ class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
  public:
   /// Constructor.
   explicit MessageReturnedException(BasicMessage::ptr_t message,
-                                    boost::uint32_t reply_code,
+                                    std::uint32_t reply_code,
                                     const std::string &reply_text,
                                     const std::string &exchange,
                                     const std::string &routing_key) throw();
@@ -59,7 +59,7 @@ class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
   /// `message` getter
   BasicMessage::ptr_t message() const throw() { return m_message; }
   /// `reply_code` getter
-  boost::uint32_t reply_code() const throw() { return m_reply_code; }
+  std::uint32_t reply_code() const throw() { return m_reply_code; }
   /// `reply_text` getter
   std::string reply_text() const throw() { return m_reply_text; }
   /// Exchange name getter
@@ -69,7 +69,7 @@ class SIMPLEAMQPCLIENT_EXPORT MessageReturnedException
 
  private:
   BasicMessage::ptr_t m_message;
-  boost::uint32_t m_reply_code;
+  std::uint32_t m_reply_code;
   std::string m_reply_text;
   std::string m_exchange;
   std::string m_routing_key;

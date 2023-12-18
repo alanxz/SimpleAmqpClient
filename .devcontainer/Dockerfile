@@ -8,4 +8,4 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends lsb-release wget software-properties-common \
     && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" \
     && apt-get -y install --no-install-recommends clang-format-11 clang-tidy-11 ninja-build rabbitmq-server \
-      libssl-dev librabbitmq-dev libboost-dev libboost-chrono-dev libboost-system-dev
+      libssl-dev librabbitmq-dev

@@ -28,10 +28,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/cstdint.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <cstdint>
 #include <ctime>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -119,42 +119,42 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @param [in] value the value
    */
-  TableValue(boost::uint8_t value);
+  TableValue(std::uint8_t value);
 
   /**
    * Construct a 1-byte signed integer value
    *
    * @param [in] value the value
    */
-  TableValue(boost::int8_t value);
+  TableValue(std::int8_t value);
 
   /**
    * Construct a 2-byte unsigned integer value
    *
    * @param [in] value the value
    */
-  TableValue(boost::uint16_t value);
+  TableValue(std::uint16_t value);
 
   /**
    * Construct a 2-byte signed integer value
    *
    * @param [in] value the value
    */
-  TableValue(boost::int16_t value);
+  TableValue(std::int16_t value);
 
   /**
    * Construct a 4-byte unsigned integer value
    *
    * @param [in] value the value
    */
-  TableValue(boost::uint32_t value);
+  TableValue(std::uint32_t value);
 
   /**
    * Construct a 4-byte signed integer value
    *
    * @param [in] value the value
    */
-  TableValue(boost::int32_t value);
+  TableValue(std::int32_t value);
 
  private:
   /**
@@ -163,7 +163,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    * RabbitMQ does not support unsigned 64-bit values in tables,
    * however, timestamps are used for this.
    */
-  TableValue(boost::uint64_t value);
+  TableValue(std::uint64_t value);
 
  public:
   /**
@@ -180,7 +180,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @param [in] value the value
    */
-  TableValue(boost::int64_t value);
+  TableValue(std::int64_t value);
 
   /**
    * Construct a single-precision floating point value
@@ -266,49 +266,49 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @returns the value if its a VT_uint8 type, 0 otherwise
    */
-  boost::uint8_t GetUint8() const;
+  std::uint8_t GetUint8() const;
 
   /**
    * Get the int8 value
    *
    * @returns the value if its a VT_int8 type, 0 otherwise
    */
-  boost::int8_t GetInt8() const;
+  std::int8_t GetInt8() const;
 
   /**
    * Get the uint16 value
    *
    * @returns the value if its a VT_uint16 type, 0 otherwise
    */
-  boost::uint16_t GetUint16() const;
+  std::uint16_t GetUint16() const;
 
   /**
    * Get the int16 value
    *
    * @returns the value if its a VT_int16 type, 0 otherwise
    */
-  boost::int16_t GetInt16() const;
+  std::int16_t GetInt16() const;
 
   /**
    * Get the uint32 value
    *
    * @returns the value if its a VT_uint32 type, 0 otherwise
    */
-  boost::uint32_t GetUint32() const;
+  std::uint32_t GetUint32() const;
 
   /**
    * Get the int32 value
    *
    * @returns the value if its a VT_int32 type, 0 otherwise
    */
-  boost::int32_t GetInt32() const;
+  std::int32_t GetInt32() const;
 
   /**
    * Get the uint64 value
    *
    * @returns the value if its a VT_uint64 type, 0 otherwise
    */
-  boost::uint64_t GetUint64() const;
+  std::uint64_t GetUint64() const;
 
   /**
    * Get the timestamp value
@@ -322,7 +322,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @returns the value if its a VT_int64 type, 0 otherwise
    */
-  boost::int64_t GetInt64() const;
+  std::int64_t GetInt64() const;
 
   /**
    * Get an integral number
@@ -334,7 +334,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    * @returns an integer number if the ValueType is VT_uint8, VT_int8,
    * VT_uint16, VT_int16, VT_uint32, VT_int32,or VT_int64 type, 0 otherwise.
    */
-  boost::int64_t GetInteger() const;
+  std::int64_t GetInteger() const;
 
   /**
    * Get a float value
@@ -395,42 +395,42 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @param [in] value the value
    */
-  void Set(boost::uint8_t value);
+  void Set(std::uint8_t value);
 
   /**
    * Set the value as a int8_t
    *
    * @param [in] value the value
    */
-  void Set(boost::int8_t value);
+  void Set(std::int8_t value);
 
   /**
    * Set the value as a uint16_t
    *
    * @param [in] value the value
    */
-  void Set(boost::uint16_t value);
+  void Set(std::uint16_t value);
 
   /**
    * Set the value as a int16_t
    *
    * @param [in] value the value
    */
-  void Set(boost::int16_t value);
+  void Set(std::int16_t value);
 
   /**
    * Set the value as a uint32_t
    *
    * @param [in] value the value
    */
-  void Set(boost::uint32_t value);
+  void Set(std::uint32_t value);
 
   /**
    * Set the value as a int32_t
    *
    * @param [in] value the value
    */
-  void Set(boost::int32_t value);
+  void Set(std::int32_t value);
 
   /**
    * Set the value as a timestamp.
@@ -444,7 +444,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
    *
    * @param [in] value the value
    */
-  void Set(boost::int64_t value);
+  void Set(std::int64_t value);
 
   /**
    * Set the value as a float
@@ -489,7 +489,7 @@ class SIMPLEAMQPCLIENT_EXPORT TableValue {
   void Set(const Table &value);
 
  private:
-  boost::scoped_ptr<Detail::TableValueImpl> m_impl;
+  std::unique_ptr<Detail::TableValueImpl> m_impl;
 };
 
 }  // namespace AmqpClient

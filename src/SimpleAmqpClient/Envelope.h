@@ -28,10 +28,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/cstdint.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <cstdint>
+#include <memory>
 #include <string>
 
 #include "SimpleAmqpClient/BasicMessage.h"
@@ -50,10 +48,10 @@ namespace AmqpClient {
 /**
  * A "message envelope" object containing the message body and delivery metadata
  */
-class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
+class SIMPLEAMQPCLIENT_EXPORT Envelope {
  public:
-  /// a `shared_ptr` pointer to Envelope
-  typedef boost::shared_ptr<Envelope> ptr_t;
+  /// a `std::shared_ptr` pointer to Envelope
+  typedef std::shared_ptr<Envelope> ptr_t;
 
   /**
    * Creates an new envelope object
@@ -66,17 +64,17 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
    * result of a redelivery
    * @param routing_key the routing key that the message was published with
    * @param delivery_channel channel ID of the delivery (see DeliveryInfo)
-   * @returns a boost::shared_ptr to an envelope object
+   * @returns a std::shared_ptr to an envelope object
    */
   static ptr_t Create(const BasicMessage::ptr_t message,
                       const std::string &consumer_tag,
-                      const boost::uint64_t delivery_tag,
+                      const std::uint64_t delivery_tag,
                       const std::string &exchange, bool redelivered,
                       const std::string &routing_key,
-                      const boost::uint16_t delivery_channel) {
-    return boost::make_shared<Envelope>(message, consumer_tag, delivery_tag,
-                                        exchange, redelivered, routing_key,
-                                        delivery_channel);
+                      const std::uint16_t delivery_channel) {
+    return std::make_shared<Envelope>(message, consumer_tag, delivery_tag,
+                                      exchange, redelivered, routing_key,
+                                      delivery_channel);
   }
 
   /**
@@ -93,12 +91,16 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
    */
   explicit Envelope(const BasicMessage::ptr_t message,
                     const std::string &consumer_tag,
-                    const boost::uint64_t delivery_tag,
+                    const std::uint64_t delivery_tag,
                     const std::string &exchange, bool redelivered,
                     const std::string &routing_key,
-                    const boost::uint16_t delivery_channel);
+                    const std::uint16_t delivery_channel);
 
  public:
+  // Non-copyable
+  Envelope(const Envelope &) = delete;
+  Envelope &operator=(const Envelope &) = delete;
+
   /**
    * destructor
    */
@@ -127,7 +129,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
    *
    * @returns the delivery tag for a message
    */
-  inline boost::uint64_t DeliveryTag() const { return m_deliveryTag; }
+  inline std::uint64_t DeliveryTag() const { return m_deliveryTag; }
 
   /**
    * Get the name of the exchange that the message was published to
@@ -159,7 +161,7 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
   /**
    * Get the delivery channel
    */
-  inline boost::uint16_t DeliveryChannel() const { return m_deliveryChannel; }
+  inline std::uint16_t DeliveryChannel() const { return m_deliveryChannel; }
 
   /**
    * A POD carrier of delivery-tag
@@ -176,9 +178,9 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
   struct DeliveryInfo {
     /// A delivery tag, assigned by the broker to identify this delivery within
     /// a channel
-    boost::uint64_t delivery_tag;
+    std::uint64_t delivery_tag;
     /// An ID of the delivery channel
-    boost::uint16_t delivery_channel;
+    std::uint16_t delivery_channel;
   };
 
   /**
@@ -195,11 +197,11 @@ class SIMPLEAMQPCLIENT_EXPORT Envelope : boost::noncopyable {
  private:
   const BasicMessage::ptr_t m_message;
   const std::string m_consumerTag;
-  const boost::uint64_t m_deliveryTag;
+  const std::uint64_t m_deliveryTag;
   const std::string m_exchange;
   const bool m_redelivered;
   const std::string m_routingKey;
-  const boost::uint16_t m_deliveryChannel;
+  const std::uint16_t m_deliveryChannel;
 };
 
 }  // namespace AmqpClient

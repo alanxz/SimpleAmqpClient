@@ -28,9 +28,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-#include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
+#include <cstdint>
 #include <stdexcept>
+#include <string>
 
 #include "SimpleAmqpClient/BasicMessage.h"
 
@@ -48,17 +48,17 @@ namespace AmqpClient {
 class SIMPLEAMQPCLIENT_EXPORT MessageRejectedException
     : public std::runtime_error {
  public:
-  MessageRejectedException(uint64_t delivery_tag)
+  MessageRejectedException(std::uint64_t delivery_tag)
       : std::runtime_error(
             std::string("Message rejected: ")
-                .append(boost::lexical_cast<std::string>(delivery_tag))),
+                .append(std::to_string(delivery_tag))),
         m_delivery_tag(delivery_tag) {}
 
   /// `delivery_tag` getter
-  uint64_t GetDeliveryTag() { return m_delivery_tag; }
+  std::uint64_t GetDeliveryTag() { return m_delivery_tag; }
 
  private:
-  uint64_t m_delivery_tag;
+  std::uint64_t m_delivery_tag;
 };
 
 }  // namespace AmqpClient

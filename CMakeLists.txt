@@ -3,11 +3,11 @@
 # version of CMake by first installing Extra Packages for Enterprise Linux
 # (https://fedoraproject.org/wiki/EPEL#Extra_Packages_for_Enterprise_Linux_.28EPEL.29)
 # and then issuing `yum install cmake3` on the command line.
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 
 project(SimpleAmqpClient LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -41,20 +41,8 @@ string(REGEX MATCH "[0-9]+" _API_VERSION_PATCH ${_API_VERSION_PATCH})
 
 set(SAC_APIVERSION ${_API_VERSION_MAJOR}.${_API_VERSION_MINOR}.${_API_VERSION_PATCH})
 
-option(Boost_Dynamic_Linking_ENABLED "Enable boost dynamic linking" OFF)
-
-if(Boost_Dynamic_Linking_ENABLED)
-  set(Boost_USE_STATIC_LIBS OFF)
-  set(Boost_USE_STATIC_RUNTIME OFF)
-endif()
-
-find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
-include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
 find_package(Rabbitmqc REQUIRED)
-INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
 
 option(ENABLE_SSL_SUPPORT "Enable SSL support." ${Rabbitmqc_SSL_ENABLED})
 
@@ -66,15 +54,6 @@ if (CMAKE_GENERATOR MATCHES ".*(Make|Ninja).*"
     AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel" FORCE)
   message(STATUS "CMAKE_BUILD_TYPE not specified. Using ${CMAKE_BUILD_TYPE} build")
-endif ()
-
-if (CMAKE_CXX_FLAGS STREQUAL ""
-    AND NOT DEFINED SAC_CXX_FLAGS_SET)
-  if (CMAKE_COMPILER_IS_GNUCXX
-      OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    SET(CMAKE_CXX_FLAGS "-Wall -Wextra" CACHE STRING "Flags used by the compiler during all build types." FORCE)
-  endif ()
-  set(SAC_CXX_FLAGS_SET TRUE CACHE INTERNAL "Have the SAC default compiler flags been set?")
 endif ()
 
 include_directories(BEFORE src
@@ -135,7 +114,12 @@ set(SAC_LIB_SRCS
 
 
 add_library(SimpleAmqpClient ${SAC_LIB_SRCS})
-target_link_libraries(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY} ${Boost_LIBRARIES} $<$<BOOL:${Boost_Dynamic_Linking_ENABLED}>:Boost::dynamic_linking>)
+target_include_directories(
+  SimpleAmqpClient 
+  PRIVATE ${Rabbitmqc_INCLUDE_DIR}
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
+         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/>")
+target_link_libraries(SimpleAmqpClient Rabbitmqc::rabbitmq ${SOCKET_LIBRARY})
 
 if (WIN32)
   set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
@@ -195,6 +179,7 @@ endif ()
 include(GNUInstallDirs)
 
 install(TARGETS SimpleAmqpClient
+    EXPORT ${PROJECT_NAME}Targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -225,22 +210,48 @@ set(exec_prefix "\${prefix}")
 set(libdir ${CMAKE_INSTALL_LIBDIR})
 set(includedir "\${prefix}/include")
 
-foreach(_lib ${Boost_LIBRARIES})
-    get_filename_component(_LIBPATH ${_lib} PATH)
-    if (NOT _LIBPATH STREQUAL _LASTLIBPATH)
-        set(libs_private "${libs_private} -L${_LIBPATH}")
-        set(_LASTLIBPATH ${_LIBPATH})
-    endif()
-
-    get_filename_component(_LIBNAME ${_lib} NAME_WE)
-    string(REGEX REPLACE "^lib" "" _LIBNAME ${_LIBNAME})
-    set(_LIBNAME "-l${_LIBNAME}")
-    set(libs_private "${libs_private} ${_LIBNAME}")
-endforeach()
-
 configure_file(libSimpleAmqpClient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAmqpClient.pc @ONLY)
 
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAmqpClient.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
     )
+    
+include(CMakePackageConfigHelpers)
+# create and install target cmake file
+install(
+  EXPORT ${PROJECT_NAME}Targets
+  NAMESPACE ${PROJECT_NAME}::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
+# create main config file for find_package
+# create project config file
+set(PROJECT_CONFIG_CONTENT "@PACKAGE_INIT@\n")
+# appending find_dependency for each dependency
+if(PROJECT_DEP_PKG)
+  string(APPEND PROJECT_CONFIG_CONTENT "include(CMakeFindDependencyMacro)\n")
+  foreach(PKG_NAME ${PROJECT_DEP_PKG})
+    string(APPEND PROJECT_CONFIG_CONTENT
+           "find_dependency(${PKG_NAME} REQUIRED)\n")
+  endforeach()
+endif()
+string(APPEND PROJECT_CONFIG_CONTENT
+       "include(\"\${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}Targets.cmake\")")
+file(WRITE PROJECT_CONFIG_FILE ${PROJECT_CONFIG_CONTENT})
+
+configure_package_config_file(
+  PROJECT_CONFIG_FILE ${PROJECT_NAME}Config.cmake
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+file(REMOVE PROJECT_CONFIG_FILE)
+
+# create version file
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  VERSION ${SAC_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+# install cmake configs
+install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+              "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")

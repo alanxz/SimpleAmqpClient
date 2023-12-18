@@ -36,10 +36,9 @@
 #include <string.h>
 
 #include <algorithm>
-#include <boost/foreach.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/static_visitor.hpp>
+#include <memory>
 #include <new>
+#include <variant>
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4800)
@@ -64,7 +63,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint8_t value) const {
+    const std::uint8_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_U8;
   v.value.u8 = value;
@@ -72,7 +71,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int8_t value) const {
+    const std::int8_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I8;
   v.value.i8 = value;
@@ -80,7 +79,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint16_t value) const {
+    const std::uint16_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_U16;
   v.value.u16 = value;
@@ -88,7 +87,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int16_t value) const {
+    const std::int16_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I16;
   v.value.i16 = value;
@@ -96,7 +95,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint32_t value) const {
+    const std::uint32_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_U32;
   v.value.u32 = value;
@@ -104,7 +103,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int32_t value) const {
+    const std::int32_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I32;
   v.value.i32 = value;
@@ -112,7 +111,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::uint64_t value) const {
+    const std::uint64_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_TIMESTAMP;
   v.value.u64 = value;
@@ -120,7 +119,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
 }
 
 amqp_field_value_t TableValueImpl::generate_field_value::operator()(
-    const boost::int64_t value) const {
+    const std::int64_t value) const {
   amqp_field_value_t v;
   v.kind = AMQP_FIELD_KIND_I64;
   v.value.i64 = value;
@@ -167,7 +166,7 @@ amqp_field_value_t TableValueImpl::generate_field_value::operator()(
   for (array_t::const_iterator it = value.begin(); it != value.end();
        ++it, ++output_iterator) {
     *output_iterator =
-        boost::apply_visitor(generate_field_value(pool), it->m_impl->m_value);
+        std::visit(generate_field_value(pool), it->m_impl->m_value);
   }
   return v;
 }
@@ -191,7 +190,7 @@ amqp_table_t TableValueImpl::CreateAmqpTable(const Table &table,
     return AMQP_EMPTY_TABLE;
   }
 
-  pool = boost::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
+  pool = std::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
   init_amqp_pool(pool.get(), 1024);
 
   return CreateAmqpTableInner(table, *pool.get());
@@ -221,8 +220,8 @@ amqp_table_t TableValueImpl::CreateAmqpTableInner(const Table &table,
 
     std::copy(it->first.begin(), it->first.end(), (char *)output_it->key.bytes);
 
-    output_it->value = boost::apply_visitor(
-        TableValueImpl::generate_field_value(pool), it->second.m_impl->m_value);
+    output_it->value = std::visit(TableValueImpl::generate_field_value(pool),
+                                  it->second.m_impl->m_value);
   }
 
   return new_table;
@@ -297,7 +296,7 @@ amqp_table_t TableValueImpl::CopyTable(const amqp_table_t &table,
     return AMQP_EMPTY_TABLE;
   }
 
-  pool = boost::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
+  pool = std::shared_ptr<amqp_pool_t>(new amqp_pool_t, free_pool);
   init_amqp_pool(pool.get(), 1024);
 
   return CopyTableInner(table, *pool.get());
