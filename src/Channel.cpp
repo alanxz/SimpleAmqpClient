@@ -819,10 +819,10 @@ void Channel::BasicReject(const Envelope::DeliveryInfo &info, bool requeue,
                                          AMQP_BASIC_NACK_METHOD, &req));
 }
 
-void Channel::BasicPublish(const std::string &exchange_name,
+bool Channel::BasicPublish(const std::string &exchange_name,
                            const std::string &routing_key,
                            const BasicMessage::ptr_t message, bool mandatory,
-                           bool immediate) {
+                           bool immediate, int timeout) {
   m_impl->CheckIsConnected();
   amqp_channel_t channel = m_impl->GetChannel();
 
@@ -833,6 +833,10 @@ void Channel::BasicPublish(const std::string &exchange_name,
       m_impl->m_connection, channel, StringToBytes(exchange_name),
       StringToBytes(routing_key), mandatory, immediate, &properties,
       StringToBytes(message->Body())));
+
+  boost::chrono::microseconds real_timeout =
+      (timeout >= 0 ? boost::chrono::milliseconds(timeout)
+                    : boost::chrono::microseconds::max());
 
   // If we've done things correctly we can get one of 4 things back from the
   // broker
@@ -850,7 +854,9 @@ void Channel::BasicPublish(const std::string &exchange_name,
        AMQP_BASIC_NACK_METHOD}};
   amqp_frame_t response;
   boost::array<amqp_channel_t, 1> channels = {{channel}};
-  m_impl->GetMethodOnChannel(channels, response, PUBLISH_ACK);
+  if (!m_impl->GetMethodOnChannel(channels, response, PUBLISH_ACK, real_timeout)) {
+	  return false;
+  }
 
   if (AMQP_BASIC_NACK_METHOD == response.payload.method.id) {
     amqp_basic_nack_t *return_method =
@@ -878,6 +884,8 @@ void Channel::BasicPublish(const std::string &exchange_name,
 
   m_impl->ReturnChannel(channel);
   m_impl->MaybeReleaseBuffersOnChannel(channel);
+
+  return true;
 }
 
 bool Channel::BasicGet(Envelope::ptr_t &envelope, const std::string &queue,
