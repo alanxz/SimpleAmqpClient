@@ -52,9 +52,16 @@ find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
-find_package(Rabbitmqc REQUIRED)
-INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
+# Try using the CMake config modules first
+find_package(rabbitmq-c CONFIG QUIET)
+if (rabbitmq-c_FOUND)
+    get_target_property(Rabbitmqc_INCLUDE_DIRS rabbitmq::rabbitmq INTERFACE_INCLUDE_DIRECTORIES)
+    set(Rabbitmqc_LIBRARY rabbitmq::rabbitmq)
+else()
+    set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
+    find_package(Rabbitmqc REQUIRED)
+    INCLUDE_DIRECTORIES(SYSTEM ${Rabbitmqc_INCLUDE_DIRS})
+endif()
 
 option(ENABLE_SSL_SUPPORT "Enable SSL support." ${Rabbitmqc_SSL_ENABLED})
 
