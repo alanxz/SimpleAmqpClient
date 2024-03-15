@@ -9,4 +9,4 @@ Version: @SAC_APIVERSION@
 Requires.private: librabbitmq
 Libs: -L${libdir} -l@SIMPLEAMQPCLIENT_LIB@
 Libs.private: @libs_private@
-CFlags: -I${includedir} -I@Boost_INCLUDE_DIRS@
+CFlags: -I${includedir} -I"@Boost_INCLUDE_DIRS@"
