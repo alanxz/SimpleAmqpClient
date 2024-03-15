@@ -229,7 +229,7 @@ install(FILES
 
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}")
-set(libdir ${CMAKE_INSTALL_LIBDIR})
+set(libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
 set(includedir "\${prefix}/include")
 if(WIN32)
     get_target_property(SIMPLEAMQPCLIENT_LIB SimpleAmqpClient OUTPUT_NAME)
