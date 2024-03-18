@@ -238,16 +238,24 @@ else(WIN32)
 endif(WIN32)
 
 foreach(_lib ${Boost_LIBRARIES})
+
+    # Check if FindBoost.cmake provided actual library paths or targets
+    if(TARGET ${_lib})
+        get_target_property(_lib ${_lib} LOCATION)
+    endif()
+
     get_filename_component(_LIBPATH ${_lib} PATH)
-    if (NOT _LIBPATH STREQUAL _LASTLIBPATH)
-        set(libs_private "${libs_private} -L${_LIBPATH}")
+    if (NOT _LIBPATH STREQUAL _LASTLIBPATH AND NOT _LIBPATH STREQUAL "")
+        set(libs_private "${libs_private} -L\"${_LIBPATH}\"")
         set(_LASTLIBPATH ${_LIBPATH})
     endif()
 
     get_filename_component(_LIBNAME ${_lib} NAME_WE)
-    string(REGEX REPLACE "^lib" "" _LIBNAME ${_LIBNAME})
-    set(_LIBNAME "-l${_LIBNAME}")
-    set(libs_private "${libs_private} ${_LIBNAME}")
+    if (NOT _LIBNAME STREQUAL "debug" AND NOT _LIBNAME STREQUAL "optimized")
+        string(REGEX REPLACE "^lib" "" _LIBNAME ${_LIBNAME})
+        set(_LIBNAME "-l${_LIBNAME}")
+        set(libs_private "${libs_private} ${_LIBNAME}")
+    endif()
 endforeach()
 
 configure_file(libSimpleAmqpClient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libSimpleAmqpClient.pc @ONLY)
