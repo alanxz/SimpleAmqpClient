@@ -41,12 +41,25 @@ string(REGEX MATCH "[0-9]+" _API_VERSION_PATCH ${_API_VERSION_PATCH})
 
 set(SAC_APIVERSION ${_API_VERSION_MAJOR}.${_API_VERSION_MINOR}.${_API_VERSION_PATCH})
 
-option(Boost_Dynamic_Linking_ENABLED "Enable boost dynamic linking" OFF)
+option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
+
+# Force the use of static boost library for static libraries
+include(CMakeDependentOption)
+
+cmake_dependent_option(
+    Boost_Dynamic_Linking_ENABLED
+    "Enable boost dynamic linking"
+    ON
+    "BUILD_SHARED_LIBS"
+    OFF
+    )
 
 if(Boost_Dynamic_Linking_ENABLED)
   set(Boost_USE_STATIC_LIBS OFF)
-  set(Boost_USE_STATIC_RUNTIME OFF)
+else()
+  set(Boost_USE_STATIC_LIBS ON)
 endif()
+set(Boost_USE_STATIC_RUNTIME OFF)
 
 find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
@@ -55,8 +68,12 @@ link_directories(${Boost_LIBRARY_DIRS})
 # Try using the CMake config modules first
 find_package(rabbitmq-c CONFIG QUIET)
 if (rabbitmq-c_FOUND)
-    get_target_property(Rabbitmqc_INCLUDE_DIRS rabbitmq::rabbitmq INTERFACE_INCLUDE_DIRECTORIES)
-    set(Rabbitmqc_LIBRARY rabbitmq::rabbitmq)
+    if (BUILD_SHARED_LIBS)
+        set(Rabbitmqc_LIBRARY rabbitmq::rabbitmq)
+    else()
+        set(Rabbitmqc_LIBRARY rabbitmq::rabbitmq-static)
+    endif()
+    get_target_property(Rabbitmqc_INCLUDE_DIRS ${Rabbitmqc_LIBRARY} INTERFACE_INCLUDE_DIRECTORIES)
 else()
     set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Modules)
     find_package(Rabbitmqc REQUIRED)
@@ -90,12 +107,6 @@ include_directories(BEFORE src
 if (WIN32)
     set(SOCKET_LIBRARY ws2_32)
 endif ()
-
-option(BUILD_SHARED_LIBS "Build SimpleAmqpClient as a shared library" ON)
-
-if (WIN32 AND NOT BUILD_SHARED_LIBS)
-  message(FATAL_ERROR "The SimpleAmqpClient library cannot be built as a static library on Win32. Set BUILD_SHARED_LIBS=ON to get around this.")
-endif()
 
 set(SAC_LIB_SRCS
     src/SimpleAmqpClient/SimpleAmqpClient.h
@@ -145,9 +156,13 @@ add_library(SimpleAmqpClient ${SAC_LIB_SRCS})
 target_link_libraries(SimpleAmqpClient ${Rabbitmqc_LIBRARY} ${SOCKET_LIBRARY} ${Boost_LIBRARIES} $<$<BOOL:${Boost_Dynamic_Linking_ENABLED}>:Boost::dynamic_linking>)
 
 if (WIN32)
-  set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
+    if (NOT BUILD_SHARED_LIBS)
+        target_compile_definitions(SimpleAmqpClient PUBLIC SimpleAmqpClient_STATIC)
+    endif ()
+
+    set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} OUTPUT_NAME SimpleAmqpClient.${SAC_SOVERSION})
 else ()
-  set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} SOVERSION ${SAC_SOVERSION})
+    set_target_properties(SimpleAmqpClient PROPERTIES VERSION ${SAC_VERSION} SOVERSION ${SAC_SOVERSION})
 endif ()
 
 # Some smoke tests:
@@ -237,24 +252,54 @@ else(WIN32)
     set(SIMPLEAMQPCLIENT_LIB SimpleAmqpClient)
 endif(WIN32)
 
-foreach(_lib ${Boost_LIBRARIES})
+# Propagate package dependencies
+if (BUILD_SHARED_LIBS)
+    set(requires_private "librabbitmq")
+else (BUILD_SHARED_LIBS)
+    set(requires_public "librabbitmq")
+endif (BUILD_SHARED_LIBS)
+
+# Propagate interface compile definitions
+set(SIMPLEAMQPCLIENT_DEFINITIONS "")
+get_target_property(propagated_definitions SimpleAmqpClient INTERFACE_COMPILE_DEFINITIONS)
+if (propagated_definitions)
+    foreach(_def ${propagated_definitions})
+        set(SIMPLEAMQPCLIENT_DEFINITIONS "${SIMPLEAMQPCLIENT_DEFINITIONS} -D${_def}")
+    endforeach()
+endif(propagated_definitions)
+
+# Propagate library dependencies
+set(libs_private "")
+set(libs_public "")
+
+if (BUILD_SHARED_LIBS)
+    set(populate_libs "libs_private")
+else (BUILD_SHARED_LIBS)
+    set(populate_libs "libs_public")
+    set(extra_win32_targets "${Rabbitmqc_LIBRARY};${SOCKET_LIBRARY}")
+endif (BUILD_SHARED_LIBS)
+
+foreach(_lib ${Boost_LIBRARIES} ${extra_win32_targets})
 
     # Check if FindBoost.cmake provided actual library paths or targets
     if(TARGET ${_lib})
         get_target_property(_lib ${_lib} LOCATION)
+        message(WARNING "Using target ${_lib} as a library")
     endif()
 
     get_filename_component(_LIBPATH ${_lib} PATH)
     if (NOT _LIBPATH STREQUAL _LASTLIBPATH AND NOT _LIBPATH STREQUAL "")
-        set(libs_private "${libs_private} -L\"${_LIBPATH}\"")
+        set(${populate_libs} "${${populate_libs}} -L\"${_LIBPATH}\"")
         set(_LASTLIBPATH ${_LIBPATH})
     endif()
 
-    get_filename_component(_LIBNAME ${_lib} NAME_WE)
+    get_filename_component(_LIBNAME ${_lib} NAME_WLE)
     if (NOT _LIBNAME STREQUAL "debug" AND NOT _LIBNAME STREQUAL "optimized")
-        string(REGEX REPLACE "^lib" "" _LIBNAME ${_LIBNAME})
+        if (NOT WIN32)
+            string(REGEX REPLACE "^lib" "" _LIBNAME ${_LIBNAME})
+        endif()
         set(_LIBNAME "-l${_LIBNAME}")
-        set(libs_private "${libs_private} ${_LIBNAME}")
+        set(${populate_libs} "${${populate_libs}} ${_LIBNAME}")
     endif()
 endforeach()
 
