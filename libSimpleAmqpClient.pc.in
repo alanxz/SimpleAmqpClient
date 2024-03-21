@@ -7,6 +7,6 @@ Name: SimpleAmqpClient
 Description: C++ wrapper of rabbitmq-c AMQP client library
 Version: @SAC_APIVERSION@
 Requires.private: librabbitmq
-Libs: -L${libdir} -l@SIMPLEAMQPCLIENT_LIB@
+Libs: -L${libdir} -l@SIMPLEAMQPCLIENT_LIB@ @libs_public@
 Libs.private: @libs_private@
-CFlags: -I${includedir} -I"@Boost_INCLUDE_DIRS@"
+CFlags: -I${includedir} -I"@Boost_INCLUDE_DIRS@" @SIMPLEAMQPCLIENT_DEFINITIONS@
