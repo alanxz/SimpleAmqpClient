@@ -61,7 +61,7 @@ class Channel::ChannelImpl : boost::noncopyable {
 
   void DoLogin(const std::string &username, const std::string &password,
                const std::string &vhost, int frame_max,
-               bool sasl_external = false);
+               bool sasl_external = false, int broker_heartbeat = 0);
   amqp_channel_t GetChannel();
   void ReturnChannel(amqp_channel_t channel);
   bool IsChannelOpen(amqp_channel_t channel);
