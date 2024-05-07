@@ -490,7 +490,7 @@ bool Channel::CheckExchangeExists(boost::string_ref exchange_name) {
     amqp_frame_t frame =
         m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
     m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
-  } catch (NotFoundException e) {
+  } catch (const NotFoundException& e) {
     return false;
   }
   return true;
@@ -614,7 +614,7 @@ bool Channel::CheckQueueExists(boost::string_ref queue_name) {
     amqp_frame_t frame =
         m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
     m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
-  } catch (NotFoundException e) {
+  } catch (const NotFoundException& e) {
     return false;
   }
   return true;
