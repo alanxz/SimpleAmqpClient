@@ -74,7 +74,7 @@ void BasicMessage::Body(const std::string& body) { m_impl->body = body; }
 
 const std::string& BasicMessage::ContentType() const {
   if (ContentTypeIsSet()) {
-    return m_impl->content_type.value();
+    return m_impl->content_type.get();
   }
   static const std::string empty;
   return empty;
@@ -92,7 +92,7 @@ void BasicMessage::ContentTypeClear() { m_impl->content_type.reset(); }
 
 const std::string& BasicMessage::ContentEncoding() const {
   if (ContentEncodingIsSet()) {
-    return m_impl->content_encoding.value();
+    return m_impl->content_encoding.get();
   }
   static const std::string empty;
   return empty;
@@ -138,7 +138,7 @@ void BasicMessage::PriorityClear() { m_impl->priority.reset(); }
 
 const std::string& BasicMessage::CorrelationId() const {
   if (CorrelationIdIsSet()) {
-    return m_impl->correlation_id.value();
+    return m_impl->correlation_id.get();
   }
   static const std::string empty;
   return empty;
@@ -156,7 +156,7 @@ void BasicMessage::CorrelationIdClear() { m_impl->correlation_id.reset(); }
 
 const std::string& BasicMessage::ReplyTo() const {
   if (ReplyToIsSet()) {
-    return m_impl->reply_to.value();
+    return m_impl->reply_to.get();
   }
   static const std::string empty;
   return empty;
@@ -174,7 +174,7 @@ void BasicMessage::ReplyToClear() { m_impl->reply_to.reset(); }
 
 const std::string& BasicMessage::Expiration() const {
   if (ExpirationIsSet()) {
-    return m_impl->expiration.value();
+    return m_impl->expiration.get();
   }
   static const std::string empty;
   return empty;
@@ -192,7 +192,7 @@ void BasicMessage::ExpirationClear() { m_impl->expiration.reset(); }
 
 const std::string& BasicMessage::MessageId() const {
   if (MessageIdIsSet()) {
-    return m_impl->message_id.value();
+    return m_impl->message_id.get();
   }
   static const std::string empty;
   return empty;
@@ -223,7 +223,7 @@ void BasicMessage::TimestampClear() { m_impl->timestamp.reset(); }
 
 const std::string& BasicMessage::Type() const {
   if (TypeIsSet()) {
-    return m_impl->type.value();
+    return m_impl->type.get();
   }
   static const std::string empty;
   return empty;
@@ -237,7 +237,7 @@ void BasicMessage::TypeClear() { m_impl->type.reset(); }
 
 const std::string& BasicMessage::UserId() const {
   if (UserIdIsSet()) {
-    return m_impl->user_id.value();
+    return m_impl->user_id.get();
   }
   static const std::string empty;
   return empty;
@@ -255,7 +255,7 @@ void BasicMessage::UserIdClear() { m_impl->user_id.reset(); }
 
 const std::string& BasicMessage::AppId() const {
   if (AppIdIsSet()) {
-    return m_impl->app_id.value();
+    return m_impl->app_id.get();
   }
   static const std::string empty;
   return empty;
@@ -271,7 +271,7 @@ void BasicMessage::AppIdClear() { m_impl->app_id.reset(); }
 
 const std::string& BasicMessage::ClusterId() const {
   if (ClusterIdIsSet()) {
-    return m_impl->cluster_id.value();
+    return m_impl->cluster_id.get();
   }
   static const std::string empty;
   return empty;
@@ -291,12 +291,12 @@ Table& BasicMessage::HeaderTable() {
   if (!HeaderTableIsSet()) {
     m_impl->header_table = Table();
   }
-  return m_impl->header_table.value();
+  return m_impl->header_table.get();
 }
 
 const Table& BasicMessage::HeaderTable() const {
   if (HeaderTableIsSet()) {
-    return m_impl->header_table.value();
+    return m_impl->header_table.get();
   }
   static const Table empty;
   return empty;
