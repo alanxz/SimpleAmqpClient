@@ -54,8 +54,6 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
-#define BROKER_HEARTBEAT 0
-
 namespace AmqpClient {
 
 namespace {
@@ -122,7 +120,7 @@ Channel::ChannelImpl::~ChannelImpl() {}
 void Channel::ChannelImpl::DoLogin(const std::string &username,
                                    const std::string &password,
                                    const std::string &vhost, int frame_max,
-                                   bool sasl_external) {
+                                   int heartbeat, bool sasl_external) {
   amqp_table_entry_t capabilties[1];
   amqp_table_entry_t capability_entry;
   amqp_table_t client_properties;
@@ -142,15 +140,14 @@ void Channel::ChannelImpl::DoLogin(const std::string &username,
 
   if (sasl_external) {
     CheckRpcReply(0, amqp_login_with_properties(
-                         m_connection, vhost.c_str(), 0, frame_max,
-                         BROKER_HEARTBEAT, &client_properties,
-                         AMQP_SASL_METHOD_EXTERNAL, username.c_str()));
+                         m_connection, vhost.c_str(), 0, frame_max, heartbeat,
+                         &client_properties, AMQP_SASL_METHOD_EXTERNAL,
+                         username.c_str()));
   } else {
-    CheckRpcReply(
-        0, amqp_login_with_properties(m_connection, vhost.c_str(), 0, frame_max,
-                                      BROKER_HEARTBEAT, &client_properties,
-                                      AMQP_SASL_METHOD_PLAIN, username.c_str(),
-                                      password.c_str()));
+    CheckRpcReply(0, amqp_login_with_properties(
+                         m_connection, vhost.c_str(), 0, frame_max, heartbeat,
+                         &client_properties, AMQP_SASL_METHOD_PLAIN,
+                         username.c_str(), password.c_str()));
   }
 
   m_brokerVersion = ComputeBrokerVersion(m_connection);
