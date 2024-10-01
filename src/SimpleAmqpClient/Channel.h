@@ -108,6 +108,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
     std::string vhost;  ///< Virtualhost on the broker. Default '/', required.
     int port;           ///< Port to connect to, default is 5672.
     int frame_max;      ///< Max frame size in bytes. Default 128KB.
+    int heartbeat;      ///< Heartbeat timer in seconds. Default 0s.
     /// One of BasicAuth or ExternalSaslAuth is required.
     boost::variant<BasicAuth, ExternalSaslAuth> auth;
     /// Connect using TLS/SSL when set, otherwise use an unencrypted channel.
@@ -128,7 +129,7 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
      */
     static OpenOpts FromUri(const std::string &uri);
 
-    OpenOpts() : vhost("/"), port(5672), frame_max(131072) {}
+    OpenOpts() : vhost("/"), port(5672), frame_max(131072), heartbeat(0) {}
     bool operator==(const OpenOpts &) const;
   };
 
@@ -924,14 +925,12 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                                   const std::string &username,
                                   const std::string &password,
                                   const std::string &vhost, int frame_max,
-                                  bool sasl_external);
+                                  int heartbeat, bool sasl_external);
 
-  static ChannelImpl *OpenSecureChannel(const std::string &host, int port,
-                                        const std::string &username,
-                                        const std::string &password,
-                                        const std::string &vhost, int frame_max,
-                                        const OpenOpts::TLSParams &tls_params,
-                                        bool sasl_external);
+  static ChannelImpl *OpenSecureChannel(
+      const std::string &host, int port, const std::string &username,
+      const std::string &password, const std::string &vhost, int frame_max,
+      int heartbeat, const OpenOpts::TLSParams &tls_params, bool sasl_external);
 
   /// PIMPL idiom
   boost::scoped_ptr<ChannelImpl> m_impl;
