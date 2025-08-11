@@ -63,7 +63,10 @@ else()
 endif()
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
+find_package(Boost 1.47.0 COMPONENTS chrono REQUIRED)
+if(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION LESS 69)
+  find_package(Boost 1.47.0 COMPONENTS chrono system REQUIRED)
+endif()
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
