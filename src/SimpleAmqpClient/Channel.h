@@ -794,6 +794,34 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * deliver. Setting this to more than 1 will allow the broker to deliver
    * messages while a current message is being processed. A value of
    * 0 means no limit. This option is ignored if `no_ack = true`.
+   * @param global_qos Sets basic.qos.global explicitly.
+   * @returns the consumer tag
+   */
+  std::string BasicConsume(const std::string &queue,
+                           const std::string &consumer_tag, bool no_local,
+                           bool no_ack, bool exclusive,
+                           boost::uint16_t message_prefetch_count, bool global_qos);
+
+  /**
+   * Starts consuming Basic messages on a queue
+   *
+   * Subscribes as a consumer to a queue, so all future messages on a queue
+   * will be Basic.Delivered
+   * @note Due to a limitation to how things are done, it is only possible to
+   * reliably have **a single consumer per channel**; calling this
+   * more than once per channel may result in undefined results.
+   * @param queue The name of the queue to subscribe to.
+   * @param consumer_tag The name of the consumer. This is used to do
+   * operations with a consumer.
+   * @param no_local Defaults to true
+   * @param no_ack If `true`, ack'ing the message is automatically done when the
+   * message is delivered. Defaults to `true` (message does not have to be
+   * ack'ed).
+   * @param exclusive Means only this consumer can access the queue.
+   * @param message_prefetch_count Number of unacked messages the broker will
+   * deliver. Setting this to more than 1 will allow the broker to deliver
+   * messages while a current message is being processed. A value of
+   * 0 means no limit. This option is ignored if `no_ack = true`.
    * @param arguments A table of additional arguments when creating the consumer
    * @returns the consumer tag
    */
@@ -801,6 +829,37 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
                            const std::string &consumer_tag, bool no_local,
                            bool no_ack, bool exclusive,
                            boost::uint16_t message_prefetch_count,
+                           const Table &arguments);
+
+  /**
+    * Starts consuming Basic messages on a queue
+    *
+    * Subscribes as a consumer to a queue, so all future messages on a queue
+    * will be Basic.Delivered
+    * @note Due to a limitation to how things are done, it is only possible to
+    * reliably have **a single consumer per channel**; calling this
+    * more than once per channel may result in undefined results.
+    * @param queue The name of the queue to subscribe to.
+    * @param consumer_tag The name of the consumer. This is used to do
+    * operations with a consumer.
+    * @param no_local Defaults to true
+    * @param no_ack If `true`, ack'ing the message is automatically done when
+    * the message is delivered. Defaults to `true` (message does not have to be
+    * ack'ed).
+    * @param exclusive Means only this consumer can access the queue.
+    * @param message_prefetch_count Number of unacked messages the broker will
+    * deliver. Setting this to more than 1 will allow the broker to deliver
+    * messages while a current message is being processed. A value of
+    * 0 means no limit. This option is ignored if `no_ack = true`.
+    * @param global_qos Sets basic.qos.global explicitly.
+    * @param arguments A table of additional arguments when creating the
+    * consumer
+    * @returns the consumer tag
+    */
+  std::string BasicConsume(const std::string &queue,
+                           const std::string &consumer_tag, bool no_local,
+                           bool no_ack, bool exclusive,
+                           boost::uint16_t message_prefetch_count, bool global_qos,
                            const Table &arguments);
 
   /**
@@ -817,6 +876,22 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    */
   void BasicQos(const std::string &consumer_tag,
                 boost::uint16_t message_prefetch_count);
+
+  /**
+   * Modify consumer's message prefetch count
+   *
+   * Sets the number of unacknowledged messages that will be delivered
+   * by the broker to a consumer.
+   *
+   * Has no effect for consumer with `no_ack` set.
+   *
+   * @param consumer_tag The consumer tag to adjust the prefetch for.
+   * @param message_prefetch_count The number of unacknowledged message the
+   * @param globalQos Sets basic.qos.global explicitly.
+   * broker will deliver. A value of 0 means no limit.
+   */
+  void BasicQos(const std::string &consumer_tag,
+                boost::uint16_t message_prefetch_count, bool globalQos);
 
   /**
    * Cancels a previously created Consumer
