@@ -178,8 +178,8 @@ bool Channel::OpenOpts::TLSParams::operator==(const TLSParams &o) const {
 
 bool Channel::OpenOpts::operator==(const OpenOpts &o) const {
   return host == o.host && vhost == o.vhost && port == o.port &&
-         frame_max == o.frame_max && auth == o.auth &&
-         tls_params == o.tls_params;
+         frame_max == o.frame_max && heartbeat == o.heartbeat &&
+         auth == o.auth && tls_params == o.tls_params;
 }
 
 Channel::ptr_t Channel::Open(const OpenOpts &opts) {
@@ -203,14 +203,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
             boost::get<OpenOpts::BasicAuth>(opts.auth);
         return boost::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.username, auth.password,
-                        opts.vhost, opts.frame_max, false));
+                        opts.vhost, opts.frame_max, opts.heartbeat, false));
       }
       case 1: {
         const OpenOpts::ExternalSaslAuth &auth =
             boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
         return boost::make_shared<Channel>(
             OpenChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
-                        opts.frame_max, true));
+                        opts.frame_max, opts.heartbeat, true));
       }
       default:
         throw std::logic_error("Unhandled auth type");
@@ -222,14 +222,14 @@ Channel::ptr_t Channel::Open(const OpenOpts &opts) {
           boost::get<OpenOpts::BasicAuth>(opts.auth);
       return boost::make_shared<Channel>(OpenSecureChannel(
           opts.host, opts.port, auth.username, auth.password, opts.vhost,
-          opts.frame_max, opts.tls_params.get(), false));
+          opts.frame_max, opts.heartbeat, opts.tls_params.get(), false));
     }
     case 1: {
       const OpenOpts::ExternalSaslAuth &auth =
           boost::get<OpenOpts::ExternalSaslAuth>(opts.auth);
-      return boost::make_shared<Channel>(
-          OpenSecureChannel(opts.host, opts.port, auth.identity, "", opts.vhost,
-                            opts.frame_max, opts.tls_params.get(), true));
+      return boost::make_shared<Channel>(OpenSecureChannel(
+          opts.host, opts.port, auth.identity, "", opts.vhost, opts.frame_max,
+          opts.heartbeat, opts.tls_params.get(), true));
     }
     default:
       throw std::logic_error("Unhandled auth type");
@@ -374,7 +374,8 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
                                            const std::string &username,
                                            const std::string &password,
                                            const std::string &vhost,
-                                           int frame_max, bool sasl_external) {
+                                           int frame_max, int heartbeat,
+                                           bool sasl_external) {
   ChannelImpl *impl = new ChannelImpl;
   impl->m_connection = amqp_new_connection();
 
@@ -387,7 +388,8 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
     int sock = amqp_socket_open(socket, host.c_str(), port);
     impl->CheckForError(sock);
 
-    impl->DoLogin(username, password, vhost, frame_max, sasl_external);
+    impl->DoLogin(username, password, vhost, frame_max, heartbeat,
+                  sasl_external);
   } catch (...) {
     amqp_destroy_connection(impl->m_connection);
     delete impl;
@@ -402,7 +404,7 @@ Channel::ChannelImpl *Channel::OpenChannel(const std::string &host, int port,
 Channel::ChannelImpl *Channel::OpenSecureChannel(
     const std::string &host, int port, const std::string &username,
     const std::string &password, const std::string &vhost, int frame_max,
-    const OpenOpts::TLSParams &tls_params, bool sasl_external) {
+    int heartbeat, const OpenOpts::TLSParams &tls_params, bool sasl_external) {
   Channel::ChannelImpl *impl = new ChannelImpl;
   impl->m_connection = amqp_new_connection();
   if (NULL == impl->m_connection) {
@@ -447,7 +449,8 @@ Channel::ChannelImpl *Channel::OpenSecureChannel(
           status, "Error setting client certificate for socket");
     }
 
-    impl->DoLogin(username, password, vhost, frame_max, sasl_external);
+    impl->DoLogin(username, password, vhost, frame_max, heartbeat,
+                  sasl_external);
   } catch (...) {
     amqp_destroy_connection(impl->m_connection);
     delete impl;
@@ -490,7 +493,7 @@ bool Channel::CheckExchangeExists(boost::string_ref exchange_name) {
     amqp_frame_t frame =
         m_impl->DoRpc(AMQP_EXCHANGE_DECLARE_METHOD, &declare, DECLARE_OK);
     m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
-  } catch (const NotFoundException& e) {
+  } catch (const NotFoundException &e) {
     return false;
   }
   return true;
@@ -614,7 +617,7 @@ bool Channel::CheckQueueExists(boost::string_ref queue_name) {
     amqp_frame_t frame =
         m_impl->DoRpc(AMQP_QUEUE_DECLARE_METHOD, &declare, DECLARE_OK);
     m_impl->MaybeReleaseBuffersOnChannel(frame.channel);
-  } catch (const NotFoundException& e) {
+  } catch (const NotFoundException &e) {
     return false;
   }
   return true;

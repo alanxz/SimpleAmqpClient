@@ -60,7 +60,7 @@ class Channel::ChannelImpl : boost::noncopyable {
   typedef channel_map_t::iterator channel_map_iterator_t;
 
   void DoLogin(const std::string &username, const std::string &password,
-               const std::string &vhost, int frame_max,
+               const std::string &vhost, int frame_max, int heartbeat,
                bool sasl_external = false);
   amqp_channel_t GetChannel();
   void ReturnChannel(amqp_channel_t channel);
