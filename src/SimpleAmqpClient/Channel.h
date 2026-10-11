@@ -714,13 +714,17 @@ class SIMPLEAMQPCLIENT_EXPORT Channel : boost::noncopyable {
    * @param immediate Requires the message to be both routed to a queue, and
    * immediately delivered to a consumer. If the message is not routed, or a
    * consumer cannot immediately deliver the message,
+   * @param timeout The timeout in milliseconds for the message to be
+   * delivered. 0 works like a non-blocking call, -1 is an infinite timeout.
+   *
    * a \ref MessageReturnedException is thrown. This has no effect when using
    * RabbitMQ v3.0 and newer.
+   * @returns `true` on message delivery, `false` on timeout.
    */
-  void BasicPublish(const std::string &exchange_name,
+  bool BasicPublish(const std::string &exchange_name,
                     const std::string &routing_key,
                     const BasicMessage::ptr_t message, bool mandatory = false,
-                    bool immediate = false);
+                    bool immediate = false, int timeout = -1);
 
   /**
    * Synchronously consume a message from a queue
